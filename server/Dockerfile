@@ -1,14 +1,20 @@
 # Il server di TiFaro in un container: si compila in un'immagine con Go e si
 # copia il solo programma in un'immagine minima, senza shell né pacchetti.
 
-FROM docker.io/library/golang:1.27-alpine AS compilazione
+# La compilazione gira sempre sulla macchina che costruisce (BUILDPLATFORM) e
+# produce il programma per quella di destinazione: Go compila per ARM senza
+# emulazione, quindi l'immagine per arm64 costa quanto quella per amd64.
+FROM --platform=$BUILDPLATFORM docker.io/library/golang:1.27-alpine AS compilazione
 WORKDIR /sorgente
 COPY go.mod go.sum ./
 RUN go mod download
 COPY *.go ./
+ARG TARGETOS
+ARG TARGETARCH
 ARG VERSIONE=sviluppo
 # CGO_ENABLED=0: SQLite è in Go puro, il programma non ha bisogno di niente.
-RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.versione=${VERSIONE}" -o /tifaro-server .
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -trimpath -ldflags "-s -w -X main.versione=${VERSIONE}" -o /tifaro-server .
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=compilazione /tifaro-server /tifaro-server

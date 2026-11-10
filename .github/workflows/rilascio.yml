@@ -1,0 +1,194 @@
+# Costruisce l'APK e la versione Linux di TiFaro e li pubblica in una
+# release di GitHub, da cui Obtainium installa e aggiorna l'APK.
+#
+# Parte da sola quando si pubblica un tag che comincia per "v" (es. v0.3.0).
+# Lanciata a mano dalla scheda Actions costruisce tutto e lo lascia fra gli
+# artefatti dell'esecuzione, senza pubblicare niente.
+name: Rilascio
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Serve a creare la release e ad allegarci i file.
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: APK
+    runs-on: ubuntu-latest
+    env:
+      # I segreti si leggono qui perché una condizione `if` non può leggerli
+      # direttamente: così i passi della firma sanno se la chiave c'è.
+      CHIAVE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+    outputs:
+      nome: ${{ steps.versione.outputs.nome }}
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepara Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+
+      - name: Calcola la versione
+        id: versione
+        # Da un tag "v1.2.3" esce "1.2.3". Lanciando a mano non c'è tag, e si
+        # usa la versione del pubspec.
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            NOME="${GITHUB_REF_NAME#v}"
+          else
+            NOME=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d+ -f1)
+          fi
+          echo "nome=$NOME" >> "$GITHUB_OUTPUT"
+          echo "Versione: $NOME"
+
+      # Senza chiave propria ogni macchina firma con una chiave di debug
+      # diversa, e Android rifiuta l'aggiornamento ("firma non
+      # corrispondente"). Per questo una release vera senza chiave si ferma:
+      # meglio nessuna release che una che poi non si aggiorna.
+      - name: Ferma il rilascio senza chiave
+        if: env.CHIAVE_BASE64 == '' && github.ref_type == 'tag'
+        run: |
+          echo "::error::Mancano i segreti della chiave di firma (vedi README.md, «Build e rilasci»): senza, l'APK non si potrebbe aggiornare."
+          exit 1
+
+      - name: Avvisa se la firma manca
+        if: env.CHIAVE_BASE64 == ''
+        run: echo "::warning::Nessuna chiave di firma nei segreti: APK di prova, firmato con la chiave di debug."
+
+      # I passi della firma sono separati di proposito: il nome del passo che
+      # fallisce deve bastare a capire cosa non va.
+      - name: Decodifica la chiave di firma
+        if: env.CHIAVE_BASE64 != ''
+        run: |
+          # Spazi e a capo entrano facilmente nel segreto copiando e
+          # incollando, e manderebbero base64 in errore.
+          printf '%s' "$CHIAVE_BASE64" | tr -d '[:space:]' | base64 --decode \
+            > "${RUNNER_TEMP}/tifaro.jks"
+          BYTE=$(stat -c%s "${RUNNER_TEMP}/tifaro.jks")
+          if [ "$BYTE" -lt 1000 ]; then
+            echo "::error::L'archivio decodificato è troppo piccolo (${BYTE} byte): ANDROID_KEYSTORE_BASE64 è probabilmente incompleto. Rigeneralo con 'base64 -w0 chiave.jks'."
+            exit 1
+          fi
+
+      - name: Verifica chiave, password e alias
+        if: env.CHIAVE_BASE64 != ''
+        env:
+          PASSWORD_ARCHIVIO: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          if ! keytool -list -keystore "${RUNNER_TEMP}/tifaro.jks" \
+              -storepass "$PASSWORD_ARCHIVIO" -alias "$ALIAS" > /dev/null 2>&1; then
+            echo "::error::La chiave non si apre: controlla ANDROID_KEYSTORE_PASSWORD e ANDROID_KEY_ALIAS."
+            exit 1
+          fi
+
+      - name: Scrivi key.properties
+        if: env.CHIAVE_BASE64 != ''
+        env:
+          PASSWORD_ARCHIVIO: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          PASSWORD_CHIAVE: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          {
+            echo "storeFile=${RUNNER_TEMP}/tifaro.jks"
+            echo "storePassword=${PASSWORD_ARCHIVIO}"
+            echo "keyAlias=${ALIAS}"
+            echo "keyPassword=${PASSWORD_CHIAVE}"
+          } > android/key.properties
+
+      - name: Costruisci l'APK
+        # Un solo APK per tutte le architetture: Obtainium non deve scegliere.
+        # Il numero di build cresce a ogni esecuzione, come Android vuole per
+        # riconoscere un aggiornamento.
+        run: |
+          flutter pub get
+          flutter build apk --release \
+            --build-name="${{ steps.versione.outputs.nome }}" \
+            --build-number="${{ github.run_number }}"
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             "TiFaro-v${{ steps.versione.outputs.nome }}.apk"
+
+      - name: Conserva l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk
+          path: TiFaro-*.apk
+          if-no-files-found: error
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Strumenti per compilare su Linux
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config \
+            libgtk-3-dev liblzma-dev libstdc++-12-dev
+
+      - name: Prepara Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+
+      - name: Costruisci la versione Linux
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            NOME="${GITHUB_REF_NAME#v}"
+          else
+            NOME=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d+ -f1)
+          fi
+          flutter pub get
+          flutter build linux --release \
+            --build-name="$NOME" --build-number="${{ github.run_number }}"
+          # Dentro l'archivio: il programma con le sue librerie, l'icona e lo
+          # script per metterlo nel menu.
+          mkdir -p pacchetto/tifaro
+          cp -r build/linux/x64/release/bundle/. pacchetto/tifaro/
+          cp assets/icona/tifaro.svg pacchetto/tifaro/
+          cp strumenti/installa_linux.sh pacchetto/tifaro/installa.sh
+          tar -czf "TiFaro-v${NOME}-linux-x64.tar.gz" -C pacchetto tifaro
+
+      - name: Conserva la versione Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: TiFaro-*-linux-x64.tar.gz
+          if-no-files-found: error
+
+  pubblica:
+    name: Pubblica la release
+    if: github.ref_type == 'tag'
+    needs: [apk, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prendi i file
+        uses: actions/download-artifact@v4
+        with:
+          path: file
+          merge-multiple: true
+
+      - name: Crea la release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: file/*
+          generate_release_notes: true

@@ -17,37 +17,39 @@ cartella, nessun altro servizio.
 
 ## Installazione sul NAS (Dockge)
 
-1. Il repository `TiFaro` deve essere su Gitea: il NAS costruisce
-   l'immagine da lì.
-2. Su Dockge, nuovo stack `tifaro` con il contenuto di
+L'immagine la costruisce GitHub e la pubblica su
+`ghcr.io/enne139/tifaro-server`: il NAS deve solo scaricarla.
+
+1. Su Dockge, nuovo stack `tifaro` con il contenuto di
    [docker-compose.yml](docker-compose.yml).
-3. Nel `.env` dello stack:
+2. Nel `.env` dello stack:
 
    ```sh
    TIFARO_TOKEN=          # openssl rand -hex 24  (è la password delle app)
    PUID=1000              # output di "id" sul NAS
    PGID=1000
-   TIFARO_BACKUP_LOCATION=/volume2/Backup/tifaro   # facoltativo, meglio un altro disco
+   TIFARO_BACKUP_LOCATION=/percorso/su/un/altro/disco   # facoltativo
    ```
 
-   Se il repository su Gitea è privato, il NAS deve poterlo leggere:
-   `TIFARO_SORGENTE=http://enne139:<token Gitea>@nas.local:3000/enne139/TiFaro.git#main:server`
-   (un token Gitea con il solo permesso di leggere i repository).
-4. Avvia lo stack: la prima volta costruisce l'immagine (un paio di
-   minuti).
-5. Controlla: `http://nas.local:8645/api/salute` deve rispondere
+   Se il repository su GitHub è privato, anche l'immagine lo è: una volta,
+   sul NAS, `docker login ghcr.io` con un token GitHub che abbia il solo
+   permesso `read:packages`.
+3. Avvia lo stack.
+4. Controlla: `http://<indirizzo del NAS>:8645/api/salute` deve rispondere
    `{"ok":true,...}`.
-6. Nell'app: Impostazioni → Server → indirizzo `http://nas.local:8645`
-   e il token → «Prova» → «Salva».
+5. Nell'app: Impostazioni → Server → indirizzo
+   `http://<indirizzo del NAS>:8645` e il token → «Prova» → «Salva».
 
 ## Aggiornare
 
-Dopo aver mandato le modifiche su Gitea, nel terminale dello stack su
-Dockge:
+Ogni tag `vX.Y.Z` pubblicato su GitHub produce l'immagine `X.Y.Z` e
+`latest`. Sul NAS, «Aggiorna» su Dockge, oppure nel terminale dello stack:
 
 ```sh
-docker compose build --pull && docker compose up -d
+docker compose pull && docker compose up -d
 ```
+
+Per restare su una versione precisa: `TIFARO_VERSIONE=0.3.0` nel `.env`.
 
 ## Ripristinare un backup
 
@@ -88,7 +90,7 @@ Tutte con `Authorization: Bearer <token>`, tranne `/api/salute`.
 ```sh
 go test ./...                    # prove del server
 go run .                         # con TIFARO_TOKEN, TIFARO_DATI e TIFARO_BACKUP impostati
-podman build -t tifaro-server .  # l'immagine
+podman build -t tifaro-server .  # l'immagine, in locale
 ```
 
 La prova completa con l'app (due dispositivi finti contro un server vero)

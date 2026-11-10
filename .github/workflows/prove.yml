@@ -1,0 +1,115 @@
+# Le prove di TiFaro, a ogni modifica: app, server e la prova completa con
+# due dispositivi finti contro un server vero acceso qui.
+#
+# Se qualcosa non va, si vede prima di fare una versione.
+name: Prove
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: App (analisi e prove)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # La stessa versione usata per sviluppare: una nuova versione di
+          # Flutter non deve rompere le prove senza che nessuno l'abbia scelta.
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+
+      - name: Scarica le dipendenze
+        run: flutter pub get
+
+      - name: Analisi statica
+        run: flutter analyze
+
+      - name: Prove
+        # Quelle con l'etichetta "server" girano nel lavoro "completa".
+        run: flutter test --exclude-tags server
+
+  server:
+    name: Server (analisi e prove)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
+      - name: Analisi statica
+        run: go vet ./...
+
+      - name: Prove
+        run: go test ./...
+
+  completa:
+    name: Prova completa (app contro server)
+    needs: [app, server]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: server/go.mod
+          cache-dependency-path: server/go.sum
+
+      - name: Prepara Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.6'
+          channel: stable
+          cache: true
+
+      - name: Accendi il server
+        run: |
+          # Un token nuovo a ogni esecuzione: non serve a niente fuori da qui.
+          TOKEN=$(openssl rand -hex 24)
+          echo "TIFARO_TOKEN_PROVA=$TOKEN" >> "$GITHUB_ENV"
+          echo "TIFARO_SERVER_PROVA=http://127.0.0.1:8645" >> "$GITHUB_ENV"
+          (cd server && go build -o "$RUNNER_TEMP/tifaro-server" .)
+          TIFARO_TOKEN="$TOKEN" \
+          TIFARO_DATI="$RUNNER_TEMP/dati" \
+          TIFARO_BACKUP="$RUNNER_TEMP/backup" \
+          TIFARO_INDIRIZZO=127.0.0.1:8645 \
+            "$RUNNER_TEMP/tifaro-server" > "$RUNNER_TEMP/server.log" 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8645/api/salute; then exit 0; fi
+            sleep 1
+          done
+          echo "::error::Il server non è partito."
+          cat "$RUNNER_TEMP/server.log"
+          exit 1
+
+      - name: Scarica le dipendenze
+        run: flutter pub get
+
+      - name: Prova completa
+        run: flutter test --tags server
+
+      - name: Log del server
+        if: failure()
+        run: cat "$RUNNER_TEMP/server.log"

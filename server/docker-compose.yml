@@ -6,24 +6,19 @@
 #   TIFARO_TOKEN=...           obbligatorio, la password delle app:
 #                              openssl rand -hex 24
 #   PUID=... / PGID=...        output di "id" del tuo utente sul NAS
-#   TIFARO_BACKUP_LOCATION=... dove vanno i backup; meglio un altro disco
-#                              (es. /volume2/Backup/tifaro). Senza: ./backup
-#   TIFARO_SORGENTE=...        da dove prendere il codice per costruire
-#                              l'immagine; senza: il repository su Gitea
+#   TIFARO_BACKUP_LOCATION=... dove vanno i backup; meglio un altro disco.
+#                              Senza: ./backup
+#   TIFARO_VERSIONE=...        quale versione dell'immagine; senza: latest
 
 name: tifaro
 
 services:
   tifaro:
     container_name: tifaro
-    # L'immagine si costruisce sul NAS dal codice su Gitea: non c'è un
-    # registry da cui scaricarla. Per aggiornare, nel terminale dello stack:
-    #   docker compose build --pull && docker compose up -d
-    build:
-      context: ${TIFARO_SORGENTE:-http://nas.local:3000/enne139/TiFaro.git#main:server}
-      args:
-        VERSIONE: ${TIFARO_VERSIONE:-main}
-    image: tifaro-server:locale
+    # L'immagine la costruisce GitHub a ogni versione (tag vX.Y.Z) e la
+    # pubblica su ghcr.io. Per aggiornare: docker compose pull && docker
+    # compose up -d (oppure "Aggiorna" su Dockge).
+    image: ghcr.io/enne139/tifaro-server:${TIFARO_VERSIONE:-latest}
     user: "${PUID:-1000}:${PGID:-1000}"
     environment:
       TZ: ${TZ:-Europe/Rome}
@@ -32,7 +27,7 @@ services:
       TIFARO_BACKUP_OGNI: ${TIFARO_BACKUP_OGNI:-24h}
       TIFARO_BACKUP_TIENI: ${TIFARO_BACKUP_TIENI:-30}
     volumes:
-      # :z per SELinux, come gli altri stack.
+      # :z per SELinux.
       - ./data:/data:z
       - ${TIFARO_BACKUP_LOCATION:-./backup}:/backup:z
     ports:

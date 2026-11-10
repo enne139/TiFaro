@@ -3,6 +3,15 @@
 App Flutter per le cose da fare (Android e Linux). Cosa fa e a che punto è:
 [README.md](README.md). Perché è fatta così: [DECISIONI.md](DECISIONI.md).
 
+## Il repository è pubblico
+
+Niente dati personali o di casa, né nel codice né nei commenti, nelle prove,
+nella documentazione o nei messaggi di commit: indirizzi IP e nomi della
+rete di casa, percorsi della propria home, nomi di persone o di
+associazioni, token, password, chiavi. Negli esempi si usano valori
+neutri (`http://indirizzo-del-nas:8645`, `/home/utente`, "Tempo libero").
+Token e chiavi stanno solo nei `.env` e nei segreti di GitHub. Voce 026.
+
 ## Lingua e commenti
 
 Tutto in italiano: codice, commenti, messaggi, commit.
@@ -113,6 +122,14 @@ Le prove con interfaccia usano `test/supporto.dart` e finiscono con
 con interfaccia, le letture e scritture dirette sul database (prepararlo,
 controllarlo) vanno in `tester.runAsync(...)`: con l'orologio finto della
 prova uno stream di drift non risponde mai e la prova resta appesa.
+
+## Rilasci
+
+Si fanno su GitHub (voce 025): `version` in `pubspec.yaml` e `versione` in
+`server/main.go` aggiornate insieme, commit, poi tag `vX.Y.Z` e push del
+tag. Il flusso Rilascio pubblica APK e versione Linux, il flusso Container
+l'immagine del server. Remote: `origin` è GitHub, `gitea` il Gitea di casa;
+si manda su tutti e due.
 
 ## Verifiche prima di consegnare
 

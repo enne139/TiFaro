@@ -569,3 +569,76 @@ lo script, e si toglie con `--togli`.
 **Alternative scartate:** pacchetto Arch o Flatpak (da mantenere, per un
 solo utente); lanciarla con `flutter run` (lenta e in modalità debug).
 
+---
+
+## 024 — «Tutte»: le attività di ogni argomento insieme
+
+**Data:** 2026-11-10
+
+**Contesto:** si vogliono vedere tutte le attività, anche di argomenti
+diversi, non uno per volta.
+
+**Decisione:** nella schermata Argomenti la prima scelta è «Tutte», ed è
+quella di partenza: l'albero mostra le attività principali di ogni
+argomento, ordinate per scadenza come le altre (voce 013), con l'argomento
+scritto sulle principali. Le sotto-attività non lo ripetono, perché hanno
+sempre quello della principale.
+
+**Motivazione:** è la stessa vista con un filtro in meno: niente schermata
+nuova da imparare, e la barra in basso resta con tre voci.
+
+**Alternative scartate:** una quarta sezione nella barra in basso (un
+doppione degli Argomenti); un elenco piatto (si perderebbe l'albero).
+
+---
+
+## 025 — Build e rilasci su GitHub, immagine del server su ghcr.io
+
+**Data:** 2026-11-10
+
+**Contesto:** il repository sta su GitHub (oltre che sul Gitea di casa), e
+le build si fanno lì. Supera la parte della voce 022 sull'immagine del
+server costruita sul NAS da Gitea.
+
+**Decisione:** tre flussi di GitHub Actions. «Prove» a ogni push: analisi e
+prove dell'app e del server, e la prova completa con un server vero acceso
+nella macchina di GitHub. «Rilascio» a ogni tag `vX.Y.Z`: APK firmato con la
+chiave presa dai segreti (senza chiave una release vera si ferma) e versione
+Linux in un archivio con lo script di installazione, allegati alla release.
+«Container» a ogni tag: immagine del server per amd64 e arm64 su
+`ghcr.io/enne139/tifaro-server`, che il NAS scarica; quando cambia il
+server si costruisce senza pubblicare. Flutter è fissato alla versione usata
+per sviluppare. Lo schema è quello di Spesone.
+
+**Motivazione:** il NAS non deve compilare niente e non deve leggere Gitea;
+un aggiornamento è un «pull» come per gli altri servizi (e Diun lo segnala).
+Le release di GitHub sono quello che Obtainium sa seguire. Fermare un
+rilascio senza chiave evita APK che poi non si aggiornano.
+
+**Alternative scartate:** immagine costruita sul NAS (voce 022: un passaggio
+a mano e il NAS che deve raggiungere Gitea); build su Gitea Actions (serve
+un runner in casa).
+
+---
+
+## 026 — Repository pubblico: niente dati personali
+
+**Data:** 2026-11-10
+
+**Contesto:** il codice va su GitHub.
+
+**Decisione:** nel repository non entrano dati personali o di casa:
+indirizzi e nomi della rete di casa, percorsi della propria home, nomi di
+persone o associazioni, token, password, chiavi. Gli esempi usano valori
+neutri; l'indirizzo del server non ha un valore preimpostato. Prima della
+prima pubblicazione la cronologia è stata ripulita (indirizzo del NAS, un
+percorso della home e un'associazione usati negli esempi), riscrivendo i
+commit che non erano mai stati pubblicati.
+
+**Motivazione:** quello che finisce in un repository pubblico non si
+cancella più davvero.
+
+**Alternative scartate:** repository privato (le release servono a
+Obtainium, e il codice non ha niente da nascondere se non contiene dati
+personali).
+
