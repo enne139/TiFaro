@@ -1,0 +1,116 @@
+import 'package:drift/drift.dart';
+import 'package:drift_flutter/drift_flutter.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'package:tifaro/features/attivita/data/attivita_dao.dart';
+import 'package:tifaro/features/attivita/data/attivita_tables.dart';
+import 'package:tifaro/features/categorie/data/categorie_dao.dart';
+import 'package:tifaro/features/categorie/data/categorie_tables.dart';
+
+part 'app_database.g.dart';
+
+/// Il database locale dell'app: un solo file SQLite.
+///
+/// Le tabelle stanno accanto alla funzionalità che le usa
+/// (`features/<nome>/data/`); qui si dichiara solo quali fanno parte del
+/// database. L'ordine conta: una tabella viene dopo quelle a cui rimanda.
+@DriftDatabase(
+  tables: <Type>[Argomenti, Tipologie, ElencoAttivita, ElencoFoto],
+  daos: <Type>[CategorieDao, AttivitaDao],
+)
+class AppDatabase extends _$AppDatabase {
+  /// Database vero, nella cartella dei dati dell'app.
+  ///
+  /// La cartella va indicata: di suo drift userebbe quella dei documenti,
+  /// che su Linux è `~/Documenti`, in vista e a portata di cancellazione.
+  AppDatabase()
+    : super(
+        driftDatabase(
+          name: 'tifaro',
+          native: const DriftNativeOptions(
+            databaseDirectory: getApplicationSupportDirectory,
+          ),
+        ),
+      );
+
+  /// Database da usare nelle prove, di solito `NativeDatabase.memory()`.
+  AppDatabase.conEsecutore(super.esecutore);
+
+  /// Da aumentare di uno a ogni modifica delle tabelle, scrivendo la
+  /// migrazione in [migration]: senza, l'app installata non si apre più.
+  @override
+  int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+        await _semina();
+      },
+      beforeOpen: (OpeningDetails details) async {
+        // Senza questo SQLite accetta i rimandi fra tabelle ma non li fa
+        // rispettare.
+        await customStatement('PRAGMA foreign_keys = ON');
+      },
+    );
+  }
+
+  /// Argomenti e tipologie del primo avvio.
+  ///
+  /// Hanno id fissi e non UUID: quando arriverà la sincronizzazione, il
+  /// "Lavoro" creato sul telefono e quello creato sul PC saranno la stessa
+  /// riga e non due doppioni (DECISIONI.md, voce 004).
+  Future<void> _semina() async {
+    final DateTime adesso = DateTime.now();
+    await batch((Batch b) {
+      b.insertAll(argomenti, <ArgomentiCompanion>[
+        ArgomentiCompanion.insert(
+          id: 'argomento-lavoro',
+          nome: 'Lavoro',
+          colore: const Value<int>(0),
+          icona: const Value<String>('lavoro'),
+          ordine: const Value<int>(0),
+          aggiornatoIl: adesso,
+        ),
+        ArgomentiCompanion.insert(
+          id: 'argomento-personale',
+          nome: 'Personale',
+          colore: const Value<int>(2),
+          icona: const Value<String>('personale'),
+          ordine: const Value<int>(1),
+          predefinito: const Value<bool>(true),
+          aggiornatoIl: adesso,
+        ),
+        ArgomentiCompanion.insert(
+          id: 'argomento-ambulanza',
+          nome: 'Ambulanza',
+          colore: const Value<int>(1),
+          icona: const Value<String>('ambulanza'),
+          ordine: const Value<int>(2),
+          aggiornatoIl: adesso,
+        ),
+      ]);
+      b.insertAll(tipologie, <TipologieCompanion>[
+        TipologieCompanion.insert(
+          id: 'tipologia-telefonata',
+          nome: 'Telefonata',
+          icona: const Value<String>('telefono'),
+          aggiornataIl: adesso,
+        ),
+        TipologieCompanion.insert(
+          id: 'tipologia-acquisto',
+          nome: 'Acquisto',
+          icona: const Value<String>('acquisto'),
+          aggiornataIl: adesso,
+        ),
+        TipologieCompanion.insert(
+          id: 'tipologia-burocrazia',
+          nome: 'Burocrazia',
+          icona: const Value<String>('documento'),
+          aggiornataIl: adesso,
+        ),
+      ]);
+    });
+  }
+}

@@ -1,0 +1,42 @@
+import 'package:flutter/widgets.dart';
+
+import 'package:tifaro/core/database/app_database.dart';
+import 'package:tifaro/core/foto_archivio.dart';
+
+/// Rende database e archivio delle foto raggiungibili da qualunque punto
+/// dell'app.
+///
+/// È un `InheritedWidget` e non una variabile globale perché così le prove
+/// possono metterci un database in memoria e una cartella temporanea, e le
+/// schermate non sanno da dove arrivano.
+class AppScope extends InheritedWidget {
+  const AppScope({
+    required this.database,
+    required this.foto,
+    required super.child,
+    super.key,
+  });
+
+  /// Il database dell'app.
+  final AppDatabase database;
+
+  /// La cartella delle foto.
+  final FotoArchivio foto;
+
+  static AppScope _di(BuildContext context) {
+    final AppScope? scope = context.getInheritedWidgetOfExactType<AppScope>();
+    assert(scope != null, 'Nessun AppScope sopra questo widget.');
+    return scope!;
+  }
+
+  /// Il database. Non registra dipendenze: non cambia mai durante la vita
+  /// dell'app, quindi si può chiamare anche nei gestori di eventi.
+  static AppDatabase db(BuildContext context) => _di(context).database;
+
+  /// L'archivio delle foto.
+  static FotoArchivio archivio(BuildContext context) => _di(context).foto;
+
+  @override
+  bool updateShouldNotify(AppScope oldWidget) =>
+      database != oldWidget.database || foto != oldWidget.foto;
+}
