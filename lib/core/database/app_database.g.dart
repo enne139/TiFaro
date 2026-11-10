@@ -4186,6 +4186,342 @@ class PreferenzeCompanion extends UpdateCompanion<Preferenza> {
   }
 }
 
+class $EventiCalendarioTable extends EventiCalendario
+    with TableInfo<$EventiCalendarioTable, EventoCalendario> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $EventiCalendarioTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _attivitaIdMeta = const VerificationMeta(
+    'attivitaId',
+  );
+  @override
+  late final GeneratedColumn<String> attivitaId = GeneratedColumn<String>(
+    'attivita_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventoIdMeta = const VerificationMeta(
+    'eventoId',
+  );
+  @override
+  late final GeneratedColumn<int> eventoId = GeneratedColumn<int>(
+    'evento_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _calendarioIdMeta = const VerificationMeta(
+    'calendarioId',
+  );
+  @override
+  late final GeneratedColumn<int> calendarioId = GeneratedColumn<int>(
+    'calendario_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _improntaMeta = const VerificationMeta(
+    'impronta',
+  );
+  @override
+  late final GeneratedColumn<String> impronta = GeneratedColumn<String>(
+    'impronta',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    attivitaId,
+    eventoId,
+    calendarioId,
+    impronta,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'eventi_calendario';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<EventoCalendario> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('attivita_id')) {
+      context.handle(
+        _attivitaIdMeta,
+        attivitaId.isAcceptableOrUnknown(data['attivita_id']!, _attivitaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_attivitaIdMeta);
+    }
+    if (data.containsKey('evento_id')) {
+      context.handle(
+        _eventoIdMeta,
+        eventoId.isAcceptableOrUnknown(data['evento_id']!, _eventoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventoIdMeta);
+    }
+    if (data.containsKey('calendario_id')) {
+      context.handle(
+        _calendarioIdMeta,
+        calendarioId.isAcceptableOrUnknown(
+          data['calendario_id']!,
+          _calendarioIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_calendarioIdMeta);
+    }
+    if (data.containsKey('impronta')) {
+      context.handle(
+        _improntaMeta,
+        impronta.isAcceptableOrUnknown(data['impronta']!, _improntaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_improntaMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {attivitaId};
+  @override
+  EventoCalendario map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return EventoCalendario(
+      attivitaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attivita_id'],
+      )!,
+      eventoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}evento_id'],
+      )!,
+      calendarioId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}calendario_id'],
+      )!,
+      impronta: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}impronta'],
+      )!,
+    );
+  }
+
+  @override
+  $EventiCalendarioTable createAlias(String alias) {
+    return $EventiCalendarioTable(attachedDatabase, alias);
+  }
+}
+
+class EventoCalendario extends DataClass
+    implements Insertable<EventoCalendario> {
+  /// L'attività da cui nasce l'evento.
+  final String attivitaId;
+
+  /// L'id dell'evento nel calendario del telefono.
+  final int eventoId;
+
+  /// Il calendario in cui sta l'evento.
+  final int calendarioId;
+
+  /// L'impronta di titolo, date e colore dell'ultima versione scritta: se
+  /// cambia, l'evento va aggiornato.
+  final String impronta;
+  const EventoCalendario({
+    required this.attivitaId,
+    required this.eventoId,
+    required this.calendarioId,
+    required this.impronta,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['attivita_id'] = Variable<String>(attivitaId);
+    map['evento_id'] = Variable<int>(eventoId);
+    map['calendario_id'] = Variable<int>(calendarioId);
+    map['impronta'] = Variable<String>(impronta);
+    return map;
+  }
+
+  EventiCalendarioCompanion toCompanion(bool nullToAbsent) {
+    return EventiCalendarioCompanion(
+      attivitaId: Value(attivitaId),
+      eventoId: Value(eventoId),
+      calendarioId: Value(calendarioId),
+      impronta: Value(impronta),
+    );
+  }
+
+  factory EventoCalendario.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return EventoCalendario(
+      attivitaId: serializer.fromJson<String>(json['attivitaId']),
+      eventoId: serializer.fromJson<int>(json['eventoId']),
+      calendarioId: serializer.fromJson<int>(json['calendarioId']),
+      impronta: serializer.fromJson<String>(json['impronta']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'attivitaId': serializer.toJson<String>(attivitaId),
+      'eventoId': serializer.toJson<int>(eventoId),
+      'calendarioId': serializer.toJson<int>(calendarioId),
+      'impronta': serializer.toJson<String>(impronta),
+    };
+  }
+
+  EventoCalendario copyWith({
+    String? attivitaId,
+    int? eventoId,
+    int? calendarioId,
+    String? impronta,
+  }) => EventoCalendario(
+    attivitaId: attivitaId ?? this.attivitaId,
+    eventoId: eventoId ?? this.eventoId,
+    calendarioId: calendarioId ?? this.calendarioId,
+    impronta: impronta ?? this.impronta,
+  );
+  EventoCalendario copyWithCompanion(EventiCalendarioCompanion data) {
+    return EventoCalendario(
+      attivitaId: data.attivitaId.present
+          ? data.attivitaId.value
+          : this.attivitaId,
+      eventoId: data.eventoId.present ? data.eventoId.value : this.eventoId,
+      calendarioId: data.calendarioId.present
+          ? data.calendarioId.value
+          : this.calendarioId,
+      impronta: data.impronta.present ? data.impronta.value : this.impronta,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventoCalendario(')
+          ..write('attivitaId: $attivitaId, ')
+          ..write('eventoId: $eventoId, ')
+          ..write('calendarioId: $calendarioId, ')
+          ..write('impronta: $impronta')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(attivitaId, eventoId, calendarioId, impronta);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventoCalendario &&
+          other.attivitaId == this.attivitaId &&
+          other.eventoId == this.eventoId &&
+          other.calendarioId == this.calendarioId &&
+          other.impronta == this.impronta);
+}
+
+class EventiCalendarioCompanion extends UpdateCompanion<EventoCalendario> {
+  final Value<String> attivitaId;
+  final Value<int> eventoId;
+  final Value<int> calendarioId;
+  final Value<String> impronta;
+  final Value<int> rowid;
+  const EventiCalendarioCompanion({
+    this.attivitaId = const Value.absent(),
+    this.eventoId = const Value.absent(),
+    this.calendarioId = const Value.absent(),
+    this.impronta = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  EventiCalendarioCompanion.insert({
+    required String attivitaId,
+    required int eventoId,
+    required int calendarioId,
+    required String impronta,
+    this.rowid = const Value.absent(),
+  }) : attivitaId = Value(attivitaId),
+       eventoId = Value(eventoId),
+       calendarioId = Value(calendarioId),
+       impronta = Value(impronta);
+  static Insertable<EventoCalendario> custom({
+    Expression<String>? attivitaId,
+    Expression<int>? eventoId,
+    Expression<int>? calendarioId,
+    Expression<String>? impronta,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (attivitaId != null) 'attivita_id': attivitaId,
+      if (eventoId != null) 'evento_id': eventoId,
+      if (calendarioId != null) 'calendario_id': calendarioId,
+      if (impronta != null) 'impronta': impronta,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  EventiCalendarioCompanion copyWith({
+    Value<String>? attivitaId,
+    Value<int>? eventoId,
+    Value<int>? calendarioId,
+    Value<String>? impronta,
+    Value<int>? rowid,
+  }) {
+    return EventiCalendarioCompanion(
+      attivitaId: attivitaId ?? this.attivitaId,
+      eventoId: eventoId ?? this.eventoId,
+      calendarioId: calendarioId ?? this.calendarioId,
+      impronta: impronta ?? this.impronta,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (attivitaId.present) {
+      map['attivita_id'] = Variable<String>(attivitaId.value);
+    }
+    if (eventoId.present) {
+      map['evento_id'] = Variable<int>(eventoId.value);
+    }
+    if (calendarioId.present) {
+      map['calendario_id'] = Variable<int>(calendarioId.value);
+    }
+    if (impronta.present) {
+      map['impronta'] = Variable<String>(impronta.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('EventiCalendarioCompanion(')
+          ..write('attivitaId: $attivitaId, ')
+          ..write('eventoId: $eventoId, ')
+          ..write('calendarioId: $calendarioId, ')
+          ..write('impronta: $impronta, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4197,10 +4533,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ElencoFotoTable elencoFoto = $ElencoFotoTable(this);
   late final $NoteSyncTable noteSync = $NoteSyncTable(this);
   late final $PreferenzeTable preferenze = $PreferenzeTable(this);
+  late final $EventiCalendarioTable eventiCalendario = $EventiCalendarioTable(
+    this,
+  );
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
   late final AttivitaDao attivitaDao = AttivitaDao(this as AppDatabase);
   late final ModelliDao modelliDao = ModelliDao(this as AppDatabase);
   late final SyncDao syncDao = SyncDao(this as AppDatabase);
+  late final CalendarioDao calendarioDao = CalendarioDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4214,6 +4554,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     elencoFoto,
     noteSync,
     preferenze,
+    eventiCalendario,
   ];
 }
 
@@ -8028,6 +8369,206 @@ typedef $$PreferenzeTableProcessedTableManager =
       Preferenza,
       PrefetchHooks Function()
     >;
+typedef $$EventiCalendarioTableCreateCompanionBuilder =
+    EventiCalendarioCompanion Function({
+      required String attivitaId,
+      required int eventoId,
+      required int calendarioId,
+      required String impronta,
+      Value<int> rowid,
+    });
+typedef $$EventiCalendarioTableUpdateCompanionBuilder =
+    EventiCalendarioCompanion Function({
+      Value<String> attivitaId,
+      Value<int> eventoId,
+      Value<int> calendarioId,
+      Value<String> impronta,
+      Value<int> rowid,
+    });
+
+class $$EventiCalendarioTableFilterComposer
+    extends Composer<_$AppDatabase, $EventiCalendarioTable> {
+  $$EventiCalendarioTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get attivitaId => $composableBuilder(
+    column: $table.attivitaId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get eventoId => $composableBuilder(
+    column: $table.eventoId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get calendarioId => $composableBuilder(
+    column: $table.calendarioId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get impronta => $composableBuilder(
+    column: $table.impronta,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$EventiCalendarioTableOrderingComposer
+    extends Composer<_$AppDatabase, $EventiCalendarioTable> {
+  $$EventiCalendarioTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attivitaId => $composableBuilder(
+    column: $table.attivitaId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get eventoId => $composableBuilder(
+    column: $table.eventoId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get calendarioId => $composableBuilder(
+    column: $table.calendarioId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get impronta => $composableBuilder(
+    column: $table.impronta,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$EventiCalendarioTableAnnotationComposer
+    extends Composer<_$AppDatabase, $EventiCalendarioTable> {
+  $$EventiCalendarioTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get attivitaId => $composableBuilder(
+    column: $table.attivitaId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get eventoId =>
+      $composableBuilder(column: $table.eventoId, builder: (column) => column);
+
+  GeneratedColumn<int> get calendarioId => $composableBuilder(
+    column: $table.calendarioId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get impronta =>
+      $composableBuilder(column: $table.impronta, builder: (column) => column);
+}
+
+class $$EventiCalendarioTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $EventiCalendarioTable,
+          EventoCalendario,
+          $$EventiCalendarioTableFilterComposer,
+          $$EventiCalendarioTableOrderingComposer,
+          $$EventiCalendarioTableAnnotationComposer,
+          $$EventiCalendarioTableCreateCompanionBuilder,
+          $$EventiCalendarioTableUpdateCompanionBuilder,
+          (
+            EventoCalendario,
+            BaseReferences<
+              _$AppDatabase,
+              $EventiCalendarioTable,
+              EventoCalendario
+            >,
+          ),
+          EventoCalendario,
+          PrefetchHooks Function()
+        > {
+  $$EventiCalendarioTableTableManager(
+    _$AppDatabase db,
+    $EventiCalendarioTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$EventiCalendarioTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$EventiCalendarioTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$EventiCalendarioTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> attivitaId = const Value.absent(),
+                Value<int> eventoId = const Value.absent(),
+                Value<int> calendarioId = const Value.absent(),
+                Value<String> impronta = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => EventiCalendarioCompanion(
+                attivitaId: attivitaId,
+                eventoId: eventoId,
+                calendarioId: calendarioId,
+                impronta: impronta,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String attivitaId,
+                required int eventoId,
+                required int calendarioId,
+                required String impronta,
+                Value<int> rowid = const Value.absent(),
+              }) => EventiCalendarioCompanion.insert(
+                attivitaId: attivitaId,
+                eventoId: eventoId,
+                calendarioId: calendarioId,
+                impronta: impronta,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$EventiCalendarioTable, EventoCalendario>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $EventiCalendarioTable,
+                    EventoCalendario
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$EventiCalendarioTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $EventiCalendarioTable,
+      EventoCalendario,
+      $$EventiCalendarioTableFilterComposer,
+      $$EventiCalendarioTableOrderingComposer,
+      $$EventiCalendarioTableAnnotationComposer,
+      $$EventiCalendarioTableCreateCompanionBuilder,
+      $$EventiCalendarioTableUpdateCompanionBuilder,
+      (
+        EventoCalendario,
+        BaseReferences<_$AppDatabase, $EventiCalendarioTable, EventoCalendario>,
+      ),
+      EventoCalendario,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8048,4 +8589,6 @@ class $AppDatabaseManager {
       $$NoteSyncTableTableManager(_db, _db.noteSync);
   $$PreferenzeTableTableManager get preferenze =>
       $$PreferenzeTableTableManager(_db, _db.preferenze);
+  $$EventiCalendarioTableTableManager get eventiCalendario =>
+      $$EventiCalendarioTableTableManager(_db, _db.eventiCalendario);
 }

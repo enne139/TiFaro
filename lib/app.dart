@@ -5,6 +5,8 @@ import 'package:tifaro/core/app_scope.dart';
 import 'package:tifaro/core/dati_app.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/features/calendario/allineatore_calendario.dart';
+import 'package:tifaro/features/calendario/auto_calendario.dart';
 import 'package:tifaro/features/sincronizzazione/auto_sync.dart';
 import 'package:tifaro/features/sincronizzazione/sincronizzatore.dart';
 import 'package:tifaro/navigation/app_shell.dart';
@@ -19,6 +21,7 @@ class TiFaroApp extends StatelessWidget {
     required this.database,
     required this.foto,
     this.sincronizzatore,
+    this.allineatore,
     super.key,
   });
 
@@ -28,6 +31,10 @@ class TiFaroApp extends StatelessWidget {
   /// La sincronizzazione con il server; senza, l'app lavora solo in locale
   /// (succede nelle prove).
   final Sincronizzatore? sincronizzatore;
+
+  /// Il calendario del telefono; senza, le attività non vanno nel
+  /// calendario (succede nelle prove).
+  final AllineatoreCalendario? allineatore;
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +62,20 @@ class TiFaroApp extends StatelessWidget {
           FonteDati(child: child ?? const SizedBox.shrink()),
       home: const AppShell(),
     );
+    final AllineatoreCalendario? calendario = allineatore;
+    Widget figlio = app;
+    if (calendario != null) {
+      figlio = AutoCalendario(allineatore: calendario, child: figlio);
+    }
+    if (sync != null) {
+      figlio = AutoSync(sincronizzatore: sync, child: figlio);
+    }
     return AppScope(
       database: database,
       foto: foto,
       sync: sync,
-      child: sync == null ? app : AutoSync(sincronizzatore: sync, child: app),
+      allineatore: calendario,
+      child: figlio,
     );
   }
 }

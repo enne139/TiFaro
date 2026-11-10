@@ -4,6 +4,8 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:tifaro/core/database/app_database.steps.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
+import 'package:tifaro/features/calendario/data/calendario_dao.dart';
+import 'package:tifaro/features/calendario/data/calendario_tables.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_dao.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
@@ -29,8 +31,9 @@ part 'app_database.g.dart';
     ElencoFoto,
     NoteSync,
     Preferenze,
+    EventiCalendario,
   ],
-  daos: <Type>[CategorieDao, AttivitaDao, ModelliDao, SyncDao],
+  daos: <Type>[CategorieDao, AttivitaDao, ModelliDao, SyncDao, CalendarioDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, nella cartella dei dati dell'app.
@@ -54,9 +57,9 @@ class AppDatabase extends _$AppDatabase {
   /// migrazione in [migration]: senza, l'app installata non si apre più.
   ///
   /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli;
-  /// 3 sincronizzazione (note e preferenze).
+  /// 3 sincronizzazione (note e preferenze); 4 eventi del calendario.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -76,6 +79,9 @@ class AppDatabase extends _$AppDatabase {
         from2To3: (Migrator m, Schema3 schema) async {
           await m.createTable(schema.syncNote);
           await m.createTable(schema.preferenze);
+        },
+        from3To4: (Migrator m, Schema4 schema) async {
+          await m.createTable(schema.eventiCalendario);
         },
       ),
       beforeOpen: (OpeningDetails details) async {

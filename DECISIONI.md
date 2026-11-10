@@ -642,3 +642,47 @@ cancella più davvero.
 Obtainium, e il codice non ha niente da nascondere se non contiene dati
 personali).
 
+---
+
+## 027 — Il calendario lo scrive il telefono, non il server
+
+**Data:** 2026-11-10
+
+**Contesto:** le attività «nel calendario» devono diventare eventi. Supera
+la voce 009, che li faceva creare al server con un account di servizio
+Google.
+
+**Decisione:** gli eventi li scrive l'app Android nel calendario del
+telefono (`CalendarContract`), attraverso un piccolo canale nativo scritto a
+mano in `MainActivity.kt` (`tifaro/calendario`). Nelle impostazioni si
+sceglie il calendario; se è quello di un account Google, è Android a portare
+gli eventi su Google Calendar. Ogni attività da fare, «nel calendario» e con
+una scadenza è un evento: tutto il giorno se la scadenza non ha l'ora
+(mezzanotti UTC, come vuole Android), di un'ora se ce l'ha; per le
+sotto-attività la descrizione dice di cosa fanno parte; il colore è la
+chiave di Google dell'argomento (voce 008), se l'account la conosce. Il
+telefono ricorda quale evento ha creato per quale attività (tabella locale
+`eventi_calendario`, con l'impronta di quello che ha scritto) e a ogni giro
+fa solo le differenze: crea, aggiorna, toglie. Ogni evento porta il segno
+`tifaro://attivita/<id>` (`CUSTOM_APP_URI`): dopo una reinstallazione gli
+eventi si ritrovano invece di duplicarsi; un evento tolto a mano torna alla
+prossima modifica dell'attività. Il giro parte all'apertura, al ritorno in
+primo piano e due secondi dopo ogni modifica, comprese quelle arrivate con la
+sincronizzazione. Su Linux le impostazioni dicono che lo fa il telefono.
+
+**Motivazione:** niente progetto Google Cloud, niente chiavi sul NAS, niente
+dati che il server manda a Google; funziona anche senza rete. Con la
+sincronizzazione il vantaggio del server (funzionare da qualunque
+dispositivo) è quasi sparito: basta che il telefono riceva le attività. Il
+canale scritto a mano evita un plugin esterno e permette il segno e i
+colori.
+
+**Limite noto:** un'attività segnata dal PC arriva nel calendario quando il
+telefono si sincronizza, cioè quando si apre l'app. Una sincronizzazione in
+background toglierebbe il ritardo.
+
+**Alternative scartate:** il server con le API di Google (voce 009: più
+pezzi e una configurazione Google da fare); un plugin per il calendario
+(niente segno né colori, e il rischio che non compili con le versioni
+nuove); un file .ics da abbonare (Google lo aggiorna ogni molte ore).
+

@@ -37,6 +37,10 @@ cambia se ne aggiunge una nuova che dice quale supera.
 - `lib/navigation/`: l'impalcatura con le sezioni.
 - `lib/features/modelli/`: i modelli; `logica/` ha le scadenze relative.
 - `lib/features/sincronizzazione/`: la sincronizzazione con il server.
+- `lib/features/calendario/`: gli eventi nel calendario del telefono; il
+  pezzo Android è in `android/app/src/main/kotlin/.../MainActivity.kt`
+  (canale `tifaro/calendario`). La logica di cosa creare, aggiornare e
+  togliere è pura, in `logica/eventi.dart` (voce 027).
 - `server/`: il server in Go, modulo a parte con le sue prove (voce 019).
 - `lib/features/cattura/composizione.dart`: come si uniscono testo, menu e
   modello nella cattura veloce (voce 018). Una regola nuova va lì, con la
@@ -90,8 +94,8 @@ una notifica che arriva dopo il commit, e l'operazione resta appesa.
   `SyncDao`, nell'ordine giusto (dopo quelle a cui rimanda), e deve avere
   `id`, `aggiornataIl`/`aggiornatoIl` e `cancellataIl`/`cancellatoIl`. Il
   server non va toccato: tiene le righe così come arrivano.
-- Le tabelle `sync_note` e `preferenze` restano su ogni dispositivo e non si
-  sincronizzano.
+- Le tabelle `sync_note`, `preferenze` ed `eventi_calendario` restano su
+  ogni dispositivo e non si sincronizzano.
 - Mai cancellare righe di tabelle sincronizzate: una cancellazione vera non
   arriverebbe agli altri dispositivi.
 

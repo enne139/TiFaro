@@ -265,7 +265,10 @@ class _DettaglioPageState extends State<DettaglioPage> {
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'Su Google Calendar arriverà quando ci sarà il server.',
+                attivita.scadenza == null
+                    ? 'Senza una scadenza non può andare nel calendario.'
+                    : 'Lo mette nel calendario l\'app sul telefono, se nelle '
+                          'sue impostazioni ne hai scelto uno.',
                 style: tema.textTheme.bodySmall,
               ),
             ),

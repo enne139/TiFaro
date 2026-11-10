@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- La rete serve a sincronizzarsi con il server sul NAS. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Il calendario serve a metterci le attività «nel calendario»
+         (DECISIONI.md, voce 027). Si chiede solo quando lo si attiva. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
     <application
         android:label="TiFaro"
         android:name="${applicationName}"

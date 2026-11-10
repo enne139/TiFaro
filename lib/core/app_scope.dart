@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/features/calendario/allineatore_calendario.dart';
 import 'package:tifaro/features/sincronizzazione/sincronizzatore.dart';
 
 /// Rende database e archivio delle foto raggiungibili da qualunque punto
@@ -16,6 +17,7 @@ class AppScope extends InheritedWidget {
     required this.foto,
     required super.child,
     this.sync,
+    this.allineatore,
     super.key,
   });
 
@@ -28,6 +30,9 @@ class AppScope extends InheritedWidget {
   /// La sincronizzazione con il server; nulla nelle prove che non la
   /// usano.
   final Sincronizzatore? sync;
+
+  /// Il calendario del telefono; nullo nelle prove che non lo usano.
+  final AllineatoreCalendario? allineatore;
 
   static AppScope _di(BuildContext context) {
     final AppScope? scope = context.getInheritedWidgetOfExactType<AppScope>();
@@ -46,9 +51,14 @@ class AppScope extends InheritedWidget {
   static Sincronizzatore? sincronizzatore(BuildContext context) =>
       _di(context).sync;
 
+  /// Il calendario del telefono, se c'è.
+  static AllineatoreCalendario? calendario(BuildContext context) =>
+      _di(context).allineatore;
+
   @override
   bool updateShouldNotify(AppScope oldWidget) =>
       database != oldWidget.database ||
       foto != oldWidget.foto ||
-      sync != oldWidget.sync;
+      sync != oldWidget.sync ||
+      allineatore != oldWidget.allineatore;
 }

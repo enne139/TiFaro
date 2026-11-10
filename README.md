@@ -5,8 +5,8 @@ profondità), argomenti, tipologie, scadenze e foto, con una cattura veloce
 che capisce una riga scritta di corsa.
 
 App Flutter per Android e Linux, con un server Go sul NAS che tiene
-allineati telefono e PC e fa i backup. In futuro metterà anche gli eventi su
-Google Calendar.
+allineati telefono e PC e fa i backup. Sul telefono, le attività «nel
+calendario» diventano eventi del calendario scelto (anche Google Calendar).
 
 ## Cosa fa
 
@@ -61,13 +61,20 @@ Google Calendar.
   cinque minuti e poco dopo ogni modifica. Il server fa un backup al giorno.
   Si collega da Impostazioni → Server; l'icona della nuvola in alto dice
   com'è andata e, toccandola, sincronizza subito.
+- **Calendario (Android):** in Impostazioni → Calendario si sceglie un
+  calendario del telefono; ogni attività da fare «nel calendario» e con una
+  scadenza diventa un evento (tutto il giorno, o di un'ora se la scadenza ha
+  l'ora), con il colore dell'argomento. Cambiando titolo o data l'evento si
+  aggiorna, facendo l'attività sparisce. Se il calendario è di un account
+  Google, è Android a portarlo su Google Calendar. Le attività segnate dal PC
+  arrivano nel calendario quando il telefono si sincronizza.
 
 ## Fasi
 
 1. App da sola, senza server — **fatta**
 2. Modelli, e il menu delle scelte nella cattura — **fatta**
 3. Server Go sul NAS, sincronizzazione, backup, versione Linux — **fatta**
-4. Google Calendar, tramite il server
+4. Calendario, dal telefono — **fatta**
 5. Notifiche, release dell'APK per Obtainium, esportazione
 
 Le scelte, con il perché, in [DECISIONI.md](DECISIONI.md).
