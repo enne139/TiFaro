@@ -58,6 +58,7 @@ dev_dependencies:
   drift_dev: ^2.35.3
   build_runner: ^2.17.1
   sqlite3: ^3.9.1
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -100,3 +101,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Icone dell'app su Android, generate dai PNG in assets/icona/ (che nascono
+# dagli SVG accanto, con rsvg-convert) con: dart run flutter_launcher_icons
+#
+# Su Android l'icona è adattiva: il faro in primo piano su fondo blu, che il
+# telefono ritaglia nella sua forma; la versione monocromatica serve alle
+# icone a tema di Android 13 e oltre. Su Linux l'icona la mette lo script di
+# installazione (strumenti/installa_linux.sh).
+flutter_launcher_icons:
+  image_path: "assets/icona/tifaro.png"
+  android: "ic_launcher"
+  adaptive_icon_background: "#1E4F8C"
+  adaptive_icon_foreground: "assets/icona/tifaro_primo_piano.png"
+  adaptive_icon_monochrome: "assets/icona/tifaro_monocromatica.png"
+  # Il faro negli SVG sta già dentro la zona sicura: niente margine in più,
+  # che lo rimpicciolirebbe.
+  adaptive_icon_foreground_inset: 0
+  min_sdk_android: 24
+  ios: false
