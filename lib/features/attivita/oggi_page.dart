@@ -7,7 +7,8 @@ import 'package:tifaro/features/attivita/logica/viste.dart';
 import 'package:tifaro/features/attivita/widgets/riga_attivita.dart';
 
 /// La schermata Oggi: cosa è scaduto, cosa scade oggi e nei prossimi sette
-/// giorni, di tutti gli argomenti e a qualunque livello dell'albero.
+/// giorni, di tutti gli argomenti e a qualunque livello dell'albero; in
+/// fondo, le attività principali senza scadenza, dalla più vecchia.
 class OggiPage extends StatelessWidget {
   const OggiPage({super.key});
 
@@ -23,11 +24,10 @@ class OggiPage extends StatelessWidget {
     if (gruppi.vuoto) {
       return const VuotoView(
         icona: Icons.wb_sunny_outlined,
-        titolo: 'Niente in scadenza',
+        titolo: 'Niente da fare',
         testo:
-            'Nei prossimi sette giorni non scade niente. Con «Nuova» '
-            'aggiungi un\'attività: per darle una scadenza scrivi per '
-            'esempio «domani», «venerdì» o «15/11».',
+            'Con «Nuova» aggiungi un\'attività: per darle una scadenza '
+            'scrivi per esempio «domani», «venerdì» o «15/11».',
       );
     }
 
@@ -67,6 +67,7 @@ class OggiPage extends StatelessWidget {
         ),
         ...gruppo('Oggi', gruppi.oggi, Icons.today),
         ...gruppo('Prossimi 7 giorni', gruppi.prossime, Icons.date_range),
+        ...gruppo('Senza scadenza', gruppi.senzaScadenza, Icons.event_busy),
       ],
     );
   }

@@ -34,6 +34,14 @@ class IndiceAttivita {
     return ordine != 0 ? ordine : a.creataIl.compareTo(b.creataIl);
   }
 
+  /// Ordine di creazione, dalla più vecchia; a parità, per titolo.
+  static int perCreazione(Attivita a, Attivita b) {
+    final int c = a.creataIl.compareTo(b.creataIl);
+    return c != 0
+        ? c
+        : a.titolo.toLowerCase().compareTo(b.titolo.toLowerCase());
+  }
+
   /// L'attività con questo id, se c'è.
   Attivita? operator [](String id) => _perId[id];
 

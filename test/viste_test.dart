@@ -99,6 +99,38 @@ void main() {
       'sotto',
       'fra-una-settimana',
     ]);
+    // Senza scadenza: solo le principali da fare.
+    expect(g.senzaScadenza.map((Attivita a) => a.id), <String>[
+      'senza-scadenza',
+    ]);
+  });
+
+  test('senza scadenza: in ordine di creazione, senza sotto-attività', () {
+    Attivita creata(String id, DateTime quando, {String? genitore}) => Attivita(
+      id: id,
+      titolo: id,
+      descrizione: '',
+      creataIl: quando,
+      scadenzaConOra: false,
+      argomentoId: 'argomento-lavoro',
+      genitoreId: genitore,
+      ordine: 0,
+      nelCalendario: false,
+      aggiornataIl: quando,
+    );
+    final IndiceAttivita indice = IndiceAttivita(<Attivita>[
+      creata('nuova', DateTime(2026, 11, 9)),
+      creata('vecchia', DateTime(2026, 11, 1)),
+      creata('passaggio', DateTime(2026, 11, 2), genitore: 'vecchia'),
+      creata('media', DateTime(2026, 11, 5)),
+    ]);
+    expect(
+      raggruppaPerScadenza(
+        indice,
+        adesso,
+      ).senzaScadenza.map((Attivita a) => a.id),
+      <String>['vecchia', 'media', 'nuova'],
+    );
   });
 
   test('scaduta: senza ora vale fino a fine giornata', () {

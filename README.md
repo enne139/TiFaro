@@ -20,7 +20,8 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   qualunque livello, per farle tutte insieme.
 - **Campi:** cosa fare, descrizione, data di creazione, scadenza (con l'ora
   facoltativa), "nel calendario", foto.
-- **Schermate:** Oggi (scadute, oggi, prossimi 7 giorni), Argomenti (albero
+- **Schermate:** Oggi (scadute, oggi, prossimi 7 giorni e, in fondo, le
+  attività senza scadenza in ordine di creazione), Argomenti (albero
   da aprire, per un argomento o per tutti insieme con «Tutte»), Tipologie,
   Modelli, Fatte, Cestino (con ripristino), Ricerca, Impostazioni
   (argomenti, tipologie e server).

@@ -12,8 +12,8 @@ void main() {
     final AppDatabase db = databaseInMemoria();
     await avviaApp(tester, db);
 
-    // All'inizio non scade niente.
-    expect(find.text('Niente in scadenza'), findsOneWidget);
+    // All'inizio non c'è niente da fare.
+    expect(find.text('Niente da fare'), findsOneWidget);
 
     // Cattura veloce con la sintassi.
     await tester.tap(find.text('Nuova'));
@@ -35,10 +35,20 @@ void main() {
     expect(find.text('Comprare guanti'), findsOneWidget);
     expect(find.text('Prossimi 7 giorni'), findsOneWidget);
 
+    // Un'attività senza data finisce in fondo, fra quelle senza scadenza.
+    await tester.tap(find.text('Nuova'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'leggere il manuale');
+    await tester.tap(find.text('Aggiungi'));
+    await tester.pumpAndSettle();
+    expect(find.text('Senza scadenza'), findsOneWidget);
+    expect(find.text('Leggere il manuale'), findsOneWidget);
+
     // In Argomenti si parte da «Tutte», con l'argomento scritto sulla riga.
     await tester.tap(find.text('Argomenti').last);
     await tester.pumpAndSettle();
-    expect(find.text('Tutte 1'), findsOneWidget);
+    // Due: i guanti (Ambulanza) e il manuale (Personale).
+    expect(find.text('Tutte 2'), findsOneWidget);
     expect(find.text('Comprare guanti'), findsWidgets);
     expect(find.text('Ambulanza'), findsOneWidget);
 

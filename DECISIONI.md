@@ -686,3 +686,25 @@ pezzi e una configurazione Google da fare); un plugin per il calendario
 (niente segno né colori, e il rischio che non compili con le versioni
 nuove); un file .ics da abbonare (Google lo aggiorna ogni molte ore).
 
+---
+
+## 028 — In Oggi, in fondo, le attività senza scadenza
+
+**Data:** 2026-11-10
+
+**Contesto:** in Oggi si vogliono vedere anche le attività senza una data.
+
+**Decisione:** sotto Scadute, Oggi e Prossimi 7 giorni c'è il gruppo «Senza
+scadenza»: le attività principali da fare che non hanno una scadenza, in
+ordine di creazione, dalla più vecchia. Le sotto-attività senza scadenza non
+ci sono.
+
+**Motivazione:** così Oggi è l'elenco completo delle cose da fare, con le
+urgenti in cima. Le sotto-attività senza data sono spesso i passaggi di
+un'attività più grande o di un modello: elencate una per una affollerebbero
+il gruppo, mentre la loro principale compare già, con l'avanzamento. Dalla
+più vecchia, perché quelle in attesa da più tempo non scivolino in fondo.
+
+**Alternative scartate:** anche le sotto-attività (troppe righe); dalla più
+recente (le vecchie sparirebbero sotto).
+

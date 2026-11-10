@@ -7,13 +7,14 @@ import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/testo.dart';
 import 'package:tifaro/features/attivita/logica/indice_attivita.dart';
 
-/// Le attività da fare con una scadenza vicina, divise come nella
-/// schermata Oggi.
+/// Le attività da fare divise come nella schermata Oggi: per scadenza
+/// vicina, e in fondo quelle senza scadenza.
 class GruppiScadenza {
   const GruppiScadenza({
     required this.scadute,
     required this.oggi,
     required this.prossime,
+    this.senzaScadenza = const <Attivita>[],
   });
 
   /// Scadute nei giorni passati.
@@ -25,8 +26,16 @@ class GruppiScadenza {
   /// In scadenza nei prossimi giorni.
   final List<Attivita> prossime;
 
+  /// Le attività principali senza scadenza, dalla più vecchia
+  /// (DECISIONI.md, voce 028).
+  final List<Attivita> senzaScadenza;
+
   /// Se non c'è niente in nessun gruppo.
-  bool get vuoto => scadute.isEmpty && oggi.isEmpty && prossime.isEmpty;
+  bool get vuoto =>
+      scadute.isEmpty &&
+      oggi.isEmpty &&
+      prossime.isEmpty &&
+      senzaScadenza.isEmpty;
 }
 
 /// Ordine per scadenza: prima la più vicina; a parità di giorno quelle con
@@ -76,7 +85,12 @@ List<Attivita> ordinaPrincipali(Iterable<Attivita> principali) {
 }
 
 /// Le attività da fare che scadono entro [giorni] giorni, sotto-attività
-/// comprese, divise in scadute, di oggi e prossime.
+/// comprese, divise in scadute, di oggi e prossime; più le attività
+/// principali senza scadenza, in ordine di creazione.
+///
+/// Fra quelle senza scadenza non ci sono le sotto-attività: sono spesso i
+/// passaggi di un'attività più grande (o di un modello), e la loro
+/// principale compare già, con l'avanzamento.
 GruppiScadenza raggruppaPerScadenza(
   IndiceAttivita indice,
   DateTime adesso, {
@@ -85,9 +99,20 @@ GruppiScadenza raggruppaPerScadenza(
   final List<Attivita> scadute = <Attivita>[];
   final List<Attivita> oggi = <Attivita>[];
   final List<Attivita> prossime = <Attivita>[];
+  final List<Attivita> senzaScadenza = <Attivita>[];
+  final Set<String> principali = indice
+      .figlie(null)
+      .map((Attivita a) => a.id)
+      .toSet();
   for (final Attivita a in indice.tutte) {
     final DateTime? scadenza = a.scadenza;
-    if (a.fattaIl != null || scadenza == null) {
+    if (a.fattaIl != null) {
+      continue;
+    }
+    if (scadenza == null) {
+      if (principali.contains(a.id)) {
+        senzaScadenza.add(a);
+      }
       continue;
     }
     final int distanza = giorniFra(adesso, scadenza);
@@ -102,7 +127,13 @@ GruppiScadenza raggruppaPerScadenza(
   scadute.sort(perScadenza);
   oggi.sort(perScadenza);
   prossime.sort(perScadenza);
-  return GruppiScadenza(scadute: scadute, oggi: oggi, prossime: prossime);
+  senzaScadenza.sort(IndiceAttivita.perCreazione);
+  return GruppiScadenza(
+    scadute: scadute,
+    oggi: oggi,
+    prossime: prossime,
+    senzaScadenza: senzaScadenza,
+  );
 }
 
 /// Se [attivita] è scaduta rispetto ad [adesso].
