@@ -35,10 +35,15 @@ void main() {
     expect(find.text('Comprare guanti'), findsOneWidget);
     expect(find.text('Prossimi 7 giorni'), findsOneWidget);
 
-    // E nell'albero dell'argomento Ambulanza.
+    // In Argomenti si parte da «Tutte», con l'argomento scritto sulla riga.
     await tester.tap(find.text('Argomenti').last);
     await tester.pumpAndSettle();
-    await tester.tap(find.textContaining('Ambulanza'));
+    expect(find.text('Tutte 1'), findsOneWidget);
+    expect(find.text('Comprare guanti'), findsWidgets);
+    expect(find.text('Ambulanza'), findsOneWidget);
+
+    // E nell'albero dell'argomento Ambulanza.
+    await tester.tap(find.text('Ambulanza 1'));
     await tester.pumpAndSettle();
     expect(find.text('Comprare guanti'), findsWidgets);
 

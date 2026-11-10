@@ -7,8 +7,12 @@ import 'package:tifaro/core/widgets/vuoto_view.dart';
 import 'package:tifaro/features/attivita/logica/viste.dart';
 import 'package:tifaro/features/attivita/widgets/albero_attivita.dart';
 
-/// La schermata Argomenti: si sceglie un argomento e se ne vede l'albero
-/// delle attività, da aprire ramo per ramo.
+/// La schermata Argomenti: si sceglie un argomento, oppure «Tutte», e se ne
+/// vede l'albero delle attività, da aprire ramo per ramo.
+///
+/// «Tutte» è la prima scelta e quella di partenza: mostra le attività di
+/// ogni argomento insieme, con l'argomento scritto su ogni riga
+/// (DECISIONI.md, voce 024).
 class ArgomentiPage extends StatefulWidget {
   const ArgomentiPage({super.key});
 
@@ -17,7 +21,7 @@ class ArgomentiPage extends StatefulWidget {
 }
 
 class _ArgomentiPageState extends State<ArgomentiPage> {
-  /// L'argomento scelto; `null` finché non se ne tocca uno.
+  /// L'argomento scelto; `null` vuol dire «Tutte».
   String? _scelto;
 
   /// I rami aperti.
@@ -35,12 +39,14 @@ class _ArgomentiPageState extends State<ArgomentiPage> {
         testo: 'Aggiungine uno dalle impostazioni, nel menu a sinistra.',
       );
     }
-    // Un argomento tolto nel frattempo fa tornare al primo.
-    final String scelto = dati.argomentiPerId.containsKey(_scelto)
-        ? _scelto!
-        : dati.argomenti.first.id;
+    // Un argomento tolto nel frattempo fa tornare a «Tutte».
+    final String? scelto = dati.argomentiPerId.containsKey(_scelto)
+        ? _scelto
+        : null;
     final List<Attivita> principali = ordinaPrincipali(
-      dati.indice.figlie(null).where((Attivita a) => a.argomentoId == scelto),
+      dati.indice
+          .figlie(null)
+          .where((Attivita a) => scelto == null || a.argomentoId == scelto),
     );
     final bool tutteChiuse = principali.every(
       (Attivita a) => !_aperte.contains(a.id),
@@ -53,6 +59,15 @@ class _ArgomentiPageState extends State<ArgomentiPage> {
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
           child: Row(
             children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  avatar: const Icon(Icons.view_list_outlined),
+                  label: Text('Tutte ${_aperteDi(dati, null)}'),
+                  selected: scelto == null,
+                  onSelected: (_) => setState(() => _scelto = null),
+                ),
+              ),
               for (final Argomento a in dati.argomenti)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
@@ -105,6 +120,8 @@ class _ArgomentiPageState extends State<ArgomentiPage> {
                   principali: principali,
                   aperte: _aperte,
                   mostraFatte: _mostraFatte,
+                  // Con tutti gli argomenti insieme, ogni riga dice il suo.
+                  mostraArgomento: scelto == null,
                   onEspandi: (String id) => setState(() {
                     if (!_aperte.remove(id)) {
                       _aperte.add(id);
@@ -115,20 +132,24 @@ class _ArgomentiPageState extends State<ArgomentiPage> {
                   icona: Icons.check_circle_outline,
                   titolo: 'Niente da fare qui',
                   testo:
-                      'Con «Nuova» aggiungi un\'attività; per metterla in '
-                      'questo argomento scrivi il suo nome dopo #, per '
-                      'esempio «#lavoro».',
+                      'Con «Nuova» aggiungi un\'attività; per metterla in un '
+                      'argomento scrivi il suo nome dopo #, per esempio '
+                      '«#lavoro», oppure sceglilo dal menu della freccia.',
                 ),
         ),
       ],
     );
   }
 
-  /// Quante attività principali da fare ha l'argomento [id].
-  int _aperteDi(DatiApp dati, String id) {
+  /// Quante attività principali da fare ha l'argomento [id]; con `null`,
+  /// tutti gli argomenti.
+  int _aperteDi(DatiApp dati, String? id) {
     return dati.indice
         .figlie(null)
-        .where((Attivita a) => a.argomentoId == id && a.fattaIl == null)
+        .where(
+          (Attivita a) =>
+              (id == null || a.argomentoId == id) && a.fattaIl == null,
+        )
         .length;
   }
 }

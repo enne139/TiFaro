@@ -15,6 +15,7 @@ class AlberoAttivita extends StatelessWidget {
     required this.aperte,
     required this.onEspandi,
     this.mostraFatte = false,
+    this.mostraArgomento = false,
     super.key,
   });
 
@@ -29,6 +30,11 @@ class AlberoAttivita extends StatelessWidget {
 
   /// Se mostrare anche le attività fatte.
   final bool mostraFatte;
+
+  /// Se scrivere l'argomento sulle righe: serve quando l'albero mescola
+  /// argomenti diversi. Basta sulle principali, le sotto-attività hanno lo
+  /// stesso.
+  final bool mostraArgomento;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +74,7 @@ class AlberoAttivita extends StatelessWidget {
           attivita: riga.attivita,
           rientro: riga.livello,
           mostraPercorso: false,
+          mostraArgomento: mostraArgomento && riga.livello == 0,
           espansa: aperte.contains(riga.attivita.id),
           onEspandi: riga.haFiglie ? () => onEspandi(riga.attivita.id) : null,
         );
