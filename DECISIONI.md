@@ -307,3 +307,113 @@ scoprono. Stessa regola di Spesone.
 
 **Alternative scartate:** trascinamento per riordinare (comodo sul telefono,
 ma da solo non basta).
+
+---
+
+## 015 — Migrazioni verificate con le fotografie dello schema
+
+**Data:** 2026-11-10
+
+**Contesto:** con i modelli il database passa alla versione 2, la prima
+migrazione vera. Una migrazione sbagliata rende l'app installata
+impossibile da aprire.
+
+**Decisione:** si usa `drift_dev make-migrations` (configurato in
+`build.yaml`): ogni versione dello schema è fotografata in `drift_schemas/`,
+la migrazione si scrive a passi con `stepByStep` e `test/drift/` verifica che
+da ogni versione vecchia si arrivi esattamente allo schema nuovo, dati
+compresi.
+
+**Motivazione:** è il modo che drift stesso consiglia, e trasforma un errore
+che si scoprirebbe sul telefono in una prova che fallisce sul PC. I passi
+generati usano lo schema di quella versione, non quello di oggi, quindi non
+si rompono quando le tabelle cambiano ancora.
+
+**Alternative scartate:** migrazioni scritte a mano e provate installando
+la versione vecchia (lento, e facile da saltare).
+
+---
+
+## 016 — Il modello fa da attività principale; le voci sono le sotto-attività
+
+**Data:** 2026-11-10
+
+**Contesto:** come tenere un modello, che è un'attività con il suo albero di
+sotto-attività.
+
+**Decisione:** due tabelle nuove. `modelli` tiene i campi dell'attività
+principale (il nome è anche il titolo, più descrizione, argomento,
+tipologia, scadenza relativa, calendario); `voci_modello` tiene le
+sotto-attività ad albero, con il rimando al genitore come le attività.
+L'argomento del modello è facoltativo: senza, vale quello della cattura.
+L'attività creata ricorda il modello da cui è nata (`modelloId`), solo sulla
+principale.
+
+**Motivazione:** tenere i modelli nella tabella delle attività con un
+segnalino avrebbe costretto ogni lettura a escluderli, e una dimenticanza li
+farebbe comparire fra le cose da fare. Un nome che fa anche da titolo evita
+due campi quasi uguali. Le stesse colonne `aggiornataIl` e `cancellataIl`
+delle altre tabelle li preparano alla sincronizzazione (voce 003).
+
+**Alternative scartate:** modelli come attività con un segnalino; una riga
+"radice" fra le voci, doppione della riga del modello.
+
+---
+
+## 017 — Scadenze relative: la principale dalla creazione, le altre dalla principale
+
+**Data:** 2026-11-10
+
+**Contesto:** un modello non può avere date vere: le scadenze devono
+spostarsi con il giorno in cui lo si usa.
+
+**Decisione:** ogni scadenza è un numero di giorni più un'ora facoltativa
+(minuti dalla mezzanotte). Per la principale i giorni si contano dal giorno
+della creazione (da 0 in su). Per le sotto-attività si contano dalla
+scadenza finale della principale, anche negativi ("1 giorno prima"); se la
+principale non ha scadenza, dal giorno della creazione. Se nella cattura si
+sceglie un'altra scadenza per la principale, le sotto-attività si spostano
+con lei. «Salva come modello» fa il contrario: le date diventano giorni
+rispetto alla creazione della principale e alla sua scadenza; lo stato
+fatto/da fare e le attività nel cestino non si copiano. Nell'editor si
+scrivono con `+2` e `-1`, solo lì: nella cattura veloce un numero di
+telefono come `+39` diventerebbe una data.
+
+**Motivazione:** il caso tipico è un evento con dei preparativi prima (il
+turno sabato, la divisa da controllare il giorno prima): contare dalla
+scadenza della principale è quello che si ha in testa, e scegliendo un altro
+sabato tutto si sposta da solo.
+
+**Alternative scartate:** tutte le scadenze dalla creazione (spostando il
+turno, i preparativi resterebbero dove sono); date fisse.
+
+---
+
+## 018 — Menu delle scelte nella cattura: il menu vince sul testo, il testo sul modello
+
+**Data:** 2026-11-10
+
+**Contesto:** oltre alla riga con la sintassi veloce si vuole poter
+scegliere i dati da un menu, senza scriverli.
+
+**Decisione:** una freccia accanto alla riga apre un menu con modello,
+argomento, tipologia, scadenza (con scorciatoie: oggi, domani, dopodomani,
+fra una settimana, una data, nessuna), ora e calendario. Le scelte del menu
+stanno a parte dal testo: il testo non viene riscritto. Per ogni campo vince
+il primo che c'è fra menu, testo, modello e valore predefinito; "nessuna"
+scelta dal menu toglie anche quello scritto. Accanto a ogni scelta fatta dal
+menu c'è la crocetta per tornare a quello scritto. Le regole stanno in una
+funzione pura (`componiCattura`), e le etichette sotto la riga mostrano
+sempre il risultato finale. Le finestre di scelta sono le stesse del
+dettaglio e dell'editor dei modelli (`selettori.dart`).
+
+**Motivazione:** il menu è un gesto deliberato, fatto dopo aver scritto:
+deve valere di più. Non riscrivere il testo evita che la riga si riempia di
+`#` e `@` mai scritti. Con una funzione pura le regole si provano una per
+una.
+
+**Alternative scartate:** scrivere nella riga le etichette scelte dal menu
+(una sola fonte di verità, ma la riga diventa illeggibile e i nomi con gli
+spazi vanno trasformati); il testo che vince sul menu (la scelta appena fatta
+sembrerebbe ignorata).
+

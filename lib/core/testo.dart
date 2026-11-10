@@ -34,6 +34,20 @@ String nomeDaEtichetta(String etichetta) {
   return conMaiuscola(conSpazi);
 }
 
+/// L'etichetta con cui si scrive un nome nella cattura veloce: "Turno in
+/// ambulanza" diventa `turno-in-ambulanza`.
+String etichettaDi(String nome) {
+  final StringBuffer risultato = StringBuffer();
+  for (final String lettera in nome.toLowerCase().split('')) {
+    final String base = _senzaAccento[lettera] ?? lettera;
+    risultato.write(RegExp(r'[a-z0-9]').hasMatch(base) ? base : '-');
+  }
+  return risultato
+      .toString()
+      .replaceAll(RegExp(r'-+'), '-')
+      .replaceAll(RegExp(r'^-|-$'), '');
+}
+
 /// Il testo con la prima lettera maiuscola.
 String conMaiuscola(String testo) {
   if (testo.isEmpty) {

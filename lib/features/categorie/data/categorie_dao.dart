@@ -5,11 +5,14 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/testo.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
+import 'package:tifaro/features/modelli/data/modelli_tables.dart';
 
 part 'categorie_dao.g.dart';
 
 /// Letture e scritture di argomenti e tipologie.
-@DriftAccessor(tables: <Type>[Argomenti, Tipologie, ElencoAttivita])
+@DriftAccessor(
+  tables: <Type>[Argomenti, Tipologie, ElencoAttivita, Modelli, VociModello],
+)
 class CategorieDao extends DatabaseAccessor<AppDatabase>
     with _$CategorieDaoMixin {
   CategorieDao(super.attachedDatabase);
@@ -100,7 +103,8 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
   ///
   /// Si rifiuta se è il predefinito o se qualche attività lo usa ancora,
   /// cestino compreso: un'attività senza argomento non saprebbe dove stare
-  /// (DECISIONI.md, voce 011).
+  /// (DECISIONI.md, voce 011). I modelli che lo usavano passano a "quello
+  /// della cattura", perché nei modelli l'argomento è facoltativo.
   Future<void> cancellaArgomento(String id) {
     return transaction(() async {
       final Argomento? argomento = await (select(
@@ -125,6 +129,12 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
         );
       }
       final DateTime adesso = DateTime.now();
+      await (update(modelli)..where((t) => t.argomentoId.equals(id))).write(
+        ModelliCompanion(
+          argomentoId: const Value<String?>(null),
+          aggiornatoIl: Value<DateTime>(adesso),
+        ),
+      );
       await (update(argomenti)..where((t) => t.id.equals(id))).write(
         ArgomentiCompanion(
           cancellatoIl: Value<DateTime>(adesso),
@@ -199,7 +209,8 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
-  /// Toglie una tipologia: le attività che l'avevano restano senza.
+  /// Toglie una tipologia: le attività, i modelli e le voci che l'avevano
+  /// restano senza.
   ///
   /// A differenza dell'argomento la tipologia è facoltativa, quindi toglierla
   /// non lascia nessuno senza posto (voce 011).
@@ -210,6 +221,18 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
         elencoAttivita,
       )..where((t) => t.tipologiaId.equals(id))).write(
         ElencoAttivitaCompanion(
+          tipologiaId: const Value<String?>(null),
+          aggiornataIl: Value<DateTime>(adesso),
+        ),
+      );
+      await (update(modelli)..where((t) => t.tipologiaId.equals(id))).write(
+        ModelliCompanion(
+          tipologiaId: const Value<String?>(null),
+          aggiornatoIl: Value<DateTime>(adesso),
+        ),
+      );
+      await (update(vociModello)..where((t) => t.tipologiaId.equals(id))).write(
+        VociModelloCompanion(
           tipologiaId: const Value<String?>(null),
           aggiornataIl: Value<DateTime>(adesso),
         ),

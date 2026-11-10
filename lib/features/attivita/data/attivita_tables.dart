@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
+import 'package:tifaro/features/modelli/data/modelli_tables.dart';
 
 /// Le attività, cioè le cose da fare, e le loro sotto-attività.
 ///
@@ -49,6 +50,10 @@ class ElencoAttivita extends Table {
 
   /// Posizione fra le sorelle (stesso genitore).
   IntColumn get ordine => integer().withDefault(const Constant(0))();
+
+  /// Il modello da cui è nata, se c'è. Si scrive solo sull'attività
+  /// principale creata dal modello, non sulle sue sotto-attività.
+  TextColumn get modelloId => text().nullable().references(Modelli, #id)();
 
   /// Se deve comparire su Google Calendar. Per ora si segna soltanto: gli
   /// eventi li creerà il server, nella fase 4 (voce 009).

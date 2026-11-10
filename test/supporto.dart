@@ -35,3 +35,15 @@ Future<void> chiudiApp(WidgetTester tester) async {
   await tester.pumpWidget(const SizedBox.shrink());
   await tester.pumpAndSettle();
 }
+
+/// Allunga lo schermo di prova, così fogli e menu stanno interi.
+///
+/// Lo schermo predefinito delle prove è 800x600: con il menu della cattura
+/// aperto, il pulsante «Aggiungi» finirebbe fuori e non si potrebbe
+/// toccare. Il telefono vero è più alto, e il foglio scorre comunque.
+void schermoAlto(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}

@@ -6,6 +6,7 @@ import 'package:tifaro/core/app_scope.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/features/attivita/logica/indice_attivita.dart';
+import 'package:tifaro/features/modelli/logica/albero_voci.dart';
 
 /// Tutto quello che serve alle schermate, letto una volta per tutta l'app.
 ///
@@ -17,7 +18,13 @@ class DatiApp {
     required this.argomenti,
     required this.tipologie,
     required List<Foto> foto,
+    required this.modelli,
+    required List<VoceModello> voci,
   }) : indice = IndiceAttivita(attivita),
+       voci = AlberoVoci(voci),
+       modelliPerId = <String, Modello>{
+         for (final Modello m in modelli) m.id: m,
+       },
        argomentiPerId = <String, Argomento>{
          for (final Argomento a in argomenti) a.id: a,
        },
@@ -43,6 +50,15 @@ class DatiApp {
 
   /// Le foto di ogni attività, dalla più vecchia.
   final Map<String, List<Foto>> fotoPerAttivita;
+
+  /// I modelli, in ordine di nome.
+  final List<Modello> modelli;
+
+  /// I modelli per id.
+  final Map<String, Modello> modelliPerId;
+
+  /// Le voci dei modelli, ad albero.
+  final AlberoVoci voci;
 
   static Map<String, List<Foto>> _perAttivita(List<Foto> foto) {
     final Map<String, List<Foto>> mappa = <String, List<Foto>>{};
@@ -102,6 +118,8 @@ class _FonteDatiState extends State<FonteDati> {
   List<Argomento>? _argomenti;
   List<Tipologia>? _tipologie;
   List<Foto>? _foto;
+  List<Modello>? _modelli;
+  List<VoceModello>? _voci;
   Object? _errore;
   DatiApp? _dati;
 
@@ -112,7 +130,7 @@ class _FonteDatiState extends State<FonteDati> {
       return;
     }
     final AppDatabase db = AppScope.db(context);
-    // Quattro letture indipendenti, una per tabella, e nessuna che aspetta
+    // Letture indipendenti, una per tabella, e nessuna che aspetta
     // l'altra: i dati si ricompongono qui quando ne cambia una.
     _abbonamenti.addAll(<StreamSubscription<Object?>>[
       db.attivitaDao.osservaTutte().listen(
@@ -131,6 +149,14 @@ class _FonteDatiState extends State<FonteDati> {
         (List<Foto> v) => _aggiorna(() => _foto = v),
         onError: _guasto,
       ),
+      db.modelliDao.osservaModelli().listen(
+        (List<Modello> v) => _aggiorna(() => _modelli = v),
+        onError: _guasto,
+      ),
+      db.modelliDao.osservaVoci().listen(
+        (List<VoceModello> v) => _aggiorna(() => _voci = v),
+        onError: _guasto,
+      ),
     ]);
   }
 
@@ -141,15 +167,21 @@ class _FonteDatiState extends State<FonteDati> {
       final List<Argomento>? argomenti = _argomenti;
       final List<Tipologia>? tipologie = _tipologie;
       final List<Foto>? foto = _foto;
+      final List<Modello>? modelli = _modelli;
+      final List<VoceModello>? voci = _voci;
       if (attivita != null &&
           argomenti != null &&
           tipologie != null &&
-          foto != null) {
+          foto != null &&
+          modelli != null &&
+          voci != null) {
         _dati = DatiApp(
           attivita: attivita,
           argomenti: argomenti,
           tipologie: tipologie,
           foto: foto,
+          modelli: modelli,
+          voci: voci,
         );
       }
     });

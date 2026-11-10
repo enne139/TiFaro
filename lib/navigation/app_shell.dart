@@ -7,6 +7,7 @@ import 'package:tifaro/features/attivita/tipologie_page.dart';
 import 'package:tifaro/features/categorie/impostazioni_page.dart';
 import 'package:tifaro/features/cattura/cattura_sheet.dart';
 import 'package:tifaro/features/cattura/condivisione.dart';
+import 'package:tifaro/features/modelli/modelli_page.dart';
 
 /// Una sezione principale dell'app.
 class _Sezione {
@@ -128,11 +129,14 @@ class _AppShellState extends State<AppShell> {
                   _apri(const CestinoPage());
                 },
               ),
-              const ListTile(
-                enabled: false,
-                leading: Icon(Icons.content_copy_outlined),
-                title: Text('Modelli'),
-                subtitle: Text('In arrivo con la fase 2'),
+              ListTile(
+                leading: const Icon(Icons.content_copy_outlined),
+                title: const Text('Modelli'),
+                subtitle: const Text('Attività con le sotto-attività pronte'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _apri(const ModelliPage());
+                },
               ),
               const Divider(),
               ListTile(

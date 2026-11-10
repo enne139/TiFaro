@@ -16,12 +16,15 @@ import 'package:tifaro/features/attivita/azioni.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/logica/viste.dart';
 import 'package:tifaro/features/attivita/widgets/riga_attivita.dart';
+import 'package:tifaro/features/attivita/widgets/selettori.dart';
 import 'package:tifaro/features/cattura/cattura_sheet.dart';
+import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/cattura/scelta_foto.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
+import 'package:tifaro/features/modelli/modelli_page.dart';
 
 /// Le voci del menu in alto nel dettaglio.
-enum _Azione { sottoCompleta, su, giu, cestino }
+enum _Azione { sottoCompleta, sottoDaModello, salvaModello, su, giu, cestino }
 
 /// Il dettaglio di un'attività: tutti i campi, le sotto-attività e le foto.
 ///
@@ -159,6 +162,20 @@ class _DettaglioPageState extends State<DettaglioPage> {
                   title: Text('Sotto-attività con foto…'),
                 ),
               ),
+              const PopupMenuItem<_Azione>(
+                value: _Azione.sottoDaModello,
+                child: ListTile(
+                  leading: Icon(Icons.playlist_add),
+                  title: Text('Sotto-attività da un modello…'),
+                ),
+              ),
+              const PopupMenuItem<_Azione>(
+                value: _Azione.salvaModello,
+                child: ListTile(
+                  leading: Icon(Icons.content_copy_outlined),
+                  title: Text('Salva come modello'),
+                ),
+              ),
               // Fra le principali l'ordine lo dà la scadenza (voce 013):
               // spostarle a mano non avrebbe effetto visibile.
               if (attivita.genitoreId != null) ...<PopupMenuEntry<_Azione>>[
@@ -262,6 +279,15 @@ class _DettaglioPageState extends State<DettaglioPage> {
               color: tema.colorScheme.onSurfaceVariant,
             ),
           ),
+          if (dati.modelliPerId[attivita.modelloId] case final Modello modello)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                icon: const Icon(Icons.content_copy_outlined, size: 16),
+                label: Text('Nata dal modello «${modello.nome}»'),
+                onPressed: () => apriModello(context, modello.id),
+              ),
+            ),
           const SizedBox(height: 16),
           TextField(
             controller: _descrizione,
@@ -306,7 +332,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
                 : coloreArgomento(argomento.colore).colore,
           ),
           label: Text(argomento?.nome ?? 'Argomento'),
-          onPressed: principale ? () => _scegliArgomento(attivita, dati) : null,
+          onPressed: principale ? () => _scegliArgomento(attivita) : null,
         ),
       ),
       InputChip(
@@ -314,7 +340,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
           tipologia == null ? Icons.label_outline : icona(tipologia.icona),
         ),
         label: Text(tipologia?.nome ?? 'Tipologia'),
-        onPressed: () => _scegliTipologia(dati),
+        onPressed: () => _scegliTipologia(attivita),
         deleteButtonTooltipMessage: 'Togli la tipologia',
         onDeleted: tipologia == null
             ? null
@@ -369,28 +395,10 @@ class _DettaglioPageState extends State<DettaglioPage> {
     ];
   }
 
-  Future<void> _scegliArgomento(Attivita attivita, DatiApp dati) async {
-    final String? scelto = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        title: const Text('Argomento'),
-        children: <Widget>[
-          for (final Argomento a in dati.argomenti)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, a.id),
-              child: ListTile(
-                leading: Icon(
-                  icona(a.icona),
-                  color: coloreArgomento(a.colore).colore,
-                ),
-                title: Text(a.nome),
-                trailing: a.id == attivita.argomentoId
-                    ? const Icon(Icons.check)
-                    : null,
-              ),
-            ),
-        ],
-      ),
+  Future<void> _scegliArgomento(Attivita attivita) async {
+    final String? scelto = await scegliArgomento(
+      context,
+      attuale: attivita.argomentoId,
     );
     if (scelto == null || scelto == attivita.argomentoId || !mounted) {
       return;
@@ -401,82 +409,45 @@ class _DettaglioPageState extends State<DettaglioPage> {
     );
   }
 
-  Future<void> _scegliTipologia(DatiApp dati) async {
-    // '' vuol dire "nuova tipologia".
-    final String? scelta = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-        title: const Text('Tipologia'),
-        children: <Widget>[
-          for (final Tipologia t in dati.tipologie)
-            SimpleDialogOption(
-              onPressed: () => Navigator.pop(context, t.id),
-              child: ListTile(
-                leading: Icon(icona(t.icona)),
-                title: Text(t.nome),
-              ),
-            ),
-          SimpleDialogOption(
-            onPressed: () => Navigator.pop(context, ''),
-            child: const ListTile(
-              leading: Icon(Icons.add),
-              title: Text('Nuova tipologia…'),
-            ),
-          ),
-        ],
-      ),
+  Future<void> _scegliTipologia(Attivita attivita) async {
+    final Scelta<String>? scelta = await scegliTipologia(
+      context,
+      attuale: attivita.tipologiaId,
     );
     if (scelta == null || !mounted) {
       return;
     }
-    if (scelta.isNotEmpty) {
-      await _aggiorna(
-        ElencoAttivitaCompanion(tipologiaId: Value<String?>(scelta)),
-      );
-      return;
-    }
-    final String? nome = await chiediTesto(
-      context,
-      titolo: 'Nuova tipologia',
-      etichetta: 'Nome',
+    await _aggiorna(
+      ElencoAttivitaCompanion(tipologiaId: Value<String?>(scelta.valore)),
     );
-    if (nome == null || !mounted) {
-      return;
-    }
-    await eseguiSegnalandoErrori(context, () async {
-      final String id = await _db.categorieDao.creaTipologia(nome);
-      await _db.attivitaDao.aggiorna(
-        widget.id,
-        ElencoAttivitaCompanion(tipologiaId: Value<String?>(id)),
-      );
-    });
   }
 
   Future<void> _scegliData(Attivita attivita) async {
     final DateTime? attuale = attivita.scadenza;
-    final DateTime? scelta = await showDatePicker(
-      context: context,
-      initialDate: attuale ?? giorno(DateTime.now()),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+    final Scelta<DateTime>? scelta = await scegliGiorno(
+      context,
+      attuale: attuale,
     );
     if (scelta == null) {
       return;
     }
+    final DateTime? data = scelta.valore;
     // Cambiando giorno l'ora già scelta resta.
-    final DateTime nuova = attuale != null && attivita.scadenzaConOra
+    final bool conOra =
+        data != null && attuale != null && attivita.scadenzaConOra;
+    final DateTime? nuova = data != null && conOra
         ? DateTime(
-            scelta.year,
-            scelta.month,
-            scelta.day,
+            data.year,
+            data.month,
+            data.day,
             attuale.hour,
             attuale.minute,
           )
-        : scelta;
+        : data;
     await _aggiorna(
       ElencoAttivitaCompanion(
         scadenza: Value<DateTime?>(nuova),
-        scadenzaConOra: Value<bool>(attivita.scadenzaConOra),
+        scadenzaConOra: Value<bool>(conOra),
       ),
     );
   }
@@ -691,12 +662,65 @@ class _DettaglioPageState extends State<DettaglioPage> {
     }
   }
 
+  /// Crea un modello da questa attività e dalle sue sotto-attività.
+  Future<void> _salvaComeModello(Attivita attivita) async {
+    if (_ritardo?.isActive ?? false) {
+      await _salvaTesti();
+    }
+    if (!mounted) {
+      return;
+    }
+    final String? nome = await chiediTesto(
+      context,
+      titolo: 'Salva come modello',
+      etichetta: 'Nome del modello',
+      iniziale: _titolo?.text.trim() ?? attivita.titolo,
+    );
+    if (nome == null || !mounted) {
+      return;
+    }
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    String? modelloId;
+    await eseguiSegnalandoErrori(context, () async {
+      modelloId = await _db.modelliDao.salvaComeModello(attivita.id, nome);
+    });
+    final String? creato = modelloId;
+    if (creato == null) {
+      return;
+    }
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('Modello «$nome» creato'),
+        action: SnackBarAction(
+          label: 'Apri',
+          onPressed: () {
+            if (mounted) {
+              apriModello(context, creato);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
   // --- Menu in alto --------------------------------------------------------
 
   Future<void> _esegui(_Azione azione, Attivita attivita) async {
     switch (azione) {
       case _Azione.sottoCompleta:
         await apriCattura(context, genitoreId: attivita.id);
+      case _Azione.sottoDaModello:
+        final Scelta<String>? scelta = await scegliModello(context);
+        final String? modelloId = scelta?.valore;
+        if (modelloId != null && mounted) {
+          await apriCattura(
+            context,
+            genitoreId: attivita.id,
+            modelloId: modelloId,
+          );
+        }
+      case _Azione.salvaModello:
+        await _salvaComeModello(attivita);
       case _Azione.su:
       case _Azione.giu:
         await eseguiSegnalandoErrori(

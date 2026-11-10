@@ -6,6 +6,7 @@ part of 'attivita_dao.dart';
 mixin _$AttivitaDaoMixin on DatabaseAccessor<AppDatabase> {
   $ArgomentiTable get argomenti => attachedDatabase.argomenti;
   $TipologieTable get tipologie => attachedDatabase.tipologie;
+  $ModelliTable get modelli => attachedDatabase.modelli;
   $ElencoAttivitaTable get elencoAttivita => attachedDatabase.elencoAttivita;
   $ElencoFotoTable get elencoFoto => attachedDatabase.elencoFoto;
   AttivitaDaoManager get managers => AttivitaDaoManager(this);
@@ -18,6 +19,8 @@ class AttivitaDaoManager {
       $$ArgomentiTableTableManager(_db.attachedDatabase, _db.argomenti);
   $$TipologieTableTableManager get tipologie =>
       $$TipologieTableTableManager(_db.attachedDatabase, _db.tipologie);
+  $$ModelliTableTableManager get modelli =>
+      $$ModelliTableTableManager(_db.attachedDatabase, _db.modelli);
   $$ElencoAttivitaTableTableManager get elencoAttivita =>
       $$ElencoAttivitaTableTableManager(
         _db.attachedDatabase,

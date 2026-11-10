@@ -2,10 +2,13 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:tifaro/core/database/app_database.steps.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_dao.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
+import 'package:tifaro/features/modelli/data/modelli_dao.dart';
+import 'package:tifaro/features/modelli/data/modelli_tables.dart';
 
 part 'app_database.g.dart';
 
@@ -15,8 +18,15 @@ part 'app_database.g.dart';
 /// (`features/<nome>/data/`); qui si dichiara solo quali fanno parte del
 /// database. L'ordine conta: una tabella viene dopo quelle a cui rimanda.
 @DriftDatabase(
-  tables: <Type>[Argomenti, Tipologie, ElencoAttivita, ElencoFoto],
-  daos: <Type>[CategorieDao, AttivitaDao],
+  tables: <Type>[
+    Argomenti,
+    Tipologie,
+    Modelli,
+    VociModello,
+    ElencoAttivita,
+    ElencoFoto,
+  ],
+  daos: <Type>[CategorieDao, AttivitaDao, ModelliDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, nella cartella dei dati dell'app.
@@ -38,8 +48,10 @@ class AppDatabase extends _$AppDatabase {
 
   /// Da aumentare di uno a ogni modifica delle tabelle, scrivendo la
   /// migrazione in [migration]: senza, l'app installata non si apre più.
+  ///
+  /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -48,6 +60,15 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
         await _semina();
       },
+      // Un passo per ogni versione, generati da `drift_dev make-migrations`
+      // con le fotografie dello schema in `drift_schemas/` (voce 015).
+      onUpgrade: stepByStep(
+        from1To2: (Migrator m, Schema2 schema) async {
+          await m.createTable(schema.modelli);
+          await m.createTable(schema.vociModello);
+          await m.addColumn(schema.attivita, schema.attivita.modelloId);
+        },
+      ),
       beforeOpen: (OpeningDetails details) async {
         // Senza questo SQLite accetta i rimandi fra tabelle ma non li fa
         // rispettare.

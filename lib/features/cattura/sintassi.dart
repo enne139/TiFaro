@@ -4,6 +4,7 @@
 ///
 /// ```text
 /// comprare guanti nitrile #ambulanza @acquisti venerdì 18:00 !cal
+/// /turno sabato
 /// ```
 library;
 
@@ -19,6 +20,7 @@ class RigaAnalizzata {
     this.scadenza,
     this.conOra = false,
     this.calendario = false,
+    this.modello,
   });
 
   /// Le parole rimaste, cioè cosa fare.
@@ -38,6 +40,10 @@ class RigaAnalizzata {
 
   /// Se nella riga c'era `!cal`.
   final bool calendario;
+
+  /// L'etichetta dopo `/`, cioè il modello da usare, così come è stata
+  /// scritta.
+  final String? modello;
 }
 
 /// I giorni della settimana come si scrivono, con e senza accento.
@@ -74,6 +80,10 @@ final RegExp _data = RegExp(r'^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?$');
 final RegExp _ora = RegExp(r'^(\d{1,2}):(\d{2})$');
 final RegExp _numero = RegExp(r'^\d{1,3}$');
 
+/// Un modello: `/` seguita da lettere, cifre, trattini o trattini bassi. Un
+/// percorso come `/home/utente` ha altre barre e resta nel titolo.
+final RegExp _modello = RegExp(r'^/([\p{L}\p{N}_-]+)$', unicode: true);
+
 /// Analizza una riga della cattura veloce, prendendo [adesso] come
 /// riferimento per le date relative.
 ///
@@ -89,6 +99,7 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
   DateTime? data;
   ({int ore, int minuti})? ora;
   bool calendario = false;
+  String? modello;
   final DateTime oggi = giorno(adesso);
 
   /// Toglie dal fondo del titolo le parole di collegamento rimaste prima di
@@ -124,6 +135,12 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
         }
         continue;
       }
+    }
+
+    final RegExpMatch? partiModello = _modello.firstMatch(parola);
+    if (partiModello != null) {
+      modello = partiModello.group(1);
+      continue;
     }
 
     if (minuscola == '!cal') {
@@ -234,6 +251,7 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
     scadenza: scadenza,
     conOra: ora != null,
     calendario: calendario,
+    modello: modello,
   );
 }
 

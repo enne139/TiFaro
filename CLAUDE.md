@@ -26,11 +26,15 @@ cambia se ne aggiunge una nuova che dice quale supera.
 - `lib/features/<funzionalità>/`: una cartella per funzionalità; le tabelle e
   i DAO in `data/`, la logica pura in `logica/`.
 - `lib/navigation/`: l'impalcatura con le sezioni.
+- `lib/features/modelli/`: i modelli; `logica/` ha le scadenze relative.
+- `lib/features/cattura/composizione.dart`: come si uniscono testo, menu e
+  modello nella cattura veloce (voce 018). Una regola nuova va lì, con la
+  sua prova in `test/composizione_test.dart`.
 
 ## Dati
 
 - **Una lettura sola per tutta l'app.** `FonteDati` (in `core/dati_app.dart`)
-  legge attività, argomenti, tipologie e foto; le schermate prendono i dati
+  legge attività, argomenti, tipologie, foto, modelli e voci; le schermate prendono i dati
   con `DatiApp.of(context)` e li filtrano in Dart con le funzioni di
   `features/attivita/logica/`. Non aprire stream nelle schermate (l'unica
   eccezione è il cestino). Voce 012.
@@ -48,8 +52,18 @@ Dopo **ogni** modifica a una tabella o a un DAO:
 dart run build_runner build
 ```
 
-e, se le tabelle sono cambiate, aumentare `schemaVersion` e scrivere la
-migrazione in `migration`. Senza migrazione l'app installata non si apre più.
+Se le tabelle sono cambiate (voce 015):
+
+1. aumentare `schemaVersion`;
+2. `dart run drift_dev make-migrations`: fotografa il nuovo schema in
+   `drift_schemas/` e rigenera `app_database.steps.dart` e gli aiuti in
+   `test/drift/`;
+3. scrivere il passo `fromNToM` in `stepByStep` dentro `migration`;
+4. `flutter test test/drift`: verifica che da ogni versione vecchia si arrivi
+   esattamente allo schema nuovo.
+
+Senza migrazione l'app installata non si apre più. Le fotografie in
+`drift_schemas/` non si toccano a mano.
 
 Dentro una `transaction(...)` si legge solo con `get()`: uno stream aspetta
 una notifica che arriva dopo il commit, e l'operazione resta appesa.
@@ -72,7 +86,10 @@ flutter test
 ```
 
 Le prove con interfaccia usano `test/supporto.dart` e finiscono con
-`chiudiApp(tester)`; il database in memoria non va chiuso.
+`chiudiApp(tester)`; il database in memoria non va chiuso. Dentro una prova
+con interfaccia, le letture e scritture dirette sul database (prepararlo,
+controllarlo) vanno in `tester.runAsync(...)`: con l'orologio finto della
+prova uno stream di drift non risponde mai e la prova resta appesa.
 
 ## Verifiche prima di consegnare
 

@@ -912,6 +912,1431 @@ class TipologieCompanion extends UpdateCompanion<Tipologia> {
   }
 }
 
+class $ModelliTable extends Modelli with TableInfo<$ModelliTable, Modello> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ModelliTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
+  @override
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descrizioneMeta = const VerificationMeta(
+    'descrizione',
+  );
+  @override
+  late final GeneratedColumn<String> descrizione = GeneratedColumn<String>(
+    'descrizione',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _argomentoIdMeta = const VerificationMeta(
+    'argomentoId',
+  );
+  @override
+  late final GeneratedColumn<String> argomentoId = GeneratedColumn<String>(
+    'argomento_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES argomenti (id)',
+    ),
+  );
+  static const VerificationMeta _tipologiaIdMeta = const VerificationMeta(
+    'tipologiaId',
+  );
+  @override
+  late final GeneratedColumn<String> tipologiaId = GeneratedColumn<String>(
+    'tipologia_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tipologie (id)',
+    ),
+  );
+  static const VerificationMeta _giorniMeta = const VerificationMeta('giorni');
+  @override
+  late final GeneratedColumn<int> giorni = GeneratedColumn<int>(
+    'giorni',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minutiMeta = const VerificationMeta('minuti');
+  @override
+  late final GeneratedColumn<int> minuti = GeneratedColumn<int>(
+    'minuti',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nelCalendarioMeta = const VerificationMeta(
+    'nelCalendario',
+  );
+  @override
+  late final GeneratedColumn<bool> nelCalendario = GeneratedColumn<bool>(
+    'nel_calendario',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("nel_calendario" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _aggiornatoIlMeta = const VerificationMeta(
+    'aggiornatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> aggiornatoIl = GeneratedColumn<DateTime>(
+    'aggiornato_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cancellatoIlMeta = const VerificationMeta(
+    'cancellatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cancellatoIl = GeneratedColumn<DateTime>(
+    'cancellato_il',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nome,
+    descrizione,
+    argomentoId,
+    tipologiaId,
+    giorni,
+    minuti,
+    nelCalendario,
+    aggiornatoIl,
+    cancellatoIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'modelli';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Modello> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('nome')) {
+      context.handle(
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('descrizione')) {
+      context.handle(
+        _descrizioneMeta,
+        descrizione.isAcceptableOrUnknown(
+          data['descrizione']!,
+          _descrizioneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('argomento_id')) {
+      context.handle(
+        _argomentoIdMeta,
+        argomentoId.isAcceptableOrUnknown(
+          data['argomento_id']!,
+          _argomentoIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tipologia_id')) {
+      context.handle(
+        _tipologiaIdMeta,
+        tipologiaId.isAcceptableOrUnknown(
+          data['tipologia_id']!,
+          _tipologiaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('giorni')) {
+      context.handle(
+        _giorniMeta,
+        giorni.isAcceptableOrUnknown(data['giorni']!, _giorniMeta),
+      );
+    }
+    if (data.containsKey('minuti')) {
+      context.handle(
+        _minutiMeta,
+        minuti.isAcceptableOrUnknown(data['minuti']!, _minutiMeta),
+      );
+    }
+    if (data.containsKey('nel_calendario')) {
+      context.handle(
+        _nelCalendarioMeta,
+        nelCalendario.isAcceptableOrUnknown(
+          data['nel_calendario']!,
+          _nelCalendarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('aggiornato_il')) {
+      context.handle(
+        _aggiornatoIlMeta,
+        aggiornatoIl.isAcceptableOrUnknown(
+          data['aggiornato_il']!,
+          _aggiornatoIlMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_aggiornatoIlMeta);
+    }
+    if (data.containsKey('cancellato_il')) {
+      context.handle(
+        _cancellatoIlMeta,
+        cancellatoIl.isAcceptableOrUnknown(
+          data['cancellato_il']!,
+          _cancellatoIlMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Modello map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Modello(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      descrizione: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}descrizione'],
+      )!,
+      argomentoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}argomento_id'],
+      ),
+      tipologiaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tipologia_id'],
+      ),
+      giorni: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}giorni'],
+      ),
+      minuti: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minuti'],
+      ),
+      nelCalendario: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}nel_calendario'],
+      )!,
+      aggiornatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}aggiornato_il'],
+      )!,
+      cancellatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cancellato_il'],
+      ),
+    );
+  }
+
+  @override
+  $ModelliTable createAlias(String alias) {
+    return $ModelliTable(attachedDatabase, alias);
+  }
+}
+
+class Modello extends DataClass implements Insertable<Modello> {
+  /// UUID.
+  final String id;
+
+  /// Il nome, che è anche il titolo dell'attività creata se nella cattura
+  /// non se ne scrive un altro. Con `/nome` si sceglie nella cattura veloce.
+  final String nome;
+
+  /// La descrizione dell'attività creata.
+  final String descrizione;
+
+  /// L'argomento dell'attività creata; nullo vuol dire "quello della
+  /// cattura" (scritto, scelto o il predefinito).
+  final String? argomentoId;
+
+  /// La tipologia dell'attività creata, facoltativa.
+  final String? tipologiaId;
+
+  /// Quanti giorni dopo la creazione scade l'attività; nullo se non ha una
+  /// scadenza (voce 017).
+  final int? giorni;
+
+  /// L'ora della scadenza in minuti dalla mezzanotte; nulla se conta solo il
+  /// giorno.
+  final int? minuti;
+
+  /// Se l'attività creata va nel calendario.
+  final bool nelCalendario;
+
+  /// Ultima modifica, per la sincronizzazione (voce 003).
+  final DateTime aggiornatoIl;
+
+  /// Se non è nullo il modello è stato tolto (voce 003).
+  final DateTime? cancellatoIl;
+  const Modello({
+    required this.id,
+    required this.nome,
+    required this.descrizione,
+    this.argomentoId,
+    this.tipologiaId,
+    this.giorni,
+    this.minuti,
+    required this.nelCalendario,
+    required this.aggiornatoIl,
+    this.cancellatoIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['nome'] = Variable<String>(nome);
+    map['descrizione'] = Variable<String>(descrizione);
+    if (!nullToAbsent || argomentoId != null) {
+      map['argomento_id'] = Variable<String>(argomentoId);
+    }
+    if (!nullToAbsent || tipologiaId != null) {
+      map['tipologia_id'] = Variable<String>(tipologiaId);
+    }
+    if (!nullToAbsent || giorni != null) {
+      map['giorni'] = Variable<int>(giorni);
+    }
+    if (!nullToAbsent || minuti != null) {
+      map['minuti'] = Variable<int>(minuti);
+    }
+    map['nel_calendario'] = Variable<bool>(nelCalendario);
+    map['aggiornato_il'] = Variable<DateTime>(aggiornatoIl);
+    if (!nullToAbsent || cancellatoIl != null) {
+      map['cancellato_il'] = Variable<DateTime>(cancellatoIl);
+    }
+    return map;
+  }
+
+  ModelliCompanion toCompanion(bool nullToAbsent) {
+    return ModelliCompanion(
+      id: Value(id),
+      nome: Value(nome),
+      descrizione: Value(descrizione),
+      argomentoId: argomentoId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(argomentoId),
+      tipologiaId: tipologiaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tipologiaId),
+      giorni: giorni == null && nullToAbsent
+          ? const Value.absent()
+          : Value(giorni),
+      minuti: minuti == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minuti),
+      nelCalendario: Value(nelCalendario),
+      aggiornatoIl: Value(aggiornatoIl),
+      cancellatoIl: cancellatoIl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cancellatoIl),
+    );
+  }
+
+  factory Modello.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Modello(
+      id: serializer.fromJson<String>(json['id']),
+      nome: serializer.fromJson<String>(json['nome']),
+      descrizione: serializer.fromJson<String>(json['descrizione']),
+      argomentoId: serializer.fromJson<String?>(json['argomentoId']),
+      tipologiaId: serializer.fromJson<String?>(json['tipologiaId']),
+      giorni: serializer.fromJson<int?>(json['giorni']),
+      minuti: serializer.fromJson<int?>(json['minuti']),
+      nelCalendario: serializer.fromJson<bool>(json['nelCalendario']),
+      aggiornatoIl: serializer.fromJson<DateTime>(json['aggiornatoIl']),
+      cancellatoIl: serializer.fromJson<DateTime?>(json['cancellatoIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'nome': serializer.toJson<String>(nome),
+      'descrizione': serializer.toJson<String>(descrizione),
+      'argomentoId': serializer.toJson<String?>(argomentoId),
+      'tipologiaId': serializer.toJson<String?>(tipologiaId),
+      'giorni': serializer.toJson<int?>(giorni),
+      'minuti': serializer.toJson<int?>(minuti),
+      'nelCalendario': serializer.toJson<bool>(nelCalendario),
+      'aggiornatoIl': serializer.toJson<DateTime>(aggiornatoIl),
+      'cancellatoIl': serializer.toJson<DateTime?>(cancellatoIl),
+    };
+  }
+
+  Modello copyWith({
+    String? id,
+    String? nome,
+    String? descrizione,
+    Value<String?> argomentoId = const Value.absent(),
+    Value<String?> tipologiaId = const Value.absent(),
+    Value<int?> giorni = const Value.absent(),
+    Value<int?> minuti = const Value.absent(),
+    bool? nelCalendario,
+    DateTime? aggiornatoIl,
+    Value<DateTime?> cancellatoIl = const Value.absent(),
+  }) => Modello(
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    descrizione: descrizione ?? this.descrizione,
+    argomentoId: argomentoId.present ? argomentoId.value : this.argomentoId,
+    tipologiaId: tipologiaId.present ? tipologiaId.value : this.tipologiaId,
+    giorni: giorni.present ? giorni.value : this.giorni,
+    minuti: minuti.present ? minuti.value : this.minuti,
+    nelCalendario: nelCalendario ?? this.nelCalendario,
+    aggiornatoIl: aggiornatoIl ?? this.aggiornatoIl,
+    cancellatoIl: cancellatoIl.present ? cancellatoIl.value : this.cancellatoIl,
+  );
+  Modello copyWithCompanion(ModelliCompanion data) {
+    return Modello(
+      id: data.id.present ? data.id.value : this.id,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      descrizione: data.descrizione.present
+          ? data.descrizione.value
+          : this.descrizione,
+      argomentoId: data.argomentoId.present
+          ? data.argomentoId.value
+          : this.argomentoId,
+      tipologiaId: data.tipologiaId.present
+          ? data.tipologiaId.value
+          : this.tipologiaId,
+      giorni: data.giorni.present ? data.giorni.value : this.giorni,
+      minuti: data.minuti.present ? data.minuti.value : this.minuti,
+      nelCalendario: data.nelCalendario.present
+          ? data.nelCalendario.value
+          : this.nelCalendario,
+      aggiornatoIl: data.aggiornatoIl.present
+          ? data.aggiornatoIl.value
+          : this.aggiornatoIl,
+      cancellatoIl: data.cancellatoIl.present
+          ? data.cancellatoIl.value
+          : this.cancellatoIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Modello(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('argomentoId: $argomentoId, ')
+          ..write('tipologiaId: $tipologiaId, ')
+          ..write('giorni: $giorni, ')
+          ..write('minuti: $minuti, ')
+          ..write('nelCalendario: $nelCalendario, ')
+          ..write('aggiornatoIl: $aggiornatoIl, ')
+          ..write('cancellatoIl: $cancellatoIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    nome,
+    descrizione,
+    argomentoId,
+    tipologiaId,
+    giorni,
+    minuti,
+    nelCalendario,
+    aggiornatoIl,
+    cancellatoIl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Modello &&
+          other.id == this.id &&
+          other.nome == this.nome &&
+          other.descrizione == this.descrizione &&
+          other.argomentoId == this.argomentoId &&
+          other.tipologiaId == this.tipologiaId &&
+          other.giorni == this.giorni &&
+          other.minuti == this.minuti &&
+          other.nelCalendario == this.nelCalendario &&
+          other.aggiornatoIl == this.aggiornatoIl &&
+          other.cancellatoIl == this.cancellatoIl);
+}
+
+class ModelliCompanion extends UpdateCompanion<Modello> {
+  final Value<String> id;
+  final Value<String> nome;
+  final Value<String> descrizione;
+  final Value<String?> argomentoId;
+  final Value<String?> tipologiaId;
+  final Value<int?> giorni;
+  final Value<int?> minuti;
+  final Value<bool> nelCalendario;
+  final Value<DateTime> aggiornatoIl;
+  final Value<DateTime?> cancellatoIl;
+  final Value<int> rowid;
+  const ModelliCompanion({
+    this.id = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.descrizione = const Value.absent(),
+    this.argomentoId = const Value.absent(),
+    this.tipologiaId = const Value.absent(),
+    this.giorni = const Value.absent(),
+    this.minuti = const Value.absent(),
+    this.nelCalendario = const Value.absent(),
+    this.aggiornatoIl = const Value.absent(),
+    this.cancellatoIl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ModelliCompanion.insert({
+    required String id,
+    required String nome,
+    this.descrizione = const Value.absent(),
+    this.argomentoId = const Value.absent(),
+    this.tipologiaId = const Value.absent(),
+    this.giorni = const Value.absent(),
+    this.minuti = const Value.absent(),
+    this.nelCalendario = const Value.absent(),
+    required DateTime aggiornatoIl,
+    this.cancellatoIl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       nome = Value(nome),
+       aggiornatoIl = Value(aggiornatoIl);
+  static Insertable<Modello> custom({
+    Expression<String>? id,
+    Expression<String>? nome,
+    Expression<String>? descrizione,
+    Expression<String>? argomentoId,
+    Expression<String>? tipologiaId,
+    Expression<int>? giorni,
+    Expression<int>? minuti,
+    Expression<bool>? nelCalendario,
+    Expression<DateTime>? aggiornatoIl,
+    Expression<DateTime>? cancellatoIl,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nome != null) 'nome': nome,
+      if (descrizione != null) 'descrizione': descrizione,
+      if (argomentoId != null) 'argomento_id': argomentoId,
+      if (tipologiaId != null) 'tipologia_id': tipologiaId,
+      if (giorni != null) 'giorni': giorni,
+      if (minuti != null) 'minuti': minuti,
+      if (nelCalendario != null) 'nel_calendario': nelCalendario,
+      if (aggiornatoIl != null) 'aggiornato_il': aggiornatoIl,
+      if (cancellatoIl != null) 'cancellato_il': cancellatoIl,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ModelliCompanion copyWith({
+    Value<String>? id,
+    Value<String>? nome,
+    Value<String>? descrizione,
+    Value<String?>? argomentoId,
+    Value<String?>? tipologiaId,
+    Value<int?>? giorni,
+    Value<int?>? minuti,
+    Value<bool>? nelCalendario,
+    Value<DateTime>? aggiornatoIl,
+    Value<DateTime?>? cancellatoIl,
+    Value<int>? rowid,
+  }) {
+    return ModelliCompanion(
+      id: id ?? this.id,
+      nome: nome ?? this.nome,
+      descrizione: descrizione ?? this.descrizione,
+      argomentoId: argomentoId ?? this.argomentoId,
+      tipologiaId: tipologiaId ?? this.tipologiaId,
+      giorni: giorni ?? this.giorni,
+      minuti: minuti ?? this.minuti,
+      nelCalendario: nelCalendario ?? this.nelCalendario,
+      aggiornatoIl: aggiornatoIl ?? this.aggiornatoIl,
+      cancellatoIl: cancellatoIl ?? this.cancellatoIl,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (descrizione.present) {
+      map['descrizione'] = Variable<String>(descrizione.value);
+    }
+    if (argomentoId.present) {
+      map['argomento_id'] = Variable<String>(argomentoId.value);
+    }
+    if (tipologiaId.present) {
+      map['tipologia_id'] = Variable<String>(tipologiaId.value);
+    }
+    if (giorni.present) {
+      map['giorni'] = Variable<int>(giorni.value);
+    }
+    if (minuti.present) {
+      map['minuti'] = Variable<int>(minuti.value);
+    }
+    if (nelCalendario.present) {
+      map['nel_calendario'] = Variable<bool>(nelCalendario.value);
+    }
+    if (aggiornatoIl.present) {
+      map['aggiornato_il'] = Variable<DateTime>(aggiornatoIl.value);
+    }
+    if (cancellatoIl.present) {
+      map['cancellato_il'] = Variable<DateTime>(cancellatoIl.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ModelliCompanion(')
+          ..write('id: $id, ')
+          ..write('nome: $nome, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('argomentoId: $argomentoId, ')
+          ..write('tipologiaId: $tipologiaId, ')
+          ..write('giorni: $giorni, ')
+          ..write('minuti: $minuti, ')
+          ..write('nelCalendario: $nelCalendario, ')
+          ..write('aggiornatoIl: $aggiornatoIl, ')
+          ..write('cancellatoIl: $cancellatoIl, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $VociModelloTable extends VociModello
+    with TableInfo<$VociModelloTable, VoceModello> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VociModelloTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _modelloIdMeta = const VerificationMeta(
+    'modelloId',
+  );
+  @override
+  late final GeneratedColumn<String> modelloId = GeneratedColumn<String>(
+    'modello_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES modelli (id)',
+    ),
+  );
+  static const VerificationMeta _genitoreIdMeta = const VerificationMeta(
+    'genitoreId',
+  );
+  @override
+  late final GeneratedColumn<String> genitoreId = GeneratedColumn<String>(
+    'genitore_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES voci_modello (id)',
+    ),
+  );
+  static const VerificationMeta _titoloMeta = const VerificationMeta('titolo');
+  @override
+  late final GeneratedColumn<String> titolo = GeneratedColumn<String>(
+    'titolo',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _descrizioneMeta = const VerificationMeta(
+    'descrizione',
+  );
+  @override
+  late final GeneratedColumn<String> descrizione = GeneratedColumn<String>(
+    'descrizione',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _tipologiaIdMeta = const VerificationMeta(
+    'tipologiaId',
+  );
+  @override
+  late final GeneratedColumn<String> tipologiaId = GeneratedColumn<String>(
+    'tipologia_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tipologie (id)',
+    ),
+  );
+  static const VerificationMeta _giorniMeta = const VerificationMeta('giorni');
+  @override
+  late final GeneratedColumn<int> giorni = GeneratedColumn<int>(
+    'giorni',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _minutiMeta = const VerificationMeta('minuti');
+  @override
+  late final GeneratedColumn<int> minuti = GeneratedColumn<int>(
+    'minuti',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _nelCalendarioMeta = const VerificationMeta(
+    'nelCalendario',
+  );
+  @override
+  late final GeneratedColumn<bool> nelCalendario = GeneratedColumn<bool>(
+    'nel_calendario',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("nel_calendario" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _ordineMeta = const VerificationMeta('ordine');
+  @override
+  late final GeneratedColumn<int> ordine = GeneratedColumn<int>(
+    'ordine',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _aggiornataIlMeta = const VerificationMeta(
+    'aggiornataIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> aggiornataIl = GeneratedColumn<DateTime>(
+    'aggiornata_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cancellataIlMeta = const VerificationMeta(
+    'cancellataIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> cancellataIl = GeneratedColumn<DateTime>(
+    'cancellata_il',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    modelloId,
+    genitoreId,
+    titolo,
+    descrizione,
+    tipologiaId,
+    giorni,
+    minuti,
+    nelCalendario,
+    ordine,
+    aggiornataIl,
+    cancellataIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'voci_modello';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<VoceModello> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('modello_id')) {
+      context.handle(
+        _modelloIdMeta,
+        modelloId.isAcceptableOrUnknown(data['modello_id']!, _modelloIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_modelloIdMeta);
+    }
+    if (data.containsKey('genitore_id')) {
+      context.handle(
+        _genitoreIdMeta,
+        genitoreId.isAcceptableOrUnknown(data['genitore_id']!, _genitoreIdMeta),
+      );
+    }
+    if (data.containsKey('titolo')) {
+      context.handle(
+        _titoloMeta,
+        titolo.isAcceptableOrUnknown(data['titolo']!, _titoloMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titoloMeta);
+    }
+    if (data.containsKey('descrizione')) {
+      context.handle(
+        _descrizioneMeta,
+        descrizione.isAcceptableOrUnknown(
+          data['descrizione']!,
+          _descrizioneMeta,
+        ),
+      );
+    }
+    if (data.containsKey('tipologia_id')) {
+      context.handle(
+        _tipologiaIdMeta,
+        tipologiaId.isAcceptableOrUnknown(
+          data['tipologia_id']!,
+          _tipologiaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('giorni')) {
+      context.handle(
+        _giorniMeta,
+        giorni.isAcceptableOrUnknown(data['giorni']!, _giorniMeta),
+      );
+    }
+    if (data.containsKey('minuti')) {
+      context.handle(
+        _minutiMeta,
+        minuti.isAcceptableOrUnknown(data['minuti']!, _minutiMeta),
+      );
+    }
+    if (data.containsKey('nel_calendario')) {
+      context.handle(
+        _nelCalendarioMeta,
+        nelCalendario.isAcceptableOrUnknown(
+          data['nel_calendario']!,
+          _nelCalendarioMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ordine')) {
+      context.handle(
+        _ordineMeta,
+        ordine.isAcceptableOrUnknown(data['ordine']!, _ordineMeta),
+      );
+    }
+    if (data.containsKey('aggiornata_il')) {
+      context.handle(
+        _aggiornataIlMeta,
+        aggiornataIl.isAcceptableOrUnknown(
+          data['aggiornata_il']!,
+          _aggiornataIlMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_aggiornataIlMeta);
+    }
+    if (data.containsKey('cancellata_il')) {
+      context.handle(
+        _cancellataIlMeta,
+        cancellataIl.isAcceptableOrUnknown(
+          data['cancellata_il']!,
+          _cancellataIlMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  VoceModello map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return VoceModello(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      modelloId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}modello_id'],
+      )!,
+      genitoreId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}genitore_id'],
+      ),
+      titolo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}titolo'],
+      )!,
+      descrizione: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}descrizione'],
+      )!,
+      tipologiaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tipologia_id'],
+      ),
+      giorni: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}giorni'],
+      ),
+      minuti: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}minuti'],
+      ),
+      nelCalendario: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}nel_calendario'],
+      )!,
+      ordine: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ordine'],
+      )!,
+      aggiornataIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}aggiornata_il'],
+      )!,
+      cancellataIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}cancellata_il'],
+      ),
+    );
+  }
+
+  @override
+  $VociModelloTable createAlias(String alias) {
+    return $VociModelloTable(attachedDatabase, alias);
+  }
+}
+
+class VoceModello extends DataClass implements Insertable<VoceModello> {
+  /// UUID.
+  final String id;
+
+  /// Il modello a cui appartiene.
+  final String modelloId;
+
+  /// La voce di cui questa è una sotto-voce; nulla per le figlie dirette
+  /// dell'attività principale (cioè del modello).
+  final String? genitoreId;
+
+  /// Il titolo della sotto-attività creata.
+  final String titolo;
+
+  /// La descrizione della sotto-attività creata.
+  final String descrizione;
+
+  /// La tipologia, facoltativa.
+  final String? tipologiaId;
+
+  /// Giorni rispetto alla scadenza della principale (o alla creazione, se la
+  /// principale non ha scadenza): negativi prima, positivi dopo. Nullo se la
+  /// sotto-attività non ha scadenza (voce 017).
+  final int? giorni;
+
+  /// L'ora della scadenza in minuti dalla mezzanotte; nulla se conta solo il
+  /// giorno.
+  final int? minuti;
+
+  /// Se la sotto-attività creata va nel calendario.
+  final bool nelCalendario;
+
+  /// Posizione fra le sorelle.
+  final int ordine;
+
+  /// Ultima modifica, per la sincronizzazione (voce 003).
+  final DateTime aggiornataIl;
+
+  /// Se non è nulla la voce è stata tolta (voce 003).
+  final DateTime? cancellataIl;
+  const VoceModello({
+    required this.id,
+    required this.modelloId,
+    this.genitoreId,
+    required this.titolo,
+    required this.descrizione,
+    this.tipologiaId,
+    this.giorni,
+    this.minuti,
+    required this.nelCalendario,
+    required this.ordine,
+    required this.aggiornataIl,
+    this.cancellataIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['modello_id'] = Variable<String>(modelloId);
+    if (!nullToAbsent || genitoreId != null) {
+      map['genitore_id'] = Variable<String>(genitoreId);
+    }
+    map['titolo'] = Variable<String>(titolo);
+    map['descrizione'] = Variable<String>(descrizione);
+    if (!nullToAbsent || tipologiaId != null) {
+      map['tipologia_id'] = Variable<String>(tipologiaId);
+    }
+    if (!nullToAbsent || giorni != null) {
+      map['giorni'] = Variable<int>(giorni);
+    }
+    if (!nullToAbsent || minuti != null) {
+      map['minuti'] = Variable<int>(minuti);
+    }
+    map['nel_calendario'] = Variable<bool>(nelCalendario);
+    map['ordine'] = Variable<int>(ordine);
+    map['aggiornata_il'] = Variable<DateTime>(aggiornataIl);
+    if (!nullToAbsent || cancellataIl != null) {
+      map['cancellata_il'] = Variable<DateTime>(cancellataIl);
+    }
+    return map;
+  }
+
+  VociModelloCompanion toCompanion(bool nullToAbsent) {
+    return VociModelloCompanion(
+      id: Value(id),
+      modelloId: Value(modelloId),
+      genitoreId: genitoreId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(genitoreId),
+      titolo: Value(titolo),
+      descrizione: Value(descrizione),
+      tipologiaId: tipologiaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(tipologiaId),
+      giorni: giorni == null && nullToAbsent
+          ? const Value.absent()
+          : Value(giorni),
+      minuti: minuti == null && nullToAbsent
+          ? const Value.absent()
+          : Value(minuti),
+      nelCalendario: Value(nelCalendario),
+      ordine: Value(ordine),
+      aggiornataIl: Value(aggiornataIl),
+      cancellataIl: cancellataIl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cancellataIl),
+    );
+  }
+
+  factory VoceModello.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return VoceModello(
+      id: serializer.fromJson<String>(json['id']),
+      modelloId: serializer.fromJson<String>(json['modelloId']),
+      genitoreId: serializer.fromJson<String?>(json['genitoreId']),
+      titolo: serializer.fromJson<String>(json['titolo']),
+      descrizione: serializer.fromJson<String>(json['descrizione']),
+      tipologiaId: serializer.fromJson<String?>(json['tipologiaId']),
+      giorni: serializer.fromJson<int?>(json['giorni']),
+      minuti: serializer.fromJson<int?>(json['minuti']),
+      nelCalendario: serializer.fromJson<bool>(json['nelCalendario']),
+      ordine: serializer.fromJson<int>(json['ordine']),
+      aggiornataIl: serializer.fromJson<DateTime>(json['aggiornataIl']),
+      cancellataIl: serializer.fromJson<DateTime?>(json['cancellataIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'modelloId': serializer.toJson<String>(modelloId),
+      'genitoreId': serializer.toJson<String?>(genitoreId),
+      'titolo': serializer.toJson<String>(titolo),
+      'descrizione': serializer.toJson<String>(descrizione),
+      'tipologiaId': serializer.toJson<String?>(tipologiaId),
+      'giorni': serializer.toJson<int?>(giorni),
+      'minuti': serializer.toJson<int?>(minuti),
+      'nelCalendario': serializer.toJson<bool>(nelCalendario),
+      'ordine': serializer.toJson<int>(ordine),
+      'aggiornataIl': serializer.toJson<DateTime>(aggiornataIl),
+      'cancellataIl': serializer.toJson<DateTime?>(cancellataIl),
+    };
+  }
+
+  VoceModello copyWith({
+    String? id,
+    String? modelloId,
+    Value<String?> genitoreId = const Value.absent(),
+    String? titolo,
+    String? descrizione,
+    Value<String?> tipologiaId = const Value.absent(),
+    Value<int?> giorni = const Value.absent(),
+    Value<int?> minuti = const Value.absent(),
+    bool? nelCalendario,
+    int? ordine,
+    DateTime? aggiornataIl,
+    Value<DateTime?> cancellataIl = const Value.absent(),
+  }) => VoceModello(
+    id: id ?? this.id,
+    modelloId: modelloId ?? this.modelloId,
+    genitoreId: genitoreId.present ? genitoreId.value : this.genitoreId,
+    titolo: titolo ?? this.titolo,
+    descrizione: descrizione ?? this.descrizione,
+    tipologiaId: tipologiaId.present ? tipologiaId.value : this.tipologiaId,
+    giorni: giorni.present ? giorni.value : this.giorni,
+    minuti: minuti.present ? minuti.value : this.minuti,
+    nelCalendario: nelCalendario ?? this.nelCalendario,
+    ordine: ordine ?? this.ordine,
+    aggiornataIl: aggiornataIl ?? this.aggiornataIl,
+    cancellataIl: cancellataIl.present ? cancellataIl.value : this.cancellataIl,
+  );
+  VoceModello copyWithCompanion(VociModelloCompanion data) {
+    return VoceModello(
+      id: data.id.present ? data.id.value : this.id,
+      modelloId: data.modelloId.present ? data.modelloId.value : this.modelloId,
+      genitoreId: data.genitoreId.present
+          ? data.genitoreId.value
+          : this.genitoreId,
+      titolo: data.titolo.present ? data.titolo.value : this.titolo,
+      descrizione: data.descrizione.present
+          ? data.descrizione.value
+          : this.descrizione,
+      tipologiaId: data.tipologiaId.present
+          ? data.tipologiaId.value
+          : this.tipologiaId,
+      giorni: data.giorni.present ? data.giorni.value : this.giorni,
+      minuti: data.minuti.present ? data.minuti.value : this.minuti,
+      nelCalendario: data.nelCalendario.present
+          ? data.nelCalendario.value
+          : this.nelCalendario,
+      ordine: data.ordine.present ? data.ordine.value : this.ordine,
+      aggiornataIl: data.aggiornataIl.present
+          ? data.aggiornataIl.value
+          : this.aggiornataIl,
+      cancellataIl: data.cancellataIl.present
+          ? data.cancellataIl.value
+          : this.cancellataIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VoceModello(')
+          ..write('id: $id, ')
+          ..write('modelloId: $modelloId, ')
+          ..write('genitoreId: $genitoreId, ')
+          ..write('titolo: $titolo, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('tipologiaId: $tipologiaId, ')
+          ..write('giorni: $giorni, ')
+          ..write('minuti: $minuti, ')
+          ..write('nelCalendario: $nelCalendario, ')
+          ..write('ordine: $ordine, ')
+          ..write('aggiornataIl: $aggiornataIl, ')
+          ..write('cancellataIl: $cancellataIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    modelloId,
+    genitoreId,
+    titolo,
+    descrizione,
+    tipologiaId,
+    giorni,
+    minuti,
+    nelCalendario,
+    ordine,
+    aggiornataIl,
+    cancellataIl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is VoceModello &&
+          other.id == this.id &&
+          other.modelloId == this.modelloId &&
+          other.genitoreId == this.genitoreId &&
+          other.titolo == this.titolo &&
+          other.descrizione == this.descrizione &&
+          other.tipologiaId == this.tipologiaId &&
+          other.giorni == this.giorni &&
+          other.minuti == this.minuti &&
+          other.nelCalendario == this.nelCalendario &&
+          other.ordine == this.ordine &&
+          other.aggiornataIl == this.aggiornataIl &&
+          other.cancellataIl == this.cancellataIl);
+}
+
+class VociModelloCompanion extends UpdateCompanion<VoceModello> {
+  final Value<String> id;
+  final Value<String> modelloId;
+  final Value<String?> genitoreId;
+  final Value<String> titolo;
+  final Value<String> descrizione;
+  final Value<String?> tipologiaId;
+  final Value<int?> giorni;
+  final Value<int?> minuti;
+  final Value<bool> nelCalendario;
+  final Value<int> ordine;
+  final Value<DateTime> aggiornataIl;
+  final Value<DateTime?> cancellataIl;
+  final Value<int> rowid;
+  const VociModelloCompanion({
+    this.id = const Value.absent(),
+    this.modelloId = const Value.absent(),
+    this.genitoreId = const Value.absent(),
+    this.titolo = const Value.absent(),
+    this.descrizione = const Value.absent(),
+    this.tipologiaId = const Value.absent(),
+    this.giorni = const Value.absent(),
+    this.minuti = const Value.absent(),
+    this.nelCalendario = const Value.absent(),
+    this.ordine = const Value.absent(),
+    this.aggiornataIl = const Value.absent(),
+    this.cancellataIl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VociModelloCompanion.insert({
+    required String id,
+    required String modelloId,
+    this.genitoreId = const Value.absent(),
+    required String titolo,
+    this.descrizione = const Value.absent(),
+    this.tipologiaId = const Value.absent(),
+    this.giorni = const Value.absent(),
+    this.minuti = const Value.absent(),
+    this.nelCalendario = const Value.absent(),
+    this.ordine = const Value.absent(),
+    required DateTime aggiornataIl,
+    this.cancellataIl = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       modelloId = Value(modelloId),
+       titolo = Value(titolo),
+       aggiornataIl = Value(aggiornataIl);
+  static Insertable<VoceModello> custom({
+    Expression<String>? id,
+    Expression<String>? modelloId,
+    Expression<String>? genitoreId,
+    Expression<String>? titolo,
+    Expression<String>? descrizione,
+    Expression<String>? tipologiaId,
+    Expression<int>? giorni,
+    Expression<int>? minuti,
+    Expression<bool>? nelCalendario,
+    Expression<int>? ordine,
+    Expression<DateTime>? aggiornataIl,
+    Expression<DateTime>? cancellataIl,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (modelloId != null) 'modello_id': modelloId,
+      if (genitoreId != null) 'genitore_id': genitoreId,
+      if (titolo != null) 'titolo': titolo,
+      if (descrizione != null) 'descrizione': descrizione,
+      if (tipologiaId != null) 'tipologia_id': tipologiaId,
+      if (giorni != null) 'giorni': giorni,
+      if (minuti != null) 'minuti': minuti,
+      if (nelCalendario != null) 'nel_calendario': nelCalendario,
+      if (ordine != null) 'ordine': ordine,
+      if (aggiornataIl != null) 'aggiornata_il': aggiornataIl,
+      if (cancellataIl != null) 'cancellata_il': cancellataIl,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VociModelloCompanion copyWith({
+    Value<String>? id,
+    Value<String>? modelloId,
+    Value<String?>? genitoreId,
+    Value<String>? titolo,
+    Value<String>? descrizione,
+    Value<String?>? tipologiaId,
+    Value<int?>? giorni,
+    Value<int?>? minuti,
+    Value<bool>? nelCalendario,
+    Value<int>? ordine,
+    Value<DateTime>? aggiornataIl,
+    Value<DateTime?>? cancellataIl,
+    Value<int>? rowid,
+  }) {
+    return VociModelloCompanion(
+      id: id ?? this.id,
+      modelloId: modelloId ?? this.modelloId,
+      genitoreId: genitoreId ?? this.genitoreId,
+      titolo: titolo ?? this.titolo,
+      descrizione: descrizione ?? this.descrizione,
+      tipologiaId: tipologiaId ?? this.tipologiaId,
+      giorni: giorni ?? this.giorni,
+      minuti: minuti ?? this.minuti,
+      nelCalendario: nelCalendario ?? this.nelCalendario,
+      ordine: ordine ?? this.ordine,
+      aggiornataIl: aggiornataIl ?? this.aggiornataIl,
+      cancellataIl: cancellataIl ?? this.cancellataIl,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (modelloId.present) {
+      map['modello_id'] = Variable<String>(modelloId.value);
+    }
+    if (genitoreId.present) {
+      map['genitore_id'] = Variable<String>(genitoreId.value);
+    }
+    if (titolo.present) {
+      map['titolo'] = Variable<String>(titolo.value);
+    }
+    if (descrizione.present) {
+      map['descrizione'] = Variable<String>(descrizione.value);
+    }
+    if (tipologiaId.present) {
+      map['tipologia_id'] = Variable<String>(tipologiaId.value);
+    }
+    if (giorni.present) {
+      map['giorni'] = Variable<int>(giorni.value);
+    }
+    if (minuti.present) {
+      map['minuti'] = Variable<int>(minuti.value);
+    }
+    if (nelCalendario.present) {
+      map['nel_calendario'] = Variable<bool>(nelCalendario.value);
+    }
+    if (ordine.present) {
+      map['ordine'] = Variable<int>(ordine.value);
+    }
+    if (aggiornataIl.present) {
+      map['aggiornata_il'] = Variable<DateTime>(aggiornataIl.value);
+    }
+    if (cancellataIl.present) {
+      map['cancellata_il'] = Variable<DateTime>(cancellataIl.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VociModelloCompanion(')
+          ..write('id: $id, ')
+          ..write('modelloId: $modelloId, ')
+          ..write('genitoreId: $genitoreId, ')
+          ..write('titolo: $titolo, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('tipologiaId: $tipologiaId, ')
+          ..write('giorni: $giorni, ')
+          ..write('minuti: $minuti, ')
+          ..write('nelCalendario: $nelCalendario, ')
+          ..write('ordine: $ordine, ')
+          ..write('aggiornataIl: $aggiornataIl, ')
+          ..write('cancellataIl: $cancellataIl, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ElencoAttivitaTable extends ElencoAttivita
     with TableInfo<$ElencoAttivitaTable, Attivita> {
   @override
@@ -1048,6 +2473,20 @@ class $ElencoAttivitaTable extends ElencoAttivita
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _modelloIdMeta = const VerificationMeta(
+    'modelloId',
+  );
+  @override
+  late final GeneratedColumn<String> modelloId = GeneratedColumn<String>(
+    'modello_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES modelli (id)',
+    ),
+  );
   static const VerificationMeta _nelCalendarioMeta = const VerificationMeta(
     'nelCalendario',
   );
@@ -1098,6 +2537,7 @@ class $ElencoAttivitaTable extends ElencoAttivita
     tipologiaId,
     genitoreId,
     ordine,
+    modelloId,
     nelCalendario,
     aggiornataIl,
     cancellataIl,
@@ -1197,6 +2637,12 @@ class $ElencoAttivitaTable extends ElencoAttivita
         ordine.isAcceptableOrUnknown(data['ordine']!, _ordineMeta),
       );
     }
+    if (data.containsKey('modello_id')) {
+      context.handle(
+        _modelloIdMeta,
+        modelloId.isAcceptableOrUnknown(data['modello_id']!, _modelloIdMeta),
+      );
+    }
     if (data.containsKey('nel_calendario')) {
       context.handle(
         _nelCalendarioMeta,
@@ -1279,6 +2725,10 @@ class $ElencoAttivitaTable extends ElencoAttivita
         DriftSqlType.int,
         data['${effectivePrefix}ordine'],
       )!,
+      modelloId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}modello_id'],
+      ),
       nelCalendario: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}nel_calendario'],
@@ -1337,6 +2787,10 @@ class Attivita extends DataClass implements Insertable<Attivita> {
   /// Posizione fra le sorelle (stesso genitore).
   final int ordine;
 
+  /// Il modello da cui è nata, se c'è. Si scrive solo sull'attività
+  /// principale creata dal modello, non sulle sue sotto-attività.
+  final String? modelloId;
+
   /// Se deve comparire su Google Calendar. Per ora si segna soltanto: gli
   /// eventi li creerà il server, nella fase 4 (voce 009).
   final bool nelCalendario;
@@ -1360,6 +2814,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     this.tipologiaId,
     this.genitoreId,
     required this.ordine,
+    this.modelloId,
     required this.nelCalendario,
     required this.aggiornataIl,
     this.cancellataIl,
@@ -1386,6 +2841,9 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       map['genitore_id'] = Variable<String>(genitoreId);
     }
     map['ordine'] = Variable<int>(ordine);
+    if (!nullToAbsent || modelloId != null) {
+      map['modello_id'] = Variable<String>(modelloId);
+    }
     map['nel_calendario'] = Variable<bool>(nelCalendario);
     map['aggiornata_il'] = Variable<DateTime>(aggiornataIl);
     if (!nullToAbsent || cancellataIl != null) {
@@ -1415,6 +2873,9 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ? const Value.absent()
           : Value(genitoreId),
       ordine: Value(ordine),
+      modelloId: modelloId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(modelloId),
       nelCalendario: Value(nelCalendario),
       aggiornataIl: Value(aggiornataIl),
       cancellataIl: cancellataIl == null && nullToAbsent
@@ -1440,6 +2901,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       tipologiaId: serializer.fromJson<String?>(json['tipologiaId']),
       genitoreId: serializer.fromJson<String?>(json['genitoreId']),
       ordine: serializer.fromJson<int>(json['ordine']),
+      modelloId: serializer.fromJson<String?>(json['modelloId']),
       nelCalendario: serializer.fromJson<bool>(json['nelCalendario']),
       aggiornataIl: serializer.fromJson<DateTime>(json['aggiornataIl']),
       cancellataIl: serializer.fromJson<DateTime?>(json['cancellataIl']),
@@ -1460,6 +2922,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       'tipologiaId': serializer.toJson<String?>(tipologiaId),
       'genitoreId': serializer.toJson<String?>(genitoreId),
       'ordine': serializer.toJson<int>(ordine),
+      'modelloId': serializer.toJson<String?>(modelloId),
       'nelCalendario': serializer.toJson<bool>(nelCalendario),
       'aggiornataIl': serializer.toJson<DateTime>(aggiornataIl),
       'cancellataIl': serializer.toJson<DateTime?>(cancellataIl),
@@ -1478,6 +2941,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     Value<String?> tipologiaId = const Value.absent(),
     Value<String?> genitoreId = const Value.absent(),
     int? ordine,
+    Value<String?> modelloId = const Value.absent(),
     bool? nelCalendario,
     DateTime? aggiornataIl,
     Value<DateTime?> cancellataIl = const Value.absent(),
@@ -1493,6 +2957,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     tipologiaId: tipologiaId.present ? tipologiaId.value : this.tipologiaId,
     genitoreId: genitoreId.present ? genitoreId.value : this.genitoreId,
     ordine: ordine ?? this.ordine,
+    modelloId: modelloId.present ? modelloId.value : this.modelloId,
     nelCalendario: nelCalendario ?? this.nelCalendario,
     aggiornataIl: aggiornataIl ?? this.aggiornataIl,
     cancellataIl: cancellataIl.present ? cancellataIl.value : this.cancellataIl,
@@ -1520,6 +2985,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ? data.genitoreId.value
           : this.genitoreId,
       ordine: data.ordine.present ? data.ordine.value : this.ordine,
+      modelloId: data.modelloId.present ? data.modelloId.value : this.modelloId,
       nelCalendario: data.nelCalendario.present
           ? data.nelCalendario.value
           : this.nelCalendario,
@@ -1546,6 +3012,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ..write('tipologiaId: $tipologiaId, ')
           ..write('genitoreId: $genitoreId, ')
           ..write('ordine: $ordine, ')
+          ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl')
@@ -1566,6 +3033,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     tipologiaId,
     genitoreId,
     ordine,
+    modelloId,
     nelCalendario,
     aggiornataIl,
     cancellataIl,
@@ -1585,6 +3053,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           other.tipologiaId == this.tipologiaId &&
           other.genitoreId == this.genitoreId &&
           other.ordine == this.ordine &&
+          other.modelloId == this.modelloId &&
           other.nelCalendario == this.nelCalendario &&
           other.aggiornataIl == this.aggiornataIl &&
           other.cancellataIl == this.cancellataIl);
@@ -1602,6 +3071,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
   final Value<String?> tipologiaId;
   final Value<String?> genitoreId;
   final Value<int> ordine;
+  final Value<String?> modelloId;
   final Value<bool> nelCalendario;
   final Value<DateTime> aggiornataIl;
   final Value<DateTime?> cancellataIl;
@@ -1618,6 +3088,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.tipologiaId = const Value.absent(),
     this.genitoreId = const Value.absent(),
     this.ordine = const Value.absent(),
+    this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
     this.aggiornataIl = const Value.absent(),
     this.cancellataIl = const Value.absent(),
@@ -1635,6 +3106,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.tipologiaId = const Value.absent(),
     this.genitoreId = const Value.absent(),
     this.ordine = const Value.absent(),
+    this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
     required DateTime aggiornataIl,
     this.cancellataIl = const Value.absent(),
@@ -1656,6 +3128,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Expression<String>? tipologiaId,
     Expression<String>? genitoreId,
     Expression<int>? ordine,
+    Expression<String>? modelloId,
     Expression<bool>? nelCalendario,
     Expression<DateTime>? aggiornataIl,
     Expression<DateTime>? cancellataIl,
@@ -1673,6 +3146,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       if (tipologiaId != null) 'tipologia_id': tipologiaId,
       if (genitoreId != null) 'genitore_id': genitoreId,
       if (ordine != null) 'ordine': ordine,
+      if (modelloId != null) 'modello_id': modelloId,
       if (nelCalendario != null) 'nel_calendario': nelCalendario,
       if (aggiornataIl != null) 'aggiornata_il': aggiornataIl,
       if (cancellataIl != null) 'cancellata_il': cancellataIl,
@@ -1692,6 +3166,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Value<String?>? tipologiaId,
     Value<String?>? genitoreId,
     Value<int>? ordine,
+    Value<String?>? modelloId,
     Value<bool>? nelCalendario,
     Value<DateTime>? aggiornataIl,
     Value<DateTime?>? cancellataIl,
@@ -1709,6 +3184,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       tipologiaId: tipologiaId ?? this.tipologiaId,
       genitoreId: genitoreId ?? this.genitoreId,
       ordine: ordine ?? this.ordine,
+      modelloId: modelloId ?? this.modelloId,
       nelCalendario: nelCalendario ?? this.nelCalendario,
       aggiornataIl: aggiornataIl ?? this.aggiornataIl,
       cancellataIl: cancellataIl ?? this.cancellataIl,
@@ -1752,6 +3228,9 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     if (ordine.present) {
       map['ordine'] = Variable<int>(ordine.value);
     }
+    if (modelloId.present) {
+      map['modello_id'] = Variable<String>(modelloId.value);
+    }
     if (nelCalendario.present) {
       map['nel_calendario'] = Variable<bool>(nelCalendario.value);
     }
@@ -1781,6 +3260,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
           ..write('tipologiaId: $tipologiaId, ')
           ..write('genitoreId: $genitoreId, ')
           ..write('ordine: $ordine, ')
+          ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl, ')
@@ -2238,10 +3718,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ArgomentiTable argomenti = $ArgomentiTable(this);
   late final $TipologieTable tipologie = $TipologieTable(this);
+  late final $ModelliTable modelli = $ModelliTable(this);
+  late final $VociModelloTable vociModello = $VociModelloTable(this);
   late final $ElencoAttivitaTable elencoAttivita = $ElencoAttivitaTable(this);
   late final $ElencoFotoTable elencoFoto = $ElencoFotoTable(this);
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
   late final AttivitaDao attivitaDao = AttivitaDao(this as AppDatabase);
+  late final ModelliDao modelliDao = ModelliDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2249,6 +3732,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     argomenti,
     tipologie,
+    modelli,
+    vociModello,
     elencoAttivita,
     elencoFoto,
   ];
@@ -2280,6 +3765,25 @@ typedef $$ArgomentiTableUpdateCompanionBuilder = ArgomentiCompanion Function({
 final class $$ArgomentiTableReferences
     extends BaseReferences<_$AppDatabase, $ArgomentiTable, Argomento> {
   $$ArgomentiTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ModelliTable, List<Modello>> _modelliRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.modelli,
+    aliasName: 'argomenti__id__modelli__argomento_id',
+  );
+
+  $$ModelliTableProcessedTableManager get modelliRefs {
+    final manager = $$ModelliTableTableManager(
+      $_db,
+      $_db.modelli,
+    ).filter((f) => f.argomentoId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_modelliRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 
   static MultiTypedResultKey<$ElencoAttivitaTable, List<Attivita>>
   _elencoAttivitaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -2348,6 +3852,31 @@ class $$ArgomentiTableFilterComposer
     column: $table.cancellatoIl,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> modelliRefs(
+    Expression<bool> Function($$ModelliTableFilterComposer f) f,
+  ) {
+    final $$ModelliTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.argomentoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableFilterComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<bool> elencoAttivitaRefs(
     Expression<bool> Function($$ElencoAttivitaTableFilterComposer f) f,
@@ -2464,6 +3993,31 @@ class $$ArgomentiTableAnnotationComposer
     builder: (column) => column,
   );
 
+  Expression<T> modelliRefs<T extends Object>(
+    Expression<T> Function($$ModelliTableAnnotationComposer a) f,
+  ) {
+    final $$ModelliTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.argomentoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableAnnotationComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> elencoAttivitaRefs<T extends Object>(
     Expression<T> Function($$ElencoAttivitaTableAnnotationComposer a) f,
   ) {
@@ -2503,7 +4057,7 @@ class $$ArgomentiTableTableManager
           $$ArgomentiTableUpdateCompanionBuilder,
           (Argomento, $$ArgomentiTableReferences),
           Argomento,
-          PrefetchHooks Function({bool elencoAttivitaRefs})
+          PrefetchHooks Function({bool modelliRefs, bool elencoAttivitaRefs})
         > {
   $$ArgomentiTableTableManager(_$AppDatabase db, $ArgomentiTable table)
     : super(
@@ -2568,39 +4122,61 @@ class $$ArgomentiTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({elencoAttivitaRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (elencoAttivitaRefs) db.elencoAttivita,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (elencoAttivitaRefs)
-                    await $_getPrefetchedDataByColumns<
-                      Argomento,
-                      $ArgomentiTable,
-                      Attivita,
-                      $ElencoAttivitaTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ArgomentiTableReferences
-                          ._elencoAttivitaRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ArgomentiTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).elencoAttivitaRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'argomento_id',
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({modelliRefs = false, elencoAttivitaRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (modelliRefs) db.modelli,
+                    if (elencoAttivitaRefs) db.elencoAttivita,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (modelliRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Argomento,
+                          $ArgomentiTable,
+                          Modello,
+                          $ModelliTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ArgomentiTableReferences
+                              ._modelliRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ArgomentiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).modelliRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'argomento_id',
+                          typedResults: items,
+                        ),
+                      if (elencoAttivitaRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Argomento,
+                          $ArgomentiTable,
+                          Attivita,
+                          $ElencoAttivitaTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ArgomentiTableReferences
+                              ._elencoAttivitaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ArgomentiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).elencoAttivitaRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'argomento_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2617,7 +4193,7 @@ typedef $$ArgomentiTableProcessedTableManager =
       $$ArgomentiTableUpdateCompanionBuilder,
       (Argomento, $$ArgomentiTableReferences),
       Argomento,
-      PrefetchHooks Function({bool elencoAttivitaRefs})
+      PrefetchHooks Function({bool modelliRefs, bool elencoAttivitaRefs})
     >;
 typedef $$TipologieTableCreateCompanionBuilder = TipologieCompanion Function({
   required String id,
@@ -2639,6 +4215,43 @@ typedef $$TipologieTableUpdateCompanionBuilder = TipologieCompanion Function({
 final class $$TipologieTableReferences
     extends BaseReferences<_$AppDatabase, $TipologieTable, Tipologia> {
   $$TipologieTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ModelliTable, List<Modello>> _modelliRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.modelli,
+    aliasName: 'tipologie__id__modelli__tipologia_id',
+  );
+
+  $$ModelliTableProcessedTableManager get modelliRefs {
+    final manager = $$ModelliTableTableManager(
+      $_db,
+      $_db.modelli,
+    ).filter((f) => f.tipologiaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_modelliRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$VociModelloTable, List<VoceModello>>
+  _vociModelloRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.vociModello,
+    aliasName: 'tipologie__id__voci_modello__tipologia_id',
+  );
+
+  $$VociModelloTableProcessedTableManager get vociModelloRefs {
+    final manager = $$VociModelloTableTableManager(
+      $_db,
+      $_db.vociModello,
+    ).filter((f) => f.tipologiaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_vociModelloRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 
   static MultiTypedResultKey<$ElencoAttivitaTable, List<Attivita>>
   _elencoAttivitaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -2692,6 +4305,56 @@ class $$TipologieTableFilterComposer
     column: $table.cancellataIl,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> modelliRefs(
+    Expression<bool> Function($$ModelliTableFilterComposer f) f,
+  ) {
+    final $$ModelliTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.tipologiaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableFilterComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> vociModelloRefs(
+    Expression<bool> Function($$VociModelloTableFilterComposer f) f,
+  ) {
+    final $$VociModelloTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.tipologiaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableFilterComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 
   Expression<bool> elencoAttivitaRefs(
     Expression<bool> Function($$ElencoAttivitaTableFilterComposer f) f,
@@ -2782,6 +4445,56 @@ class $$TipologieTableAnnotationComposer
     builder: (column) => column,
   );
 
+  Expression<T> modelliRefs<T extends Object>(
+    Expression<T> Function($$ModelliTableAnnotationComposer a) f,
+  ) {
+    final $$ModelliTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.tipologiaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableAnnotationComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> vociModelloRefs<T extends Object>(
+    Expression<T> Function($$VociModelloTableAnnotationComposer a) f,
+  ) {
+    final $$VociModelloTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.tipologiaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableAnnotationComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> elencoAttivitaRefs<T extends Object>(
     Expression<T> Function($$ElencoAttivitaTableAnnotationComposer a) f,
   ) {
@@ -2821,7 +4534,11 @@ class $$TipologieTableTableManager
           $$TipologieTableUpdateCompanionBuilder,
           (Tipologia, $$TipologieTableReferences),
           Tipologia,
-          PrefetchHooks Function({bool elencoAttivitaRefs})
+          PrefetchHooks Function({
+            bool modelliRefs,
+            bool vociModelloRefs,
+            bool elencoAttivitaRefs,
+          })
         > {
   $$TipologieTableTableManager(_$AppDatabase db, $TipologieTable table)
     : super(
@@ -2874,39 +4591,86 @@ class $$TipologieTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({elencoAttivitaRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (elencoAttivitaRefs) db.elencoAttivita,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (elencoAttivitaRefs)
-                    await $_getPrefetchedDataByColumns<
-                      Tipologia,
-                      $TipologieTable,
-                      Attivita,
-                      $ElencoAttivitaTable
-                    >(
-                      currentTable: table,
-                      referencedTable: $$TipologieTableReferences
-                          ._elencoAttivitaRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$TipologieTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).elencoAttivitaRefs,
-                      currentColumn: 'id',
-                      referencedColumn: 'tipologia_id',
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({
+                modelliRefs = false,
+                vociModelloRefs = false,
+                elencoAttivitaRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (modelliRefs) db.modelli,
+                    if (vociModelloRefs) db.vociModello,
+                    if (elencoAttivitaRefs) db.elencoAttivita,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (modelliRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Tipologia,
+                          $TipologieTable,
+                          Modello,
+                          $ModelliTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TipologieTableReferences
+                              ._modelliRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TipologieTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).modelliRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'tipologia_id',
+                          typedResults: items,
+                        ),
+                      if (vociModelloRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Tipologia,
+                          $TipologieTable,
+                          VoceModello,
+                          $VociModelloTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TipologieTableReferences
+                              ._vociModelloRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TipologieTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).vociModelloRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'tipologia_id',
+                          typedResults: items,
+                        ),
+                      if (elencoAttivitaRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Tipologia,
+                          $TipologieTable,
+                          Attivita,
+                          $ElencoAttivitaTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TipologieTableReferences
+                              ._elencoAttivitaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TipologieTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).elencoAttivitaRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'tipologia_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2923,7 +4687,1340 @@ typedef $$TipologieTableProcessedTableManager =
       $$TipologieTableUpdateCompanionBuilder,
       (Tipologia, $$TipologieTableReferences),
       Tipologia,
-      PrefetchHooks Function({bool elencoAttivitaRefs})
+      PrefetchHooks Function({
+        bool modelliRefs,
+        bool vociModelloRefs,
+        bool elencoAttivitaRefs,
+      })
+    >;
+typedef $$ModelliTableCreateCompanionBuilder = ModelliCompanion Function({
+  required String id,
+  required String nome,
+  Value<String> descrizione,
+  Value<String?> argomentoId,
+  Value<String?> tipologiaId,
+  Value<int?> giorni,
+  Value<int?> minuti,
+  Value<bool> nelCalendario,
+  required DateTime aggiornatoIl,
+  Value<DateTime?> cancellatoIl,
+  Value<int> rowid,
+});
+typedef $$ModelliTableUpdateCompanionBuilder = ModelliCompanion Function({
+  Value<String> id,
+  Value<String> nome,
+  Value<String> descrizione,
+  Value<String?> argomentoId,
+  Value<String?> tipologiaId,
+  Value<int?> giorni,
+  Value<int?> minuti,
+  Value<bool> nelCalendario,
+  Value<DateTime> aggiornatoIl,
+  Value<DateTime?> cancellatoIl,
+  Value<int> rowid,
+});
+
+final class $$ModelliTableReferences
+    extends BaseReferences<_$AppDatabase, $ModelliTable, Modello> {
+  $$ModelliTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ArgomentiTable _argomentoIdTable(_$AppDatabase db) =>
+      db.argomenti.createAlias('modelli__argomento_id__argomenti__id');
+
+  $$ArgomentiTableProcessedTableManager? get argomentoId {
+    final $_column = $_itemColumn<String>('argomento_id');
+    if ($_column == null) return null;
+    final manager = $$ArgomentiTableTableManager(
+      $_db,
+      $_db.argomenti,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_argomentoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TipologieTable _tipologiaIdTable(_$AppDatabase db) =>
+      db.tipologie.createAlias('modelli__tipologia_id__tipologie__id');
+
+  $$TipologieTableProcessedTableManager? get tipologiaId {
+    final $_column = $_itemColumn<String>('tipologia_id');
+    if ($_column == null) return null;
+    final manager = $$TipologieTableTableManager(
+      $_db,
+      $_db.tipologie,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tipologiaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$VociModelloTable, List<VoceModello>>
+  _vociModelloRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.vociModello,
+    aliasName: 'modelli__id__voci_modello__modello_id',
+  );
+
+  $$VociModelloTableProcessedTableManager get vociModelloRefs {
+    final manager = $$VociModelloTableTableManager(
+      $_db,
+      $_db.vociModello,
+    ).filter((f) => f.modelloId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_vociModelloRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ElencoAttivitaTable, List<Attivita>>
+  _elencoAttivitaRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.elencoAttivita,
+    aliasName: 'modelli__id__attivita__modello_id',
+  );
+
+  $$ElencoAttivitaTableProcessedTableManager get elencoAttivitaRefs {
+    final manager = $$ElencoAttivitaTableTableManager(
+      $_db,
+      $_db.elencoAttivita,
+    ).filter((f) => f.modelloId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_elencoAttivitaRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$ModelliTableFilterComposer
+    extends Composer<_$AppDatabase, $ModelliTable> {
+  $$ModelliTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get giorni => $composableBuilder(
+    column: $table.giorni,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minuti => $composableBuilder(
+    column: $table.minuti,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cancellatoIl => $composableBuilder(
+    column: $table.cancellatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ArgomentiTableFilterComposer get argomentoId {
+    final $$ArgomentiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.argomentoId,
+      referencedTable: $db.argomenti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArgomentiTableFilterComposer(
+            $db: $db,
+            $table: $db.argomenti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableFilterComposer get tipologiaId {
+    final $$TipologieTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableFilterComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> vociModelloRefs(
+    Expression<bool> Function($$VociModelloTableFilterComposer f) f,
+  ) {
+    final $$VociModelloTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.modelloId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableFilterComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> elencoAttivitaRefs(
+    Expression<bool> Function($$ElencoAttivitaTableFilterComposer f) f,
+  ) {
+    final $$ElencoAttivitaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elencoAttivita,
+      getReferencedColumn: (t) => t.modelloId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElencoAttivitaTableFilterComposer(
+            $db: $db,
+            $table: $db.elencoAttivita,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ModelliTableOrderingComposer
+    extends Composer<_$AppDatabase, $ModelliTable> {
+  $$ModelliTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get giorni => $composableBuilder(
+    column: $table.giorni,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minuti => $composableBuilder(
+    column: $table.minuti,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cancellatoIl => $composableBuilder(
+    column: $table.cancellatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ArgomentiTableOrderingComposer get argomentoId {
+    final $$ArgomentiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.argomentoId,
+      referencedTable: $db.argomenti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArgomentiTableOrderingComposer(
+            $db: $db,
+            $table: $db.argomenti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableOrderingComposer get tipologiaId {
+    final $$TipologieTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableOrderingComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ModelliTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ModelliTable> {
+  $$ModelliTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get giorni =>
+      $composableBuilder(column: $table.giorni, builder: (column) => column);
+
+  GeneratedColumn<int> get minuti =>
+      $composableBuilder(column: $table.minuti, builder: (column) => column);
+
+  GeneratedColumn<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cancellatoIl => $composableBuilder(
+    column: $table.cancellatoIl,
+    builder: (column) => column,
+  );
+
+  $$ArgomentiTableAnnotationComposer get argomentoId {
+    final $$ArgomentiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.argomentoId,
+      referencedTable: $db.argomenti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ArgomentiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.argomenti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableAnnotationComposer get tipologiaId {
+    final $$TipologieTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> vociModelloRefs<T extends Object>(
+    Expression<T> Function($$VociModelloTableAnnotationComposer a) f,
+  ) {
+    final $$VociModelloTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.modelloId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableAnnotationComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> elencoAttivitaRefs<T extends Object>(
+    Expression<T> Function($$ElencoAttivitaTableAnnotationComposer a) f,
+  ) {
+    final $$ElencoAttivitaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.elencoAttivita,
+      getReferencedColumn: (t) => t.modelloId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ElencoAttivitaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.elencoAttivita,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$ModelliTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ModelliTable,
+          Modello,
+          $$ModelliTableFilterComposer,
+          $$ModelliTableOrderingComposer,
+          $$ModelliTableAnnotationComposer,
+          $$ModelliTableCreateCompanionBuilder,
+          $$ModelliTableUpdateCompanionBuilder,
+          (Modello, $$ModelliTableReferences),
+          Modello,
+          PrefetchHooks Function({
+            bool argomentoId,
+            bool tipologiaId,
+            bool vociModelloRefs,
+            bool elencoAttivitaRefs,
+          })
+        > {
+  $$ModelliTableTableManager(_$AppDatabase db, $ModelliTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ModelliTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ModelliTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ModelliTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> nome = const Value.absent(),
+                Value<String> descrizione = const Value.absent(),
+                Value<String?> argomentoId = const Value.absent(),
+                Value<String?> tipologiaId = const Value.absent(),
+                Value<int?> giorni = const Value.absent(),
+                Value<int?> minuti = const Value.absent(),
+                Value<bool> nelCalendario = const Value.absent(),
+                Value<DateTime> aggiornatoIl = const Value.absent(),
+                Value<DateTime?> cancellatoIl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ModelliCompanion(
+                id: id,
+                nome: nome,
+                descrizione: descrizione,
+                argomentoId: argomentoId,
+                tipologiaId: tipologiaId,
+                giorni: giorni,
+                minuti: minuti,
+                nelCalendario: nelCalendario,
+                aggiornatoIl: aggiornatoIl,
+                cancellatoIl: cancellatoIl,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String nome,
+                Value<String> descrizione = const Value.absent(),
+                Value<String?> argomentoId = const Value.absent(),
+                Value<String?> tipologiaId = const Value.absent(),
+                Value<int?> giorni = const Value.absent(),
+                Value<int?> minuti = const Value.absent(),
+                Value<bool> nelCalendario = const Value.absent(),
+                required DateTime aggiornatoIl,
+                Value<DateTime?> cancellatoIl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ModelliCompanion.insert(
+                id: id,
+                nome: nome,
+                descrizione: descrizione,
+                argomentoId: argomentoId,
+                tipologiaId: tipologiaId,
+                giorni: giorni,
+                minuti: minuti,
+                nelCalendario: nelCalendario,
+                aggiornatoIl: aggiornatoIl,
+                cancellatoIl: cancellatoIl,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ModelliTable, Modello>(table),
+                  $$ModelliTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                argomentoId = false,
+                tipologiaId = false,
+                vociModelloRefs = false,
+                elencoAttivitaRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (vociModelloRefs) db.vociModello,
+                    if (elencoAttivitaRefs) db.elencoAttivita,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (argomentoId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.argomentoId,
+                            referencedTable: $$ModelliTableReferences
+                                ._argomentoIdTable(db),
+                            referencedColumn: $$ModelliTableReferences
+                                ._argomentoIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (tipologiaId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.tipologiaId,
+                            referencedTable: $$ModelliTableReferences
+                                ._tipologiaIdTable(db),
+                            referencedColumn: $$ModelliTableReferences
+                                ._tipologiaIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (vociModelloRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Modello,
+                          $ModelliTable,
+                          VoceModello,
+                          $VociModelloTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ModelliTableReferences
+                              ._vociModelloRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ModelliTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).vociModelloRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'modello_id',
+                          typedResults: items,
+                        ),
+                      if (elencoAttivitaRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Modello,
+                          $ModelliTable,
+                          Attivita,
+                          $ElencoAttivitaTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ModelliTableReferences
+                              ._elencoAttivitaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ModelliTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).elencoAttivitaRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'modello_id',
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ModelliTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ModelliTable,
+      Modello,
+      $$ModelliTableFilterComposer,
+      $$ModelliTableOrderingComposer,
+      $$ModelliTableAnnotationComposer,
+      $$ModelliTableCreateCompanionBuilder,
+      $$ModelliTableUpdateCompanionBuilder,
+      (Modello, $$ModelliTableReferences),
+      Modello,
+      PrefetchHooks Function({
+        bool argomentoId,
+        bool tipologiaId,
+        bool vociModelloRefs,
+        bool elencoAttivitaRefs,
+      })
+    >;
+typedef $$VociModelloTableCreateCompanionBuilder =
+    VociModelloCompanion Function({
+      required String id,
+      required String modelloId,
+      Value<String?> genitoreId,
+      required String titolo,
+      Value<String> descrizione,
+      Value<String?> tipologiaId,
+      Value<int?> giorni,
+      Value<int?> minuti,
+      Value<bool> nelCalendario,
+      Value<int> ordine,
+      required DateTime aggiornataIl,
+      Value<DateTime?> cancellataIl,
+      Value<int> rowid,
+    });
+typedef $$VociModelloTableUpdateCompanionBuilder =
+    VociModelloCompanion Function({
+      Value<String> id,
+      Value<String> modelloId,
+      Value<String?> genitoreId,
+      Value<String> titolo,
+      Value<String> descrizione,
+      Value<String?> tipologiaId,
+      Value<int?> giorni,
+      Value<int?> minuti,
+      Value<bool> nelCalendario,
+      Value<int> ordine,
+      Value<DateTime> aggiornataIl,
+      Value<DateTime?> cancellataIl,
+      Value<int> rowid,
+    });
+
+final class $$VociModelloTableReferences
+    extends BaseReferences<_$AppDatabase, $VociModelloTable, VoceModello> {
+  $$VociModelloTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ModelliTable _modelloIdTable(_$AppDatabase db) =>
+      db.modelli.createAlias('voci_modello__modello_id__modelli__id');
+
+  $$ModelliTableProcessedTableManager get modelloId {
+    final $_column = $_itemColumn<String>('modello_id')!;
+
+    final manager = $$ModelliTableTableManager(
+      $_db,
+      $_db.modelli,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_modelloIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $VociModelloTable _genitoreIdTable(_$AppDatabase db) =>
+      db.vociModello.createAlias('voci_modello__genitore_id__voci_modello__id');
+
+  $$VociModelloTableProcessedTableManager? get genitoreId {
+    final $_column = $_itemColumn<String>('genitore_id');
+    if ($_column == null) return null;
+    final manager = $$VociModelloTableTableManager(
+      $_db,
+      $_db.vociModello,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_genitoreIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TipologieTable _tipologiaIdTable(_$AppDatabase db) =>
+      db.tipologie.createAlias('voci_modello__tipologia_id__tipologie__id');
+
+  $$TipologieTableProcessedTableManager? get tipologiaId {
+    final $_column = $_itemColumn<String>('tipologia_id');
+    if ($_column == null) return null;
+    final manager = $$TipologieTableTableManager(
+      $_db,
+      $_db.tipologie,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tipologiaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$VociModelloTableFilterComposer
+    extends Composer<_$AppDatabase, $VociModelloTable> {
+  $$VociModelloTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titolo => $composableBuilder(
+    column: $table.titolo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get giorni => $composableBuilder(
+    column: $table.giorni,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get minuti => $composableBuilder(
+    column: $table.minuti,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ordine => $composableBuilder(
+    column: $table.ordine,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get aggiornataIl => $composableBuilder(
+    column: $table.aggiornataIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get cancellataIl => $composableBuilder(
+    column: $table.cancellataIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ModelliTableFilterComposer get modelloId {
+    final $$ModelliTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableFilterComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VociModelloTableFilterComposer get genitoreId {
+    final $$VociModelloTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.genitoreId,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableFilterComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableFilterComposer get tipologiaId {
+    final $$TipologieTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableFilterComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VociModelloTableOrderingComposer
+    extends Composer<_$AppDatabase, $VociModelloTable> {
+  $$VociModelloTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titolo => $composableBuilder(
+    column: $table.titolo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get giorni => $composableBuilder(
+    column: $table.giorni,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get minuti => $composableBuilder(
+    column: $table.minuti,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ordine => $composableBuilder(
+    column: $table.ordine,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get aggiornataIl => $composableBuilder(
+    column: $table.aggiornataIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get cancellataIl => $composableBuilder(
+    column: $table.cancellataIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ModelliTableOrderingComposer get modelloId {
+    final $$ModelliTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableOrderingComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VociModelloTableOrderingComposer get genitoreId {
+    final $$VociModelloTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.genitoreId,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableOrderingComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableOrderingComposer get tipologiaId {
+    final $$TipologieTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableOrderingComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VociModelloTableAnnotationComposer
+    extends Composer<_$AppDatabase, $VociModelloTable> {
+  $$VociModelloTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get titolo =>
+      $composableBuilder(column: $table.titolo, builder: (column) => column);
+
+  GeneratedColumn<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get giorni =>
+      $composableBuilder(column: $table.giorni, builder: (column) => column);
+
+  GeneratedColumn<int> get minuti =>
+      $composableBuilder(column: $table.minuti, builder: (column) => column);
+
+  GeneratedColumn<bool> get nelCalendario => $composableBuilder(
+    column: $table.nelCalendario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get ordine =>
+      $composableBuilder(column: $table.ordine, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get aggiornataIl => $composableBuilder(
+    column: $table.aggiornataIl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get cancellataIl => $composableBuilder(
+    column: $table.cancellataIl,
+    builder: (column) => column,
+  );
+
+  $$ModelliTableAnnotationComposer get modelloId {
+    final $$ModelliTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableAnnotationComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$VociModelloTableAnnotationComposer get genitoreId {
+    final $$VociModelloTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.genitoreId,
+      referencedTable: $db.vociModello,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$VociModelloTableAnnotationComposer(
+            $db: $db,
+            $table: $db.vociModello,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TipologieTableAnnotationComposer get tipologiaId {
+    final $$TipologieTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tipologiaId,
+      referencedTable: $db.tipologie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TipologieTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tipologie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$VociModelloTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VociModelloTable,
+          VoceModello,
+          $$VociModelloTableFilterComposer,
+          $$VociModelloTableOrderingComposer,
+          $$VociModelloTableAnnotationComposer,
+          $$VociModelloTableCreateCompanionBuilder,
+          $$VociModelloTableUpdateCompanionBuilder,
+          (VoceModello, $$VociModelloTableReferences),
+          VoceModello,
+          PrefetchHooks Function({
+            bool modelloId,
+            bool genitoreId,
+            bool tipologiaId,
+          })
+        > {
+  $$VociModelloTableTableManager(_$AppDatabase db, $VociModelloTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$VociModelloTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$VociModelloTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$VociModelloTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> modelloId = const Value.absent(),
+                Value<String?> genitoreId = const Value.absent(),
+                Value<String> titolo = const Value.absent(),
+                Value<String> descrizione = const Value.absent(),
+                Value<String?> tipologiaId = const Value.absent(),
+                Value<int?> giorni = const Value.absent(),
+                Value<int?> minuti = const Value.absent(),
+                Value<bool> nelCalendario = const Value.absent(),
+                Value<int> ordine = const Value.absent(),
+                Value<DateTime> aggiornataIl = const Value.absent(),
+                Value<DateTime?> cancellataIl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VociModelloCompanion(
+                id: id,
+                modelloId: modelloId,
+                genitoreId: genitoreId,
+                titolo: titolo,
+                descrizione: descrizione,
+                tipologiaId: tipologiaId,
+                giorni: giorni,
+                minuti: minuti,
+                nelCalendario: nelCalendario,
+                ordine: ordine,
+                aggiornataIl: aggiornataIl,
+                cancellataIl: cancellataIl,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String modelloId,
+                Value<String?> genitoreId = const Value.absent(),
+                required String titolo,
+                Value<String> descrizione = const Value.absent(),
+                Value<String?> tipologiaId = const Value.absent(),
+                Value<int?> giorni = const Value.absent(),
+                Value<int?> minuti = const Value.absent(),
+                Value<bool> nelCalendario = const Value.absent(),
+                Value<int> ordine = const Value.absent(),
+                required DateTime aggiornataIl,
+                Value<DateTime?> cancellataIl = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VociModelloCompanion.insert(
+                id: id,
+                modelloId: modelloId,
+                genitoreId: genitoreId,
+                titolo: titolo,
+                descrizione: descrizione,
+                tipologiaId: tipologiaId,
+                giorni: giorni,
+                minuti: minuti,
+                nelCalendario: nelCalendario,
+                ordine: ordine,
+                aggiornataIl: aggiornataIl,
+                cancellataIl: cancellataIl,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$VociModelloTable, VoceModello>(table),
+                  $$VociModelloTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({modelloId = false, genitoreId = false, tipologiaId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (modelloId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.modelloId,
+                            referencedTable: $$VociModelloTableReferences
+                                ._modelloIdTable(db),
+                            referencedColumn: $$VociModelloTableReferences
+                                ._modelloIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (genitoreId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.genitoreId,
+                            referencedTable: $$VociModelloTableReferences
+                                ._genitoreIdTable(db),
+                            referencedColumn: $$VociModelloTableReferences
+                                ._genitoreIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (tipologiaId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.tipologiaId,
+                            referencedTable: $$VociModelloTableReferences
+                                ._tipologiaIdTable(db),
+                            referencedColumn: $$VociModelloTableReferences
+                                ._tipologiaIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$VociModelloTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VociModelloTable,
+      VoceModello,
+      $$VociModelloTableFilterComposer,
+      $$VociModelloTableOrderingComposer,
+      $$VociModelloTableAnnotationComposer,
+      $$VociModelloTableCreateCompanionBuilder,
+      $$VociModelloTableUpdateCompanionBuilder,
+      (VoceModello, $$VociModelloTableReferences),
+      VoceModello,
+      PrefetchHooks Function({
+        bool modelloId,
+        bool genitoreId,
+        bool tipologiaId,
+      })
     >;
 typedef $$ElencoAttivitaTableCreateCompanionBuilder =
     ElencoAttivitaCompanion Function({
@@ -2938,6 +6035,7 @@ typedef $$ElencoAttivitaTableCreateCompanionBuilder =
       Value<String?> tipologiaId,
       Value<String?> genitoreId,
       Value<int> ordine,
+      Value<String?> modelloId,
       Value<bool> nelCalendario,
       required DateTime aggiornataIl,
       Value<DateTime?> cancellataIl,
@@ -2956,6 +6054,7 @@ typedef $$ElencoAttivitaTableUpdateCompanionBuilder =
       Value<String?> tipologiaId,
       Value<String?> genitoreId,
       Value<int> ordine,
+      Value<String?> modelloId,
       Value<bool> nelCalendario,
       Value<DateTime> aggiornataIl,
       Value<DateTime?> cancellataIl,
@@ -3015,6 +6114,23 @@ final class $$ElencoAttivitaTableReferences
       $_db.elencoAttivita,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_genitoreIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $ModelliTable _modelloIdTable(_$AppDatabase db) =>
+      db.modelli.createAlias('attivita__modello_id__modelli__id');
+
+  $$ModelliTableProcessedTableManager? get modelloId {
+    final $_column = $_itemColumn<String>('modello_id');
+    if ($_column == null) return null;
+    final manager = $$ModelliTableTableManager(
+      $_db,
+      $_db.modelli,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_modelloIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -3165,6 +6281,29 @@ class $$ElencoAttivitaTableFilterComposer
           }) => $$ElencoAttivitaTableFilterComposer(
             $db: $db,
             $table: $db.elencoAttivita,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$ModelliTableFilterComposer get modelloId {
+    final $$ModelliTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableFilterComposer(
+            $db: $db,
+            $table: $db.modelli,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3332,6 +6471,29 @@ class $$ElencoAttivitaTableOrderingComposer
     );
     return composer;
   }
+
+  $$ModelliTableOrderingComposer get modelloId {
+    final $$ModelliTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableOrderingComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$ElencoAttivitaTableAnnotationComposer
@@ -3455,6 +6617,29 @@ class $$ElencoAttivitaTableAnnotationComposer
     return composer;
   }
 
+  $$ModelliTableAnnotationComposer get modelloId {
+    final $$ModelliTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.modelloId,
+      referencedTable: $db.modelli,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ModelliTableAnnotationComposer(
+            $db: $db,
+            $table: $db.modelli,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<T> elencoFotoRefs<T extends Object>(
     Expression<T> Function($$ElencoFotoTableAnnotationComposer a) f,
   ) {
@@ -3498,6 +6683,7 @@ class $$ElencoAttivitaTableTableManager
             bool argomentoId,
             bool tipologiaId,
             bool genitoreId,
+            bool modelloId,
             bool elencoFotoRefs,
           })
         > {
@@ -3527,6 +6713,7 @@ class $$ElencoAttivitaTableTableManager
                 Value<String?> tipologiaId = const Value.absent(),
                 Value<String?> genitoreId = const Value.absent(),
                 Value<int> ordine = const Value.absent(),
+                Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
                 Value<DateTime> aggiornataIl = const Value.absent(),
                 Value<DateTime?> cancellataIl = const Value.absent(),
@@ -3543,6 +6730,7 @@ class $$ElencoAttivitaTableTableManager
                 tipologiaId: tipologiaId,
                 genitoreId: genitoreId,
                 ordine: ordine,
+                modelloId: modelloId,
                 nelCalendario: nelCalendario,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
@@ -3561,6 +6749,7 @@ class $$ElencoAttivitaTableTableManager
                 Value<String?> tipologiaId = const Value.absent(),
                 Value<String?> genitoreId = const Value.absent(),
                 Value<int> ordine = const Value.absent(),
+                Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
                 required DateTime aggiornataIl,
                 Value<DateTime?> cancellataIl = const Value.absent(),
@@ -3577,6 +6766,7 @@ class $$ElencoAttivitaTableTableManager
                 tipologiaId: tipologiaId,
                 genitoreId: genitoreId,
                 ordine: ordine,
+                modelloId: modelloId,
                 nelCalendario: nelCalendario,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
@@ -3595,6 +6785,7 @@ class $$ElencoAttivitaTableTableManager
                 argomentoId = false,
                 tipologiaId = false,
                 genitoreId = false,
+                modelloId = false,
                 elencoFotoRefs = false,
               }) {
                 return PrefetchHooks(
@@ -3649,6 +6840,17 @@ class $$ElencoAttivitaTableTableManager
                                 .id,
                           ) as T;
                         }
+                        if (modelloId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.modelloId,
+                            referencedTable: $$ElencoAttivitaTableReferences
+                                ._modelloIdTable(db),
+                            referencedColumn: $$ElencoAttivitaTableReferences
+                                ._modelloIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
                         return state;
                       },
@@ -3698,6 +6900,7 @@ typedef $$ElencoAttivitaTableProcessedTableManager =
         bool argomentoId,
         bool tipologiaId,
         bool genitoreId,
+        bool modelloId,
         bool elencoFotoRefs,
       })
     >;
@@ -4045,6 +7248,10 @@ class $AppDatabaseManager {
       $$ArgomentiTableTableManager(_db, _db.argomenti);
   $$TipologieTableTableManager get tipologie =>
       $$TipologieTableTableManager(_db, _db.tipologie);
+  $$ModelliTableTableManager get modelli =>
+      $$ModelliTableTableManager(_db, _db.modelli);
+  $$VociModelloTableTableManager get vociModello =>
+      $$VociModelloTableTableManager(_db, _db.vociModello);
   $$ElencoAttivitaTableTableManager get elencoAttivita =>
       $$ElencoAttivitaTableTableManager(_db, _db.elencoAttivita);
   $$ElencoFotoTableTableManager get elencoFoto =>

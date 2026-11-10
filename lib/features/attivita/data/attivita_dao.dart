@@ -72,6 +72,7 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
   /// Una sotto-attività ([genitoreId]) prende sempre l'argomento del
   /// genitore e ignora [argomentoId]; un'attività principale senza argomento
   /// prende il predefinito. La nuova attività va in fondo alle sorelle.
+  /// [modelloId] dice da quale modello nasce, se nasce da uno.
   Future<String> crea({
     required String titolo,
     String descrizione = '',
@@ -81,6 +82,7 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
     DateTime? scadenza,
     bool scadenzaConOra = false,
     bool nelCalendario = false,
+    String? modelloId,
     DateTime? adesso,
   }) {
     return transaction(() async {
@@ -110,6 +112,7 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
           genitoreId: Value<String?>(genitoreId),
           ordine: Value<int>(await _prossimoOrdine(genitoreId)),
           nelCalendario: Value<bool>(nelCalendario),
+          modelloId: Value<String?>(modelloId),
           aggiornataIl: ora,
         ),
       );
