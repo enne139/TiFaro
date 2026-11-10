@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
+import 'package:tifaro/core/database/data_modifica.dart';
 import 'package:tifaro/core/testo.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
@@ -65,21 +66,31 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
     required String nome,
     required int colore,
     required String icona,
-  }) {
-    return (update(argomenti)..where((t) => t.id.equals(id))).write(
+  }) async {
+    await (update(argomenti)..where((t) => t.id.equals(id))).write(
       ArgomentiCompanion(
         nome: Value<String>(nome.trim()),
         colore: Value<int>(colore),
         icona: Value<String>(icona),
-        aggiornatoIl: Value<DateTime>(DateTime.now()),
+        aggiornatoIl: Value<DateTime>(await _dataArgomenti(<String>[id])),
       ),
     );
   }
 
+  /// La data di modifica per gli argomenti [ids] (`dataDiModifica`).
+  Future<DateTime> _dataArgomenti(List<String> ids) => dataDiModificaPerId(
+    attachedDatabase,
+    'argomenti',
+    ids,
+    colonna: 'aggiornato_il',
+  );
+
   /// Fa di [id] l'argomento predefinito della cattura veloce.
   Future<void> rendiPredefinito(String id) {
     return transaction(() async {
-      final DateTime adesso = DateTime.now();
+      final DateTime adesso = await _dataArgomenti(
+        (await leggiArgomenti()).map((Argomento a) => a.id).toList(),
+      );
       // Si tocca solo chi cambia davvero, perché ogni riga toccata andrà
       // poi sincronizzata.
       await (update(argomenti)
@@ -132,13 +143,22 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
       await (update(modelli)..where((t) => t.argomentoId.equals(id))).write(
         ModelliCompanion(
           argomentoId: const Value<String?>(null),
-          aggiornatoIl: Value<DateTime>(adesso),
+          aggiornatoIl: Value<DateTime>(
+            await dataDiModifica(
+              attachedDatabase,
+              'modelli',
+              dove: 'argomento_id = ?',
+              variabili: <Variable<Object>>[Variable<String>(id)],
+              colonna: 'aggiornato_il',
+              adesso: adesso,
+            ),
+          ),
         ),
       );
       await (update(argomenti)..where((t) => t.id.equals(id))).write(
         ArgomentiCompanion(
           cancellatoIl: Value<DateTime>(adesso),
-          aggiornatoIl: Value<DateTime>(adesso),
+          aggiornatoIl: Value<DateTime>(await _dataArgomenti(<String>[id])),
         ),
       );
     });
@@ -199,12 +219,16 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
     String id, {
     required String nome,
     required String icona,
-  }) {
-    return (update(tipologie)..where((t) => t.id.equals(id))).write(
+  }) async {
+    await (update(tipologie)..where((t) => t.id.equals(id))).write(
       TipologieCompanion(
         nome: Value<String>(nome.trim()),
         icona: Value<String>(icona),
-        aggiornataIl: Value<DateTime>(DateTime.now()),
+        aggiornataIl: Value<DateTime>(
+          await dataDiModificaPerId(attachedDatabase, 'tipologie', <String>[
+            id,
+          ]),
+        ),
       ),
     );
   }
@@ -217,30 +241,48 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
   Future<void> cancellaTipologia(String id) {
     return transaction(() async {
       final DateTime adesso = DateTime.now();
+      // La data di modifica per le righe di [tabella] con questa tipologia.
+      Future<DateTime> data(
+        String tabella, {
+        String colonna = 'aggiornata_il',
+      }) => dataDiModifica(
+        attachedDatabase,
+        tabella,
+        dove: 'tipologia_id = ?',
+        variabili: <Variable<Object>>[Variable<String>(id)],
+        colonna: colonna,
+        adesso: adesso,
+      );
       await (update(
         elencoAttivita,
       )..where((t) => t.tipologiaId.equals(id))).write(
         ElencoAttivitaCompanion(
           tipologiaId: const Value<String?>(null),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(await data('attivita')),
         ),
       );
       await (update(modelli)..where((t) => t.tipologiaId.equals(id))).write(
         ModelliCompanion(
           tipologiaId: const Value<String?>(null),
-          aggiornatoIl: Value<DateTime>(adesso),
+          aggiornatoIl: Value<DateTime>(
+            await data('modelli', colonna: 'aggiornato_il'),
+          ),
         ),
       );
       await (update(vociModello)..where((t) => t.tipologiaId.equals(id))).write(
         VociModelloCompanion(
           tipologiaId: const Value<String?>(null),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(await data('voci_modello')),
         ),
       );
       await (update(tipologie)..where((t) => t.id.equals(id))).write(
         TipologieCompanion(
           cancellataIl: Value<DateTime>(adesso),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModificaPerId(attachedDatabase, 'tipologie', <String>[
+              id,
+            ], adesso: adesso),
+          ),
         ),
       );
     });

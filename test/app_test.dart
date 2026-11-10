@@ -145,4 +145,32 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets(
+    'con la sincronizzazione ma senza server, l\'app lavora da sola',
+    (WidgetTester tester) async {
+      schermoAlto(tester);
+      final AppDatabase db = databaseInMemoria();
+      await avviaApp(tester, db, conSincronizzazione: true);
+
+      // Senza server non c'è l'icona nella barra.
+      expect(find.byIcon(Icons.cloud_done_outlined), findsNothing);
+
+      // Le impostazioni lo dicono e offrono di collegarlo.
+      final ScaffoldState scaffold = tester.firstState<ScaffoldState>(
+        find.byType(Scaffold),
+      );
+      scaffold.openDrawer();
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Impostazioni'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Server e sincronizzazione'),
+        200,
+      );
+      expect(find.textContaining('Non collegato'), findsOneWidget);
+
+      await chiudiApp(tester);
+    },
+  );
 }

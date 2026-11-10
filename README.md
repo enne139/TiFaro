@@ -4,8 +4,9 @@ Le cose da fare, a modo mio: attività divise in sotto-attività (a qualunque
 profondità), argomenti, tipologie, scadenze e foto, con una cattura veloce
 che capisce una riga scritta di corsa.
 
-App Flutter per Android e Linux. In futuro un server Go sul NAS terrà
-allineati telefono e PC e metterà gli eventi su Google Calendar.
+App Flutter per Android e Linux, con un server Go sul NAS che tiene
+allineati telefono e PC e fa i backup. In futuro metterà anche gli eventi su
+Google Calendar.
 
 ## Cosa fa
 
@@ -53,12 +54,18 @@ allineati telefono e PC e metterà gli eventi su Google Calendar.
   principale.
 - **Dal tasto Condividi di Android:** una foto o un testo da un'altra app
   aprono la cattura veloce già compilata.
+- **Sincronizzazione e backup:** con il server sul NAS ([server/](server/)),
+  telefono e PC vedono le stesse attività, foto comprese. L'app lavora anche
+  senza rete e si allinea quando raggiunge il server: all'apertura, ogni
+  cinque minuti e poco dopo ogni modifica. Il server fa un backup al giorno.
+  Si collega da Impostazioni → Server; l'icona della nuvola in alto dice
+  com'è andata e, toccandola, sincronizza subito.
 
 ## Fasi
 
 1. App da sola, senza server — **fatta**
 2. Modelli, e il menu delle scelte nella cattura — **fatta**
-3. Server Go sul NAS e sincronizzazione
+3. Server Go sul NAS, sincronizzazione, backup, versione Linux — **fatta**
 4. Google Calendar, tramite il server
 5. Notifiche, release dell'APK per Obtainium, esportazione
 
@@ -73,6 +80,15 @@ dart run build_runner build     # dopo ogni modifica a tabelle o DAO
 dart run drift_dev make-migrations  # dopo aver cambiato schemaVersion
 flutter analyze && flutter test # prima di consegnare
 ```
+
+## Installazione
+
+- **Linux:** `strumenti/installa_linux.sh` compila la versione definitiva e
+  la installa per l'utente, con l'icona nel menu e il comando `tifaro`.
+  Rilanciarlo aggiorna; `--togli` la toglie (i dati restano).
+- **Android:** per ora l'APK di prova (`flutter build apk`); le release per
+  Obtainium arrivano con la fase 5.
+- **Server:** vedi [server/README.md](server/README.md).
 
 ## Dove stanno i dati
 

@@ -417,3 +417,155 @@ una.
 spazi vanno trasformati); il testo che vince sul menu (la scelta appena fatta
 sembrerebbe ignorata).
 
+---
+
+## 019 — Server generico: righe in JSON, revisioni, vince la più recente
+
+**Data:** 2026-11-10
+
+**Contesto:** telefono e PC devono vedere le stesse attività; il server sta
+sul NAS.
+
+**Decisione:** il server Go tiene una sola tabella di righe: tabella, id,
+dati (il JSON di `toJson()` dell'app, mai riscritto), data di modifica,
+revisione, dispositivo. Ogni riga salvata prende una revisione più alta di
+tutte; l'app chiede "tutto dopo la revisione N" a pagine. Una riga entra se
+è nuova o se la sua data di modifica non è più vecchia di quella che c'è (a
+parità entra); altrimenti è rifiutata e il server restituisce la sua
+versione. Se l'app conosce una revisione più alta della massima del server
+(server ripristinato da un backup), il server non prende niente e risponde
+"ripartire": l'app dimentica cosa risultava mandato e rimanda tutto da zero.
+Accesso con un token (Bearer), confrontato a tempo costante.
+
+**Motivazione:** un server che non conosce le tabelle non va cambiato
+quando l'app aggiunge una colonna o una tabella. Le revisioni del server, e
+non le date dei dispositivi, decidono cosa è nuovo: gli orologi dei
+dispositivi possono sbagliare, il contatore no. Il controllo del ritorno
+indietro va fatto prima di salvare, perché le modifiche appena arrivate
+alzerebbero la revisione massima e lo nasconderebbero.
+
+**Limite noto:** vince la riga intera. Se sulla stessa attività si cambia il
+titolo sul telefono e la descrizione sul PC prima di sincronizzare, resta
+solo la modifica più recente.
+
+**Alternative scartate:** tabelle del server uguali a quelle dell'app (ogni
+cambio di schema da fare due volte); unione campo per campo (più giusta, ma
+molto più complicata per un uso personale); CRDT.
+
+---
+
+## 020 — Backup fatti dal server, a rotazione
+
+**Data:** 2026-11-10
+
+**Contesto:** il server deve fare anche i backup.
+
+**Decisione:** una volta al giorno (`TIFARO_BACKUP_OGNI`) il server scrive
+un'istantanea del database con `VACUUM INTO` (coerente anche mentre lavora),
+prima con un nome provvisorio e poi rinominata, e tiene le ultime 30
+(`TIFARO_BACKUP_TIENI`). Le foto nuove si copiano nella cartella dei backup;
+non si cancellano mai, perché non cambiano. Controlla ogni dieci minuti se è
+ora, così dopo uno spegnimento il backup arriva appena il NAS riparte. La
+cartella dei backup è un volume a parte (`TIFARO_BACKUP_LOCATION`), da
+mettere su un altro disco se si può. L'app mostra l'ultimo backup e ne può
+chiedere uno.
+
+**Motivazione:** i backup stanno dove stanno i dati, senza strumenti in più
+sul NAS. Il nome provvisorio evita che una copia interrotta sembri buona.
+
+**Alternative scartate:** copia del file del database (in WAL può essere
+incoerente); backup fatto dall'app (il telefono non è sempre acceso).
+
+---
+
+## 021 — Sincronizzazione nell'app: impronte, un giro solo, date che avanzano
+
+**Data:** 2026-11-10
+
+**Contesto:** l'app deve capire cosa mandare, applicare cosa arriva e non
+perdere modifiche.
+
+**Decisione:**
+
+- **Cosa mandare:** per ogni riga si annota (tabella locale `sync_note`)
+  l'impronta del contenuto che il server ha di sicuro. Va mandata ogni riga
+  la cui impronta attuale è diversa. L'impronta è FNV-1a del JSON con le
+  chiavi in ordine.
+- **Un giro:** si caricano prima le foto nuove, poi si mandano le righe e si
+  ricevono tutte le pagine; si applica tutto in una sola transazione, con i
+  vincoli fra tabelle controllati alla fine (`defer_foreign_keys`), perché
+  una sotto-attività può arrivare prima della sua principale. Poi si
+  scaricano le foto che mancano.
+- **Cosa arriva:** una riga ricevuta sostituisce quella locale, tranne se
+  quella locale è cambiata dopo l'ultima sincronizzazione ed è più recente:
+  allora resta e partirà alla prossima.
+- **Date che avanzano:** ogni modifica a una riga esistente prende come data
+  il massimo fra adesso e la data che la riga ha già più un secondo
+  (`dataDiModifica`). Così una modifica fatta dopo aver visto una versione
+  la batte sempre, anche se l'orologio di quel dispositivo è un po' indietro.
+- **Righe di partenza:** argomenti e tipologie del primo avvio hanno una data
+  fissa (1 gennaio 2026), così un dispositivo installato dopo non sovrascrive
+  quello che si è già rinominato altrove.
+- **Quando:** all'apertura, al ritorno in primo piano, ogni cinque minuti e
+  cinque secondi dopo una modifica (solo se c'è qualcosa da mandare). Si può
+  spegnere; l'icona in alto sincronizza a richiesta.
+
+**Motivazione:** le date nel database sono al secondo: due modifiche nello
+stesso secondo sembrerebbero una, l'impronta no. Applicare tutto insieme
+evita stati a metà. Le date che avanzano sono il modo più semplice per non
+dipendere dagli orologi, ed è servito: la prova completa con due dispositivi
+l'ha trovato.
+
+**Alternative scartate:** segnalino "da mandare" su ogni tabella (una colonna
+in più ovunque, da tenere giusta a mano); confronto per data (cieco alle
+modifiche nello stesso secondo); trigger SQLite (fuori dallo schema che
+drift verifica).
+
+---
+
+## 022 — Server sul NAS, in rete locale, immagine costruita da Gitea
+
+**Data:** 2026-11-10
+
+**Contesto:** dove far girare il server e come portarci l'immagine.
+
+**Decisione:** il server sta sul NAS, come stack di Dockge con lo stile degli
+altri (`docker-compose.yml`, `.env`, `user: PUID:PGID`, volumi `:z`), sulla
+porta 8645. L'immagine si costruisce sul NAS dal codice su Gitea (contesto
+git con `#main:server`), su un'immagine distroless senza shell; il programma
+fa da sé il controllo di salute. Parla HTTP, solo in rete locale: su Android
+serve `usesCleartextTraffic`, e il permesso INTERNET va dichiarato nel
+manifest principale (Flutter lo mette solo in quelli di debug). Fuori casa
+l'app lavora da sola e si allinea al rientro.
+
+**Motivazione:** i dati restano in casa, come gli altri servizi del NAS. Non
+c'è un registry per le immagini, e Gitea c'è già. HTTPS in rete locale
+richiederebbe certificati per un indirizzo IP, senza un vero guadagno finché
+il server non esce di casa.
+
+**Da rivedere quando:** si vorrà sincronizzare fuori casa (VPN verso il NAS,
+o HTTPS davanti al server).
+
+**Alternative scartate:** server sul VPS (raggiungibile ovunque, ma dati e
+foto fuori casa); immagine costruita sul PC e copiata (un passaggio a mano a
+ogni aggiornamento).
+
+---
+
+## 023 — Versione Linux installata per l'utente
+
+**Data:** 2026-11-10
+
+**Contesto:** oltre all'app Android serve la versione per il PC.
+
+**Decisione:** `strumenti/installa_linux.sh` compila la versione definitiva
+e la copia in `~/.local/opt/tifaro`, con l'icona e la voce nel menu delle
+applicazioni e il comando `tifaro`. I dati stanno in
+`~/.local/share/com.enne139.tifaro` e sopravvivono agli aggiornamenti.
+
+**Motivazione:** nessun permesso di amministratore, si aggiorna rilanciando
+lo script, e si toglie con `--togli`.
+
+**Alternative scartate:** pacchetto Arch o Flatpak (da mantenere, per un
+solo utente); lanciarla con `flutter run` (lenta e in modalità debug).
+

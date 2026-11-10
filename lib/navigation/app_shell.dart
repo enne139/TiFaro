@@ -8,6 +8,7 @@ import 'package:tifaro/features/categorie/impostazioni_page.dart';
 import 'package:tifaro/features/cattura/cattura_sheet.dart';
 import 'package:tifaro/features/cattura/condivisione.dart';
 import 'package:tifaro/features/modelli/modelli_page.dart';
+import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Una sezione principale dell'app.
 class _Sezione {
@@ -96,6 +97,7 @@ class _AppShellState extends State<AppShell> {
       appBar: AppBar(
         title: Text(_sezioni[_sezione].titolo),
         actions: <Widget>[
+          const IconaSync(),
           IconButton(
             icon: const Icon(Icons.search),
             tooltip: 'Cerca',
@@ -142,7 +144,7 @@ class _AppShellState extends State<AppShell> {
               ListTile(
                 leading: const Icon(Icons.settings_outlined),
                 title: const Text('Impostazioni'),
-                subtitle: const Text('Argomenti e tipologie'),
+                subtitle: const Text('Argomenti, tipologie e server'),
                 onTap: () {
                   Navigator.pop(context);
                   _apri(const ImpostazioniPage());

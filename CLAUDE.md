@@ -27,6 +27,8 @@ cambia se ne aggiunge una nuova che dice quale supera.
   i DAO in `data/`, la logica pura in `logica/`.
 - `lib/navigation/`: l'impalcatura con le sezioni.
 - `lib/features/modelli/`: i modelli; `logica/` ha le scadenze relative.
+- `lib/features/sincronizzazione/`: la sincronizzazione con il server.
+- `server/`: il server in Go, modulo a parte con le sue prove (voce 019).
 - `lib/features/cattura/composizione.dart`: come si uniscono testo, menu e
   modello nella cattura veloce (voce 018). Una regola nuova va lì, con la
   sua prova in `test/composizione_test.dart`.
@@ -68,6 +70,22 @@ Senza migrazione l'app installata non si apre più. Le fotografie in
 Dentro una `transaction(...)` si legge solo con `get()`: uno stream aspetta
 una notifica che arriva dopo il commit, e l'operazione resta appesa.
 
+## Sincronizzazione
+
+- **Ogni modifica a una riga esistente** scrive la data di modifica presa da
+  `dataDiModifica` / `dataDiModificaPerId` (`core/database/data_modifica.dart`),
+  mai `DateTime.now()` diretto: deve stare almeno un secondo dopo quella che
+  la riga ha già, altrimenti con un orologio indietro la modifica perde
+  contro la versione che aveva sostituito (voce 021).
+- **Una tabella nuova da sincronizzare** va aggiunta all'elenco `tabelle` di
+  `SyncDao`, nell'ordine giusto (dopo quelle a cui rimanda), e deve avere
+  `id`, `aggiornataIl`/`aggiornatoIl` e `cancellataIl`/`cancellatoIl`. Il
+  server non va toccato: tiene le righe così come arrivano.
+- Le tabelle `sync_note` e `preferenze` restano su ogni dispositivo e non si
+  sincronizzano.
+- Mai cancellare righe di tabelle sincronizzate: una cancellazione vera non
+  arriverebbe agli altri dispositivi.
+
 ## Interfaccia
 
 - **Ogni gesto ha un pulsante.** L'app gira anche sul computer: niente azioni
@@ -82,8 +100,13 @@ una notifica che arriva dopo il commit, e l'operazione resta appesa.
 
 ```sh
 flutter analyze
-flutter test
+flutter test --exclude-tags server
+cd server && go vet ./... && go test ./...
 ```
+
+La prova completa contro un server vero (`test/sincronizzazione_server_test.dart`,
+etichetta `server`) parte solo con le variabili `TIFARO_SERVER_PROVA` e
+`TIFARO_TOKEN_PROVA`: vedi [server/README.md](server/README.md).
 
 Le prove con interfaccia usano `test/supporto.dart` e finiscono con
 `chiudiApp(tester)`; il database in memoria non va chiuso. Dentro una prova
@@ -94,5 +117,7 @@ prova uno stream di drift non risponde mai e la prova resta appesa.
 ## Verifiche prima di consegnare
 
 - `flutter analyze` senza segnalazioni;
-- `flutter test` verde;
+- `flutter test --exclude-tags server` verde;
+- se si è toccato `server/` o la sincronizzazione: `go test ./...` in
+  `server/` e la prova completa contro un server acceso;
 - se si è toccato il manifest Android o un plugin: `flutter build apk --debug`.

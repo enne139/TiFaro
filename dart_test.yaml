@@ -1,0 +1,5 @@
+# Le etichette delle prove. "server" vuol dire che serve un server di TiFaro
+# acceso (vedi server/README.md): con `flutter test --exclude-tags server` si
+# saltano.
+tags:
+  server: {}

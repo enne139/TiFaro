@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/features/sincronizzazione/sincronizzatore.dart';
 
 /// Rende database e archivio delle foto raggiungibili da qualunque punto
 /// dell'app.
@@ -14,6 +15,7 @@ class AppScope extends InheritedWidget {
     required this.database,
     required this.foto,
     required super.child,
+    this.sync,
     super.key,
   });
 
@@ -22,6 +24,10 @@ class AppScope extends InheritedWidget {
 
   /// La cartella delle foto.
   final FotoArchivio foto;
+
+  /// La sincronizzazione con il server; nulla nelle prove che non la
+  /// usano.
+  final Sincronizzatore? sync;
 
   static AppScope _di(BuildContext context) {
     final AppScope? scope = context.getInheritedWidgetOfExactType<AppScope>();
@@ -36,7 +42,13 @@ class AppScope extends InheritedWidget {
   /// L'archivio delle foto.
   static FotoArchivio archivio(BuildContext context) => _di(context).foto;
 
+  /// La sincronizzazione, se c'è.
+  static Sincronizzatore? sincronizzatore(BuildContext context) =>
+      _di(context).sync;
+
   @override
   bool updateShouldNotify(AppScope oldWidget) =>
-      database != oldWidget.database || foto != oldWidget.foto;
+      database != oldWidget.database ||
+      foto != oldWidget.foto ||
+      sync != oldWidget.sync;
 }

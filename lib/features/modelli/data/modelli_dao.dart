@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
+import 'package:tifaro/core/database/data_modifica.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/modelli/data/modelli_tables.dart';
@@ -85,10 +86,17 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
     return id;
   }
 
-  /// Scrive [modifiche] su un modello, aggiornando la data di modifica.
-  Future<void> modificaModello(String id, ModelliCompanion modifiche) {
-    return (update(modelli)..where((t) => t.id.equals(id))).write(
-      modifiche.copyWith(aggiornatoIl: Value<DateTime>(DateTime.now())),
+  /// Scrive [modifiche] su un modello, aggiornando la data di modifica
+  /// (`dataDiModifica`).
+  Future<void> modificaModello(String id, ModelliCompanion modifiche) async {
+    final DateTime quando = await dataDiModificaPerId(
+      attachedDatabase,
+      'modelli',
+      <String>[id],
+      colonna: 'aggiornato_il',
+    );
+    await (update(modelli)..where((t) => t.id.equals(id))).write(
+      modifiche.copyWith(aggiornatoIl: Value<DateTime>(quando)),
     );
   }
 
@@ -104,7 +112,15 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
       )..where((t) => t.modelloId.equals(id) & t.cancellataIl.isNull())).write(
         VociModelloCompanion(
           cancellataIl: Value<DateTime?>(adesso),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModifica(
+              attachedDatabase,
+              'voci_modello',
+              dove: 'modello_id = ?',
+              variabili: <Variable<Object>>[Variable<String>(id)],
+              adesso: adesso,
+            ),
+          ),
         ),
       );
       await modificaModello(
@@ -155,10 +171,16 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
     return id;
   }
 
-  /// Scrive [modifiche] su una voce, aggiornando la data di modifica.
-  Future<void> modificaVoce(String id, VociModelloCompanion modifiche) {
-    return (update(vociModello)..where((t) => t.id.equals(id))).write(
-      modifiche.copyWith(aggiornataIl: Value<DateTime>(DateTime.now())),
+  /// Scrive [modifiche] su una voce, aggiornando la data di modifica
+  /// (`dataDiModifica`).
+  Future<void> modificaVoce(String id, VociModelloCompanion modifiche) async {
+    final DateTime quando = await dataDiModificaPerId(
+      attachedDatabase,
+      'voci_modello',
+      <String>[id],
+    );
+    await (update(vociModello)..where((t) => t.id.equals(id))).write(
+      modifiche.copyWith(aggiornataIl: Value<DateTime>(quando)),
     );
   }
 
@@ -182,7 +204,14 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
       )..where((t) => t.id.isIn(ids) & t.cancellataIl.isNull())).write(
         VociModelloCompanion(
           cancellataIl: Value<DateTime?>(adesso),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModificaPerId(
+              attachedDatabase,
+              'voci_modello',
+              ids,
+              adesso: adesso,
+            ),
+          ),
         ),
       );
     });

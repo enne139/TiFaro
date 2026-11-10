@@ -3713,6 +3713,479 @@ class ElencoFotoCompanion extends UpdateCompanion<Foto> {
   }
 }
 
+class $NoteSyncTable extends NoteSync with TableInfo<$NoteSyncTable, NotaSync> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NoteSyncTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _tabellaMeta = const VerificationMeta(
+    'tabella',
+  );
+  @override
+  late final GeneratedColumn<String> tabella = GeneratedColumn<String>(
+    'tabella',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _improntaMeta = const VerificationMeta(
+    'impronta',
+  );
+  @override
+  late final GeneratedColumn<String> impronta = GeneratedColumn<String>(
+    'impronta',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [tabella, id, impronta];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sync_note';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotaSync> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('tabella')) {
+      context.handle(
+        _tabellaMeta,
+        tabella.isAcceptableOrUnknown(data['tabella']!, _tabellaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tabellaMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('impronta')) {
+      context.handle(
+        _improntaMeta,
+        impronta.isAcceptableOrUnknown(data['impronta']!, _improntaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_improntaMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {tabella, id};
+  @override
+  NotaSync map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotaSync(
+      tabella: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tabella'],
+      )!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      impronta: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}impronta'],
+      )!,
+    );
+  }
+
+  @override
+  $NoteSyncTable createAlias(String alias) {
+    return $NoteSyncTable(attachedDatabase, alias);
+  }
+}
+
+class NotaSync extends DataClass implements Insertable<NotaSync> {
+  /// Il nome della tabella della riga, come lo conosce il server.
+  final String tabella;
+
+  /// L'id della riga.
+  final String id;
+
+  /// L'impronta del contenuto (`impronta()`).
+  final String impronta;
+  const NotaSync({
+    required this.tabella,
+    required this.id,
+    required this.impronta,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['tabella'] = Variable<String>(tabella);
+    map['id'] = Variable<String>(id);
+    map['impronta'] = Variable<String>(impronta);
+    return map;
+  }
+
+  NoteSyncCompanion toCompanion(bool nullToAbsent) {
+    return NoteSyncCompanion(
+      tabella: Value(tabella),
+      id: Value(id),
+      impronta: Value(impronta),
+    );
+  }
+
+  factory NotaSync.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotaSync(
+      tabella: serializer.fromJson<String>(json['tabella']),
+      id: serializer.fromJson<String>(json['id']),
+      impronta: serializer.fromJson<String>(json['impronta']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'tabella': serializer.toJson<String>(tabella),
+      'id': serializer.toJson<String>(id),
+      'impronta': serializer.toJson<String>(impronta),
+    };
+  }
+
+  NotaSync copyWith({String? tabella, String? id, String? impronta}) =>
+      NotaSync(
+        tabella: tabella ?? this.tabella,
+        id: id ?? this.id,
+        impronta: impronta ?? this.impronta,
+      );
+  NotaSync copyWithCompanion(NoteSyncCompanion data) {
+    return NotaSync(
+      tabella: data.tabella.present ? data.tabella.value : this.tabella,
+      id: data.id.present ? data.id.value : this.id,
+      impronta: data.impronta.present ? data.impronta.value : this.impronta,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotaSync(')
+          ..write('tabella: $tabella, ')
+          ..write('id: $id, ')
+          ..write('impronta: $impronta')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(tabella, id, impronta);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotaSync &&
+          other.tabella == this.tabella &&
+          other.id == this.id &&
+          other.impronta == this.impronta);
+}
+
+class NoteSyncCompanion extends UpdateCompanion<NotaSync> {
+  final Value<String> tabella;
+  final Value<String> id;
+  final Value<String> impronta;
+  final Value<int> rowid;
+  const NoteSyncCompanion({
+    this.tabella = const Value.absent(),
+    this.id = const Value.absent(),
+    this.impronta = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  NoteSyncCompanion.insert({
+    required String tabella,
+    required String id,
+    required String impronta,
+    this.rowid = const Value.absent(),
+  }) : tabella = Value(tabella),
+       id = Value(id),
+       impronta = Value(impronta);
+  static Insertable<NotaSync> custom({
+    Expression<String>? tabella,
+    Expression<String>? id,
+    Expression<String>? impronta,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (tabella != null) 'tabella': tabella,
+      if (id != null) 'id': id,
+      if (impronta != null) 'impronta': impronta,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  NoteSyncCompanion copyWith({
+    Value<String>? tabella,
+    Value<String>? id,
+    Value<String>? impronta,
+    Value<int>? rowid,
+  }) {
+    return NoteSyncCompanion(
+      tabella: tabella ?? this.tabella,
+      id: id ?? this.id,
+      impronta: impronta ?? this.impronta,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (tabella.present) {
+      map['tabella'] = Variable<String>(tabella.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (impronta.present) {
+      map['impronta'] = Variable<String>(impronta.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NoteSyncCompanion(')
+          ..write('tabella: $tabella, ')
+          ..write('id: $id, ')
+          ..write('impronta: $impronta, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PreferenzeTable extends Preferenze
+    with TableInfo<$PreferenzeTable, Preferenza> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PreferenzeTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _chiaveMeta = const VerificationMeta('chiave');
+  @override
+  late final GeneratedColumn<String> chiave = GeneratedColumn<String>(
+    'chiave',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valoreMeta = const VerificationMeta('valore');
+  @override
+  late final GeneratedColumn<String> valore = GeneratedColumn<String>(
+    'valore',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [chiave, valore];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'preferenze';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Preferenza> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('chiave')) {
+      context.handle(
+        _chiaveMeta,
+        chiave.isAcceptableOrUnknown(data['chiave']!, _chiaveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chiaveMeta);
+    }
+    if (data.containsKey('valore')) {
+      context.handle(
+        _valoreMeta,
+        valore.isAcceptableOrUnknown(data['valore']!, _valoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valoreMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {chiave};
+  @override
+  Preferenza map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Preferenza(
+      chiave: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chiave'],
+      )!,
+      valore: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valore'],
+      )!,
+    );
+  }
+
+  @override
+  $PreferenzeTable createAlias(String alias) {
+    return $PreferenzeTable(attachedDatabase, alias);
+  }
+}
+
+class Preferenza extends DataClass implements Insertable<Preferenza> {
+  final String chiave;
+  final String valore;
+  const Preferenza({required this.chiave, required this.valore});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['chiave'] = Variable<String>(chiave);
+    map['valore'] = Variable<String>(valore);
+    return map;
+  }
+
+  PreferenzeCompanion toCompanion(bool nullToAbsent) {
+    return PreferenzeCompanion(chiave: Value(chiave), valore: Value(valore));
+  }
+
+  factory Preferenza.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Preferenza(
+      chiave: serializer.fromJson<String>(json['chiave']),
+      valore: serializer.fromJson<String>(json['valore']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'chiave': serializer.toJson<String>(chiave),
+      'valore': serializer.toJson<String>(valore),
+    };
+  }
+
+  Preferenza copyWith({String? chiave, String? valore}) =>
+      Preferenza(chiave: chiave ?? this.chiave, valore: valore ?? this.valore);
+  Preferenza copyWithCompanion(PreferenzeCompanion data) {
+    return Preferenza(
+      chiave: data.chiave.present ? data.chiave.value : this.chiave,
+      valore: data.valore.present ? data.valore.value : this.valore,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Preferenza(')
+          ..write('chiave: $chiave, ')
+          ..write('valore: $valore')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(chiave, valore);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Preferenza &&
+          other.chiave == this.chiave &&
+          other.valore == this.valore);
+}
+
+class PreferenzeCompanion extends UpdateCompanion<Preferenza> {
+  final Value<String> chiave;
+  final Value<String> valore;
+  final Value<int> rowid;
+  const PreferenzeCompanion({
+    this.chiave = const Value.absent(),
+    this.valore = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PreferenzeCompanion.insert({
+    required String chiave,
+    required String valore,
+    this.rowid = const Value.absent(),
+  }) : chiave = Value(chiave),
+       valore = Value(valore);
+  static Insertable<Preferenza> custom({
+    Expression<String>? chiave,
+    Expression<String>? valore,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (chiave != null) 'chiave': chiave,
+      if (valore != null) 'valore': valore,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PreferenzeCompanion copyWith({
+    Value<String>? chiave,
+    Value<String>? valore,
+    Value<int>? rowid,
+  }) {
+    return PreferenzeCompanion(
+      chiave: chiave ?? this.chiave,
+      valore: valore ?? this.valore,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (chiave.present) {
+      map['chiave'] = Variable<String>(chiave.value);
+    }
+    if (valore.present) {
+      map['valore'] = Variable<String>(valore.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PreferenzeCompanion(')
+          ..write('chiave: $chiave, ')
+          ..write('valore: $valore, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3722,9 +4195,12 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $VociModelloTable vociModello = $VociModelloTable(this);
   late final $ElencoAttivitaTable elencoAttivita = $ElencoAttivitaTable(this);
   late final $ElencoFotoTable elencoFoto = $ElencoFotoTable(this);
+  late final $NoteSyncTable noteSync = $NoteSyncTable(this);
+  late final $PreferenzeTable preferenze = $PreferenzeTable(this);
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
   late final AttivitaDao attivitaDao = AttivitaDao(this as AppDatabase);
   late final ModelliDao modelliDao = ModelliDao(this as AppDatabase);
+  late final SyncDao syncDao = SyncDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3736,6 +4212,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vociModello,
     elencoAttivita,
     elencoFoto,
+    noteSync,
+    preferenze,
   ];
 }
 
@@ -7240,6 +7718,316 @@ typedef $$ElencoFotoTableProcessedTableManager =
       Foto,
       PrefetchHooks Function({bool attivitaId})
     >;
+typedef $$NoteSyncTableCreateCompanionBuilder = NoteSyncCompanion Function({
+  required String tabella,
+  required String id,
+  required String impronta,
+  Value<int> rowid,
+});
+typedef $$NoteSyncTableUpdateCompanionBuilder = NoteSyncCompanion Function({
+  Value<String> tabella,
+  Value<String> id,
+  Value<String> impronta,
+  Value<int> rowid,
+});
+
+class $$NoteSyncTableFilterComposer
+    extends Composer<_$AppDatabase, $NoteSyncTable> {
+  $$NoteSyncTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get tabella => $composableBuilder(
+    column: $table.tabella,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get impronta => $composableBuilder(
+    column: $table.impronta,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NoteSyncTableOrderingComposer
+    extends Composer<_$AppDatabase, $NoteSyncTable> {
+  $$NoteSyncTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get tabella => $composableBuilder(
+    column: $table.tabella,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get impronta => $composableBuilder(
+    column: $table.impronta,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NoteSyncTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NoteSyncTable> {
+  $$NoteSyncTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get tabella =>
+      $composableBuilder(column: $table.tabella, builder: (column) => column);
+
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get impronta =>
+      $composableBuilder(column: $table.impronta, builder: (column) => column);
+}
+
+class $$NoteSyncTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NoteSyncTable,
+          NotaSync,
+          $$NoteSyncTableFilterComposer,
+          $$NoteSyncTableOrderingComposer,
+          $$NoteSyncTableAnnotationComposer,
+          $$NoteSyncTableCreateCompanionBuilder,
+          $$NoteSyncTableUpdateCompanionBuilder,
+          (NotaSync, BaseReferences<_$AppDatabase, $NoteSyncTable, NotaSync>),
+          NotaSync,
+          PrefetchHooks Function()
+        > {
+  $$NoteSyncTableTableManager(_$AppDatabase db, $NoteSyncTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NoteSyncTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NoteSyncTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NoteSyncTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> tabella = const Value.absent(),
+                Value<String> id = const Value.absent(),
+                Value<String> impronta = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => NoteSyncCompanion(
+                tabella: tabella,
+                id: id,
+                impronta: impronta,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String tabella,
+                required String id,
+                required String impronta,
+                Value<int> rowid = const Value.absent(),
+              }) => NoteSyncCompanion.insert(
+                tabella: tabella,
+                id: id,
+                impronta: impronta,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$NoteSyncTable, NotaSync>(table),
+                  BaseReferences<_$AppDatabase, $NoteSyncTable, NotaSync>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NoteSyncTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NoteSyncTable,
+      NotaSync,
+      $$NoteSyncTableFilterComposer,
+      $$NoteSyncTableOrderingComposer,
+      $$NoteSyncTableAnnotationComposer,
+      $$NoteSyncTableCreateCompanionBuilder,
+      $$NoteSyncTableUpdateCompanionBuilder,
+      (NotaSync, BaseReferences<_$AppDatabase, $NoteSyncTable, NotaSync>),
+      NotaSync,
+      PrefetchHooks Function()
+    >;
+typedef $$PreferenzeTableCreateCompanionBuilder = PreferenzeCompanion Function({
+  required String chiave,
+  required String valore,
+  Value<int> rowid,
+});
+typedef $$PreferenzeTableUpdateCompanionBuilder = PreferenzeCompanion Function({
+  Value<String> chiave,
+  Value<String> valore,
+  Value<int> rowid,
+});
+
+class $$PreferenzeTableFilterComposer
+    extends Composer<_$AppDatabase, $PreferenzeTable> {
+  $$PreferenzeTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get chiave => $composableBuilder(
+    column: $table.chiave,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valore => $composableBuilder(
+    column: $table.valore,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PreferenzeTableOrderingComposer
+    extends Composer<_$AppDatabase, $PreferenzeTable> {
+  $$PreferenzeTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get chiave => $composableBuilder(
+    column: $table.chiave,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valore => $composableBuilder(
+    column: $table.valore,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PreferenzeTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PreferenzeTable> {
+  $$PreferenzeTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get chiave =>
+      $composableBuilder(column: $table.chiave, builder: (column) => column);
+
+  GeneratedColumn<String> get valore =>
+      $composableBuilder(column: $table.valore, builder: (column) => column);
+}
+
+class $$PreferenzeTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PreferenzeTable,
+          Preferenza,
+          $$PreferenzeTableFilterComposer,
+          $$PreferenzeTableOrderingComposer,
+          $$PreferenzeTableAnnotationComposer,
+          $$PreferenzeTableCreateCompanionBuilder,
+          $$PreferenzeTableUpdateCompanionBuilder,
+          (
+            Preferenza,
+            BaseReferences<_$AppDatabase, $PreferenzeTable, Preferenza>,
+          ),
+          Preferenza,
+          PrefetchHooks Function()
+        > {
+  $$PreferenzeTableTableManager(_$AppDatabase db, $PreferenzeTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PreferenzeTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PreferenzeTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PreferenzeTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> chiave = const Value.absent(),
+                Value<String> valore = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenzeCompanion(
+                chiave: chiave,
+                valore: valore,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String chiave,
+                required String valore,
+                Value<int> rowid = const Value.absent(),
+              }) => PreferenzeCompanion.insert(
+                chiave: chiave,
+                valore: valore,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PreferenzeTable, Preferenza>(table),
+                  BaseReferences<_$AppDatabase, $PreferenzeTable, Preferenza>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PreferenzeTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PreferenzeTable,
+      Preferenza,
+      $$PreferenzeTableFilterComposer,
+      $$PreferenzeTableOrderingComposer,
+      $$PreferenzeTableAnnotationComposer,
+      $$PreferenzeTableCreateCompanionBuilder,
+      $$PreferenzeTableUpdateCompanionBuilder,
+      (Preferenza, BaseReferences<_$AppDatabase, $PreferenzeTable, Preferenza>),
+      Preferenza,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7256,4 +8044,8 @@ class $AppDatabaseManager {
       $$ElencoAttivitaTableTableManager(_db, _db.elencoAttivita);
   $$ElencoFotoTableTableManager get elencoFoto =>
       $$ElencoFotoTableTableManager(_db, _db.elencoFoto);
+  $$NoteSyncTableTableManager get noteSync =>
+      $$NoteSyncTableTableManager(_db, _db.noteSync);
+  $$PreferenzeTableTableManager get preferenze =>
+      $$PreferenzeTableTableManager(_db, _db.preferenze);
 }

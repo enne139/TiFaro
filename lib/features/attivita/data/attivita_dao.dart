@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
+import 'package:tifaro/core/database/data_modifica.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
 
@@ -159,17 +160,24 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
     return riga.read<int>('prossimo');
   }
 
-  /// Scrive [modifiche] su un'attività, aggiornando la data di modifica.
+  /// Scrive [modifiche] su un'attività, aggiornando la data di modifica
+  /// (`dataDiModifica`).
   Future<void> aggiorna(
     String id,
     ElencoAttivitaCompanion modifiche, {
     DateTime? adesso,
   }) {
-    return (update(elencoAttivita)..where((t) => t.id.equals(id))).write(
-      modifiche.copyWith(
-        aggiornataIl: Value<DateTime>(adesso ?? DateTime.now()),
-      ),
-    );
+    return transaction(() async {
+      final DateTime quando = await dataDiModificaPerId(
+        attachedDatabase,
+        'attivita',
+        <String>[id],
+        adesso: adesso,
+      );
+      await (update(elencoAttivita)..where((t) => t.id.equals(id))).write(
+        modifiche.copyWith(aggiornataIl: Value<DateTime>(quando)),
+      );
+    });
   }
 
   /// Sposta un'attività principale, con tutte le sue sotto-attività, in un
@@ -180,7 +188,9 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
       await (update(elencoAttivita)..where((t) => t.id.isIn(ids))).write(
         ElencoAttivitaCompanion(
           argomentoId: Value<String>(argomentoId),
-          aggiornataIl: Value<DateTime>(DateTime.now()),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModificaPerId(attachedDatabase, 'attivita', ids),
+          ),
         ),
       );
     });
@@ -216,7 +226,14 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
           .write(
             ElencoAttivitaCompanion(
               fattaIl: Value<DateTime?>(ora),
-              aggiornataIl: Value<DateTime>(ora),
+              aggiornataIl: Value<DateTime>(
+                await dataDiModificaPerId(
+                  attachedDatabase,
+                  'attivita',
+                  ids,
+                  adesso: ora,
+                ),
+              ),
             ),
           );
     });
@@ -287,7 +304,14 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
       )..where((t) => t.id.isIn(ids) & t.cancellataIl.isNull())).write(
         ElencoAttivitaCompanion(
           cancellataIl: Value<DateTime?>(ora),
-          aggiornataIl: Value<DateTime>(ora),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModificaPerId(
+              attachedDatabase,
+              'attivita',
+              ids,
+              adesso: ora,
+            ),
+          ),
         ),
       );
     });
@@ -313,7 +337,14 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
       )..where((t) => t.id.isIn(ids) & t.cancellataIl.equals(quando))).write(
         ElencoAttivitaCompanion(
           cancellataIl: const Value<DateTime?>(null),
-          aggiornataIl: Value<DateTime>(adesso),
+          aggiornataIl: Value<DateTime>(
+            await dataDiModificaPerId(
+              attachedDatabase,
+              'attivita',
+              ids,
+              adesso: adesso,
+            ),
+          ),
         ),
       );
 
@@ -367,12 +398,16 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
   ///
   /// Il file resta nella cartella: servirà a chi dovrà ancora riceverne la
   /// cancellazione con la sincronizzazione, e occupa poco (voce 007).
-  Future<void> togliFoto(String id) {
+  Future<void> togliFoto(String id) async {
     final DateTime adesso = DateTime.now();
-    return (update(elencoFoto)..where((t) => t.id.equals(id))).write(
+    await (update(elencoFoto)..where((t) => t.id.equals(id))).write(
       ElencoFotoCompanion(
         cancellataIl: Value<DateTime?>(adesso),
-        aggiornataIl: Value<DateTime>(adesso),
+        aggiornataIl: Value<DateTime>(
+          await dataDiModificaPerId(attachedDatabase, 'foto', <String>[
+            id,
+          ], adesso: adesso),
+        ),
       ),
     );
   }

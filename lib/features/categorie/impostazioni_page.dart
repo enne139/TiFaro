@@ -7,6 +7,7 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
 import 'package:tifaro/core/widgets/vuoto_view.dart';
+import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Le impostazioni: argomenti e tipologie da aggiungere, modificare e
 /// togliere.
@@ -125,6 +126,7 @@ class ImpostazioniPage extends StatelessWidget {
             title: const Text('Nuova tipologia'),
             onTap: () => _nuovaTipologia(context, db),
           ),
+          const SezioneSync(),
         ],
       ),
     );

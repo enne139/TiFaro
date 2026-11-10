@@ -9,6 +9,8 @@ import 'package:tifaro/features/categorie/data/categorie_dao.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
 import 'package:tifaro/features/modelli/data/modelli_dao.dart';
 import 'package:tifaro/features/modelli/data/modelli_tables.dart';
+import 'package:tifaro/features/sincronizzazione/data/sync_dao.dart';
+import 'package:tifaro/features/sincronizzazione/data/sync_tables.dart';
 
 part 'app_database.g.dart';
 
@@ -25,8 +27,10 @@ part 'app_database.g.dart';
     VociModello,
     ElencoAttivita,
     ElencoFoto,
+    NoteSync,
+    Preferenze,
   ],
-  daos: <Type>[CategorieDao, AttivitaDao, ModelliDao],
+  daos: <Type>[CategorieDao, AttivitaDao, ModelliDao, SyncDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, nella cartella dei dati dell'app.
@@ -49,9 +53,10 @@ class AppDatabase extends _$AppDatabase {
   /// Da aumentare di uno a ogni modifica delle tabelle, scrivendo la
   /// migrazione in [migration]: senza, l'app installata non si apre più.
   ///
-  /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli.
+  /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli;
+  /// 3 sincronizzazione (note e preferenze).
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -68,6 +73,10 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(schema.vociModello);
           await m.addColumn(schema.attivita, schema.attivita.modelloId);
         },
+        from2To3: (Migrator m, Schema3 schema) async {
+          await m.createTable(schema.syncNote);
+          await m.createTable(schema.preferenze);
+        },
       ),
       beforeOpen: (OpeningDetails details) async {
         // Senza questo SQLite accetta i rimandi fra tabelle ma non li fa
@@ -79,11 +88,13 @@ class AppDatabase extends _$AppDatabase {
 
   /// Argomenti e tipologie del primo avvio.
   ///
-  /// Hanno id fissi e non UUID: quando arriverà la sincronizzazione, il
-  /// "Lavoro" creato sul telefono e quello creato sul PC saranno la stessa
-  /// riga e non due doppioni (DECISIONI.md, voce 004).
+  /// Hanno id fissi e non UUID: il "Lavoro" creato sul telefono e quello
+  /// creato sul PC sono la stessa riga e non due doppioni (DECISIONI.md,
+  /// voce 004). E hanno una data di modifica fissa e vecchia: così un
+  /// dispositivo installato dopo non sovrascrive con i nomi di partenza
+  /// quello che si è già cambiato altrove (voce 021).
   Future<void> _semina() async {
-    final DateTime adesso = DateTime.now();
+    final DateTime adesso = DateTime.utc(2026);
     await batch((Batch b) {
       b.insertAll(argomenti, <ArgomentiCompanion>[
         ArgomentiCompanion.insert(

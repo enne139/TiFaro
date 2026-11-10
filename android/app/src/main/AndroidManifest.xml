@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- La rete serve a sincronizzarsi con il server sul NAS. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="TiFaro"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        <!-- usesCleartextTraffic: il server sul NAS parla HTTP, solo in rete
+             locale (DECISIONI.md, voce 022). -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
