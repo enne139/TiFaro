@@ -1,0 +1,47 @@
+#
+# TiFaro: il server che tiene allineate le app (telefono e PC) e fa i
+# backup. Spiegazione completa in README.md, accanto a questo file.
+#
+# Variabili nel .env (accanto a questo file, mai nel repository):
+#   TIFARO_TOKEN=...           obbligatorio, la password delle app:
+#                              openssl rand -hex 24
+#   PUID=... / PGID=...        output di "id" del tuo utente sul NAS
+#   TIFARO_BACKUP_LOCATION=... dove vanno i backup; meglio un altro disco
+#                              (es. /volume2/Backup/tifaro). Senza: ./backup
+#   TIFARO_SORGENTE=...        da dove prendere il codice per costruire
+#                              l'immagine; senza: il repository su Gitea
+
+name: tifaro
+
+services:
+  tifaro:
+    container_name: tifaro
+    # L'immagine si costruisce sul NAS dal codice su Gitea: non c'è un
+    # registry da cui scaricarla. Per aggiornare, nel terminale dello stack:
+    #   docker compose build --pull && docker compose up -d
+    build:
+      context: ${TIFARO_SORGENTE:-http://nas.local:3000/enne139/TiFaro.git#main:server}
+      args:
+        VERSIONE: ${TIFARO_VERSIONE:-main}
+    image: tifaro-server:locale
+    user: "${PUID:-1000}:${PGID:-1000}"
+    environment:
+      TZ: ${TZ:-Europe/Rome}
+      TIFARO_TOKEN: ${TIFARO_TOKEN:?imposta TIFARO_TOKEN nel .env}
+      # Un backup al giorno, tenendo gli ultimi 30.
+      TIFARO_BACKUP_OGNI: ${TIFARO_BACKUP_OGNI:-24h}
+      TIFARO_BACKUP_TIENI: ${TIFARO_BACKUP_TIENI:-30}
+    volumes:
+      # :z per SELinux, come gli altri stack.
+      - ./data:/data:z
+      - ${TIFARO_BACKUP_LOCATION:-./backup}:/backup:z
+    ports:
+      - '8645:8645'
+    healthcheck:
+      test: ["CMD", "/tifaro-server", "salute"]
+      interval: 1m
+      timeout: 5s
+    restart: always
+    # Il server usa pochi MB; il margine serve alla prima sincronizzazione,
+    # che arriva tutta insieme.
+    mem_limit: 128m

@@ -1,0 +1,6 @@
+*_test.go
+README.md
+docker-compose.yml
+.env
+data/
+backup/
