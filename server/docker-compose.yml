@@ -32,6 +32,17 @@ services:
       - ${TIFARO_BACKUP_LOCATION:-./backup}:/backup:z
     ports:
       - '8645:8645'
+    labels:
+      # Diun avvisa quando esce una versione nuova, con il suo numero
+      # (es. 0.4.0), invece di dire solo che "latest" è cambiata: guarda i
+      # tag del repository dell'immagine e tiene solo quelli X.Y.Z.
+      # Il $$ è un $ per la regola: da solo, compose lo prenderebbe per una
+      # variabile.
+      diun.enable: 'true'
+      diun.watch_repo: 'true'
+      diun.include_tags: '^\d+\.\d+\.\d+$$'
+      diun.sort_tags: semver
+      diun.max_tags: '5'
     healthcheck:
       test: ["CMD", "/tifaro-server", "salute"]
       interval: 1m

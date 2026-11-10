@@ -51,6 +51,9 @@ docker compose pull && docker compose up -d
 
 Per restare su una versione precisa: `TIFARO_VERSIONE=0.3.0` nel `.env`.
 
+Se sul NAS gira [Diun](https://crazymax.dev/diun/), le etichette `diun.*`
+del compose gli fanno segnalare ogni versione nuova con il suo numero.
+
 ## Ripristinare un backup
 
 1. Ferma lo stack.
