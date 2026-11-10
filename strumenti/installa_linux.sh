@@ -44,6 +44,12 @@ fi
 rm -rf "$destinazione"
 mkdir -p "$destinazione" "$(dirname "$lanciatore")" "$(dirname "$icona")" "$(dirname "$comando")"
 cp -r "$programma/." "$destinazione/"
+# L'icona sta accanto al programma, e la voce del menu la indica con il
+# percorso completo: così menu e barra delle applicazioni la mostrano
+# subito. Con il solo nome, Plasma già acceso non vede le icone installate
+# dopo il suo avvio e mostra quella generica fino al prossimo accesso.
+cp "$file_icona" "$destinazione/tifaro.svg"
+# Anche nel tema delle icone, per chi la cerca per nome.
 cp "$file_icona" "$icona"
 ln -sf "$destinazione/tifaro" "$comando"
 
@@ -54,12 +60,16 @@ Name=TiFaro
 GenericName=Cose da fare
 Comment=Attività, sotto-attività, modelli e scadenze
 Exec=$destinazione/tifaro
-Icon=com.enne139.tifaro
+Icon=$destinazione/tifaro.svg
 Terminal=false
 Categories=Office;ProjectManagement;
 Keywords=todo;attività;compiti;scadenze;
 StartupWMClass=com.enne139.tifaro
 DESKTOP
 
+# Fa rileggere a KDE (e agli altri ambienti) le applicazioni e le icone;
+# ognuno di questi comandi può mancare, e allora si salta.
 update-desktop-database "$(dirname "$lanciatore")" 2>/dev/null || true
+gtk-update-icon-cache -q -t -f "$HOME/.local/share/icons/hicolor" 2>/dev/null || true
+kbuildsycoca6 2>/dev/null || kbuildsycoca5 2>/dev/null || true
 echo "Installato in $destinazione: lo trovi nel menu come «TiFaro» o con il comando «tifaro»."
