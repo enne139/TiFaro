@@ -288,7 +288,7 @@ class _DialogoServer extends StatefulWidget {
 
 class _DialogoServerState extends State<_DialogoServer> {
   late final TextEditingController _indirizzo = TextEditingController(
-    text: widget.attuale.indirizzo ?? 'http://nas.local:8645',
+    text: widget.attuale.indirizzo ?? '',
   );
   late final TextEditingController _token = TextEditingController(
     text: widget.attuale.token ?? '',
@@ -359,6 +359,7 @@ class _DialogoServerState extends State<_DialogoServer> {
               keyboardType: TextInputType.url,
               decoration: const InputDecoration(
                 labelText: 'Indirizzo',
+                hintText: 'http://indirizzo-del-nas:8645',
                 helperText: 'Il NAS e la porta del container',
               ),
             ),

@@ -109,7 +109,7 @@ class ClientServer {
   }) : indirizzo = normalizzaIndirizzo(indirizzo),
        _client = client ?? http.Client();
 
-  /// L'indirizzo del server, per esempio `http://nas.local:8645`.
+  /// L'indirizzo del server, per esempio `http://indirizzo-del-nas:8645`.
   final String indirizzo;
 
   /// Il token, lo stesso di TIFARO_TOKEN sul server.
