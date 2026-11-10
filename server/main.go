@@ -24,7 +24,7 @@ import (
 
 // versione si può sovrascrivere compilando con
 // -ldflags "-X main.versione=1.2.3".
-var versione = "0.3.0"
+var versione = "0.4.0"
 
 // configurazione è quello che si legge dalle variabili d'ambiente.
 type configurazione struct {
