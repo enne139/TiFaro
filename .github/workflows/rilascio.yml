@@ -68,7 +68,8 @@ jobs:
 
       - name: Avvisa se la firma manca
         if: env.CHIAVE_BASE64 == ''
-        run: echo "::warning::Nessuna chiave di firma nei segreti: APK di prova, firmato con la chiave di debug."
+        run: |
+          echo "::warning::Nessuna chiave di firma nei segreti: APK di prova, firmato con la chiave di debug."
 
       # I passi della firma sono separati di proposito: il nome del passo che
       # fallisce deve bastare a capire cosa non va.
