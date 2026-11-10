@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Un faro su un fondo blu notte: TiFaro. -->
+  <rect width="64" height="64" rx="14" fill="#1E4F8C"/>
+  <path d="M32 18 L52 12 L52 24 Z" fill="#FFD54F" opacity="0.85"/>
+  <path d="M32 18 L12 12 L12 24 Z" fill="#FFD54F" opacity="0.45"/>
+  <rect x="27" y="14" width="10" height="8" rx="1.5" fill="#FFD54F"/>
+  <path d="M26 22 H38 L41 52 H23 Z" fill="#FFFFFF"/>
+  <path d="M25.2 30 H38.8 L39.4 36 H24.6 Z" fill="#E53935"/>
+  <path d="M24 42 H40 L40.6 48 H23.4 Z" fill="#E53935"/>
+  <rect x="18" y="52" width="28" height="4" rx="2" fill="#90CAF9"/>
+</svg>
