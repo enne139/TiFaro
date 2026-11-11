@@ -20,6 +20,9 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   qualunque livello, per farle tutte insieme.
 - **Campi:** cosa fare, descrizione, data di creazione, scadenza (con l'ora
   facoltativa), "nel calendario", foto.
+- **Descrizione in Markdown:** nel dettaglio si legge formattata
+  (grassetti, elenchi, caselle `- [ ]`, titoli, link che si aprono nel
+  browser); con la matita, o toccandola, si torna al testo da scrivere.
 - **Schermate:** Oggi (scadute, oggi, prossimi 7 giorni e, in fondo, le
   attività senza scadenza in ordine di creazione), Argomenti (albero
   da aprire, per un argomento o per tutti insieme con «Tutte»), Tipologie,

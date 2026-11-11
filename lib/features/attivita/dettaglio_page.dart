@@ -11,6 +11,7 @@ import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/foto_archivio.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
+import 'package:tifaro/core/widgets/testo_markdown.dart';
 import 'package:tifaro/core/widgets/vuoto_view.dart';
 import 'package:tifaro/features/attivita/azioni.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
@@ -55,10 +56,29 @@ class _DettaglioPageState extends State<DettaglioPage> {
   final TextEditingController _nuovaSotto = TextEditingController();
   final FocusNode _focusNuovaSotto = FocusNode();
 
+  /// Se la descrizione si sta scrivendo; altrimenti si vede formattata
+  /// (voce 031).
+  bool _modificaDescrizione = false;
+
+  /// Il fuoco del campo della descrizione: quando lo prende, il campo resta
+  /// aperto anche se era vuoto e ci si scrive la prima lettera.
+  late final FocusNode _focusDescrizione = FocusNode()
+    ..addListener(() {
+      if (_focusDescrizione.hasFocus && !_modificaDescrizione) {
+        setState(() => _modificaDescrizione = true);
+      }
+    });
+
+  /// Dove mostrare gli errori del salvataggio. Si tiene da parte perché il
+  /// salvataggio può partire da `dispose`, quando gli antenati non si possono
+  /// più cercare.
+  ScaffoldMessengerState? _messenger;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _db = AppScope.db(context);
+    _messenger = ScaffoldMessenger.maybeOf(context);
   }
 
   @override
@@ -71,6 +91,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
     _descrizione?.dispose();
     _nuovaSotto.dispose();
     _focusNuovaSotto.dispose();
+    _focusDescrizione.dispose();
     super.dispose();
   }
 
@@ -88,9 +109,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
     // controller vengono eliminati appena questa funzione restituisce.
     final String titolo = _titolo?.text.trim() ?? '';
     final String? descrizione = _descrizione?.text.trim();
-    final ScaffoldMessengerState? messenger = mounted
-        ? ScaffoldMessenger.of(context)
-        : null;
+    final ScaffoldMessengerState? messenger = _messenger;
     try {
       await _db.attivitaDao.aggiorna(
         widget.id,
@@ -292,23 +311,107 @@ class _DettaglioPageState extends State<DettaglioPage> {
               ),
             ),
           const SizedBox(height: 16),
-          TextField(
-            controller: _descrizione,
-            minLines: 3,
-            maxLines: null,
-            textCapitalization: TextCapitalization.sentences,
-            decoration: const InputDecoration(
-              labelText: 'Descrizione',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-            onChanged: (_) => _testoCambiato(),
-          ),
+          ..._descrizioneMarkdown(tema),
           ..._sottoAttivita(attivita, dati, tema),
           ..._foto(attivita, dati, tema),
         ],
       ),
     );
+  }
+
+  // --- Descrizione in Markdown ---------------------------------------------
+
+  /// La descrizione: formattata quando la si legge, testo semplice quando
+  /// la si scrive. Vuota, è subito il campo dove scriverla (voce 031).
+  List<Widget> _descrizioneMarkdown(ThemeData tema) {
+    final TextEditingController controller = _descrizione!;
+    final bool scrivendo =
+        _modificaDescrizione || controller.text.trim().isEmpty;
+    return <Widget>[
+      Row(
+        children: <Widget>[
+          Text('Descrizione', style: tema.textTheme.titleMedium),
+          const Spacer(),
+          if (scrivendo)
+            // Segue il testo mentre si scrive: con il campo vuoto non c'è
+            // niente da mostrare.
+            ListenableBuilder(
+              listenable: controller,
+              builder: (BuildContext context, _) =>
+                  controller.text.trim().isEmpty
+                  ? const SizedBox.shrink()
+                  : TextButton.icon(
+                      icon: const Icon(Icons.visibility_outlined),
+                      label: const Text('Anteprima'),
+                      onPressed: _mostraDescrizione,
+                    ),
+            )
+          else
+            IconButton(
+              icon: const Icon(Icons.edit_outlined),
+              tooltip: 'Modifica la descrizione',
+              onPressed: _scriviDescrizione,
+            ),
+        ],
+      ),
+      if (scrivendo)
+        TextField(
+          key: const ValueKey<String>('campo-descrizione'),
+          controller: controller,
+          focusNode: _focusDescrizione,
+          minLines: 3,
+          maxLines: null,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            hintText: 'Note, link, elenchi…',
+            helperText:
+                'Markdown: **grassetto**, *corsivo*, - elenco, - [ ] casella, '
+                '# titolo, [testo](https://…)',
+            helperMaxLines: 2,
+            border: OutlineInputBorder(),
+          ),
+          onChanged: (_) => _testoCambiato(),
+        )
+      else
+        // Toccando il testo lo si modifica; i link si aprono lo stesso,
+        // perché il loro tocco arriva prima.
+        InkWell(
+          key: const ValueKey<String>('descrizione-formattata'),
+          borderRadius: BorderRadius.circular(8),
+          onTap: _scriviDescrizione,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(color: tema.colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: TestoMarkdown(controller.text),
+          ),
+        ),
+    ];
+  }
+
+  /// Passa al campo per scrivere la descrizione, con il cursore in fondo.
+  void _scriviDescrizione() {
+    setState(() => _modificaDescrizione = true);
+    final TextEditingController? controller = _descrizione;
+    if (controller != null) {
+      controller.selection = TextSelection.collapsed(
+        offset: controller.text.length,
+      );
+    }
+    _focusDescrizione.requestFocus();
+  }
+
+  /// Torna alla descrizione formattata, salvando subito quello che si è
+  /// scritto.
+  void _mostraDescrizione() {
+    _focusDescrizione.unfocus();
+    setState(() => _modificaDescrizione = false);
+    if (_ritardo?.isActive ?? false) {
+      _salvaTesti();
+    }
   }
 
   // --- Etichette: argomento, tipologia, scadenza, calendario ---------------

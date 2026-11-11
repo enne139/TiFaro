@@ -755,3 +755,34 @@ che offrono di annullare (cestino).
 **Alternative scartate:** un avviso più breve o più discreto (resta un
 avviso a ogni aggiunta).
 
+---
+
+## 031 — Descrizione in Markdown
+
+**Data:** 2026-11-11
+
+**Contesto:** nella descrizione si vogliono grassetti, elenchi, caselle e
+link, non solo testo semplice.
+
+**Decisione:** la descrizione si scrive in Markdown (quello di GitHub:
+caselle `- [ ]`, tabelle, link scritti per intero) e nel dettaglio si legge
+formattata (`flutter_markdown_plus`). Toccandola, o con la matita, torna il
+testo da scrivere, con sotto un promemoria della sintassi; «Anteprima» la
+mostra di nuovo formattata. Vuota, è subito il campo dove scriverla. Un a
+capo resta un a capo, anche senza la riga vuota che il Markdown vorrebbe. I
+link si aprono nell'app giusta (`url_launcher`); su Android il manifest
+dichiara quali (pagine web, posta, telefono). Il testo resta salvato così
+com'è scritto: nel calendario e nella ricerca si vede il Markdown grezzo.
+Le caselle della descrizione si vedono ma non si spuntano: per i passaggi
+da segnare ci sono le sotto-attività.
+
+**Motivazione:** il Markdown si scrive anche sul telefono senza pulsanti, e
+resta leggibile pure dove non viene formattato (calendario, esportazione).
+`flutter_markdown_plus` è il seguito di `flutter_markdown`, abbandonato dal
+gruppo di Flutter. Tenere gli a capo evita che un testo condiviso da
+un'altra app diventi un paragrafo solo.
+
+**Alternative scartate:** un editor con la barra dei pulsanti (pesante sul
+telefono, e il testo salvato sarebbe un formato suo); caselle spuntabili
+nella descrizione (doppione delle sotto-attività, e bisognerebbe riscrivere
+il testo a ogni tocco).
