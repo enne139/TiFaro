@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Le immagini che l'app chiama per nome da Dart: senza questo, la build di
+     release le toglierebbe come inutilizzate. ic_notifica è l'icona degli
+     avvisi (DECISIONI.md, voce 033). -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_notifica" />

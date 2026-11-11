@@ -8,10 +8,11 @@ import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
 import 'package:tifaro/core/widgets/vuoto_view.dart';
 import 'package:tifaro/features/calendario/sezione_calendario.dart';
+import 'package:tifaro/features/notifiche/sezione_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Le impostazioni: argomenti e tipologie da aggiungere, modificare e
-/// togliere.
+/// togliere, avvisi, server e calendario.
 class ImpostazioniPage extends StatelessWidget {
   const ImpostazioniPage({super.key});
 
@@ -127,6 +128,7 @@ class ImpostazioniPage extends StatelessWidget {
             title: const Text('Nuova tipologia'),
             onTap: () => _nuovaTipologia(context, db),
           ),
+          const SezioneNotifiche(),
           const SezioneSync(),
           const SezioneCalendario(),
         ],

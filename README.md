@@ -84,6 +84,12 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   Google, è Android a portarlo su Google Calendar. Le attività segnate dal PC
   arrivano nel calendario quando il telefono si sincronizza.
 
+- **Avvisi delle scadenze:** un'attività con l'ora avvisa a quell'ora;
+  quelle senza ora arrivano in un riepilogo del giorno in cui scadono, alle
+  9 (si cambia in Impostazioni → Avvisi). Toccando l'avviso si apre
+  l'attività. Su Android arrivano anche ad app chiusa; su Linux solo mentre
+  TiFaro è aperta.
+
 ## Fasi
 
 1. App da sola, senza server — **fatta**

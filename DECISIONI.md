@@ -838,3 +838,52 @@ troppo per l'uso che serve); una sola attività che si riapre con la data
 spostata (si perde lo storico delle volte fatte e delle sotto-attività
 chiuse); creare in anticipo le volte future (si moltiplicano gli eventi e
 le attività da guardare).
+
+---
+
+## 033 — Avvisi delle scadenze
+
+**Data:** 2026-11-11
+
+**Contesto:** le attività nel calendario hanno il promemoria di Google, le
+altre scadono senza che il telefono avvisi (fase 5).
+
+**Decisione:** notifiche locali con `flutter_local_notifications`, senza
+server. Un'attività da fare con scadenza e ora ha un avviso a quell'ora; le
+attività con scadenza ma senza ora finiscono in un riepilogo per giorno,
+alle 9 (l'ora si cambia in Impostazioni → Avvisi): con una sola attività il
+riepilogo è lei, con più attività dice quante sono e i titoli. Toccando un
+avviso si apre l'attività, o Oggi se è un riepilogo. Come per il
+calendario (voce 027), un giro calcola gli avvisi voluti (`logica/avvisi.dart`,
+logica pura) e fa solo le differenze con quelli programmati: all'apertura,
+al ritorno in primo piano e due secondi dopo ogni modifica alle attività,
+comprese quelle arrivate con la sincronizzazione. Si programmano al massimo
+60 avvisi, nei prossimi 30 giorni: il sistema ne tiene un numero limitato, e
+a ogni apertura si va avanti. Ogni avviso ha un numero fisso (un'impronta
+dell'id dell'attività, o la data per i riepiloghi) e porta con sé l'istante
+e l'attività: rileggendo quelli programmati si capisce cosa è cambiato, ora
+compresa, senza tenere una tabella. Gli istanti si passano in UTC, così non
+serve il nome del fuso orario del telefono.
+
+Su Android li programma il sistema e arrivano ad app chiusa, anche dopo un
+riavvio. Il permesso di mostrarli si chiede alla prima apertura, una volta
+sola. Se gli orari precisi non sono permessi (Android 14 non li dà da sé),
+gli avvisi arrivano lo stesso, con qualche minuto di ritardo, e le
+impostazioni offrono di permetterli. Su Linux il sistema sa solo mostrare
+una notifica subito: gli avvisi aspettano in un timer finché l'app è aperta,
+e le impostazioni lo dicono. Le preferenze (acceso, ora del riepilogo)
+restano su ogni dispositivo.
+
+**Motivazione:** il riepilogo evita una raffica di notifiche alle 9 quando
+scadono più cose lo stesso giorno, e un'attività senza ora non ha un
+momento suo. Le notifiche locali funzionano senza rete e senza un servizio
+di notifiche esterno, che per un'app installata fuori dal Play Store
+vorrebbe un account Firebase.
+
+**Limite noto:** un'attività «nel calendario» con l'ora può avvisare due
+volte, da TiFaro e dal promemoria di Google Calendar.
+
+**Alternative scartate:** avvisi mandati dal server (servirebbe un servizio
+di notifiche push); un avviso per ogni attività anche senza ora (troppe
+notifiche alla stessa ora); il permesso `USE_EXACT_ALARM`, concesso da sé
+ma riservato alle app sveglia e calendario.

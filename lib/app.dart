@@ -7,6 +7,8 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/foto_archivio.dart';
 import 'package:tifaro/features/calendario/allineatore_calendario.dart';
 import 'package:tifaro/features/calendario/auto_calendario.dart';
+import 'package:tifaro/features/notifiche/auto_notifiche.dart';
+import 'package:tifaro/features/notifiche/pianificatore_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/auto_sync.dart';
 import 'package:tifaro/features/sincronizzazione/sincronizzatore.dart';
 import 'package:tifaro/navigation/app_shell.dart';
@@ -22,6 +24,7 @@ class TiFaroApp extends StatelessWidget {
     required this.foto,
     this.sincronizzatore,
     this.allineatore,
+    this.notifiche,
     super.key,
   });
 
@@ -35,6 +38,10 @@ class TiFaroApp extends StatelessWidget {
   /// Il calendario del telefono; senza, le attività non vanno nel
   /// calendario (succede nelle prove).
   final AllineatoreCalendario? allineatore;
+
+  /// Gli avvisi delle scadenze; senza, non ci sono avvisi (succede nelle
+  /// prove).
+  final PianificatoreNotifiche? notifiche;
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +74,10 @@ class TiFaroApp extends StatelessWidget {
     if (calendario != null) {
       figlio = AutoCalendario(allineatore: calendario, child: figlio);
     }
+    final PianificatoreNotifiche? avvisi = notifiche;
+    if (avvisi != null) {
+      figlio = AutoNotifiche(pianificatore: avvisi, child: figlio);
+    }
     if (sync != null) {
       figlio = AutoSync(sincronizzatore: sync, child: figlio);
     }
@@ -75,6 +86,7 @@ class TiFaroApp extends StatelessWidget {
       foto: foto,
       sync: sync,
       allineatore: calendario,
+      avvisi: avvisi,
       child: figlio,
     );
   }

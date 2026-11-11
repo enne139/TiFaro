@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tifaro/app.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/features/notifiche/pianificatore_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/sincronizzatore.dart';
 
 /// Un database vero ma in memoria: ha i vincoli e le transazioni di SQLite e
@@ -19,11 +20,13 @@ AppDatabase databaseInMemoria() {
 /// temporanea per le foto.
 ///
 /// Con [conSincronizzazione] c'è anche il sincronizzatore, senza server
-/// impostato: serve a provare che l'app lavori lo stesso.
+/// impostato: serve a provare che l'app lavori lo stesso. Con [notifiche]
+/// ci sono gli avvisi, di solito con un dispositivo finto.
 Future<void> avviaApp(
   WidgetTester tester,
   AppDatabase db, {
   bool conSincronizzazione = false,
+  PianificatoreNotifiche? notifiche,
 }) async {
   final Directory cartella = Directory.systemTemp.createTempSync('tifaro_');
   addTearDown(() => cartella.deleteSync(recursive: true));
@@ -35,6 +38,7 @@ Future<void> avviaApp(
       sincronizzatore: conSincronizzazione
           ? Sincronizzatore(db: db, foto: foto)
           : null,
+      notifiche: notifiche,
     ),
   );
   await tester.pumpAndSettle();

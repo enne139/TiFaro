@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:tifaro/core/app_scope.dart';
+import 'package:tifaro/core/dati_app.dart';
 import 'package:tifaro/features/attivita/argomenti_page.dart';
+import 'package:tifaro/features/attivita/azioni.dart';
 import 'package:tifaro/features/attivita/elenchi_pages.dart';
 import 'package:tifaro/features/attivita/oggi_page.dart';
 import 'package:tifaro/features/attivita/tipologie_page.dart';
@@ -8,6 +11,7 @@ import 'package:tifaro/features/categorie/impostazioni_page.dart';
 import 'package:tifaro/features/cattura/cattura_sheet.dart';
 import 'package:tifaro/features/cattura/condivisione.dart';
 import 'package:tifaro/features/modelli/modelli_page.dart';
+import 'package:tifaro/features/notifiche/pianificatore_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Una sezione principale dell'app.
@@ -47,6 +51,9 @@ class _AppShellState extends State<AppShell> {
     _condivisioneRicevuta,
   );
 
+  /// Gli avvisi, per aprire quello che si tocca.
+  PianificatoreNotifiche? _avvisi;
+
   @override
   void initState() {
     super.initState();
@@ -54,9 +61,46 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_avvisi == null) {
+      _avvisi = AppScope.notifiche(context);
+      _avvisi?.daAprire.addListener(_avvisoToccato);
+      // Un avviso che ha aperto l'app è arrivato prima di questa pagina.
+      _avvisoToccato();
+    }
+  }
+
+  @override
   void dispose() {
     _condivisioni.ferma();
+    _avvisi?.daAprire.removeListener(_avvisoToccato);
     super.dispose();
+  }
+
+  /// Un avviso toccato apre la sua attività, oppure Oggi se era il
+  /// riepilogo di più attività.
+  void _avvisoToccato() {
+    final PianificatoreNotifiche? avvisi = _avvisi;
+    final AperturaDaAvviso? apertura = avvisi?.daAprire.value;
+    if (avvisi == null || apertura == null) {
+      return;
+    }
+    avvisi.daAprire.value = null;
+    // Dopo il primo disegno, come per il tasto Condividi.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _sezione = 0);
+      final String? id = apertura.attivitaId;
+      if (id != null && DatiApp.leggi(context).indice[id] != null) {
+        apriDettaglio(context, id);
+      }
+    });
+    // Senza altri cambiamenti il disegno successivo non arriverebbe, e con
+    // lui l'apertura.
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   /// Una foto o un testo arrivati dal tasto Condividi di un'altra app
@@ -76,6 +120,7 @@ class _AppShellState extends State<AppShell> {
         foto: condivisione.foto,
       );
     });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   void _apri(Widget pagina) {
