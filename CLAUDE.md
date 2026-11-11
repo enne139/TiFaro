@@ -94,6 +94,12 @@ una notifica che arriva dopo il commit, e l'operazione resta appesa.
   `SyncDao`, nell'ordine giusto (dopo quelle a cui rimanda), e deve avere
   `id`, `aggiornataIl`/`aggiornatoIl` e `cancellataIl`/`cancellatoIl`. Il
   server non va toccato: tiene le righe così come arrivano.
+- **Una colonna nuova in una tabella sincronizzata** deve poter essere
+  vuota (`nullable()`): una versione vecchia dell'app manda le righe senza
+  quella chiave, e il JSON senza la chiave diventa `null`. L'impronta non
+  conta i campi vuoti, così le due versioni non si rimandano le righe a
+  ogni giro (voce 032). Una colonna obbligatoria romperebbe la lettura
+  delle righe vecchie.
 - Le tabelle `sync_note`, `preferenze` ed `eventi_calendario` restano su
   ogni dispositivo e non si sincronizzano.
 - Mai cancellare righe di tabelle sincronizzate: una cancellazione vera non

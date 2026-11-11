@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
 
@@ -170,5 +171,29 @@ void main() {
     );
     expect(c.argomento?.id, 'lavoro');
     expect(c.nuovoArgomento, isNull);
+  });
+
+  test('la ricorrenza: il menu vale più del testo, il modello non ne ha', () {
+    expect(
+      componi('bolletta ogni mese').ricorrenza,
+      const Ricorrenza(UnitaRicorrenza.mese),
+    );
+    expect(
+      componi(
+        'bolletta ogni mese',
+        menu: const SceltaMenu(
+          ricorrenza: (valore: Ricorrenza(UnitaRicorrenza.mese, 2)),
+        ),
+      ).ricorrenza,
+      const Ricorrenza(UnitaRicorrenza.mese, 2),
+    );
+    expect(
+      componi(
+        'bolletta ogni mese',
+        menu: const SceltaMenu(ricorrenza: (valore: null)),
+      ).ricorrenza,
+      isNull,
+    );
+    expect(componi('/turno').ricorrenza, isNull);
   });
 }

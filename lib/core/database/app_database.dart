@@ -57,9 +57,10 @@ class AppDatabase extends _$AppDatabase {
   /// migrazione in [migration]: senza, l'app installata non si apre più.
   ///
   /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli;
-  /// 3 sincronizzazione (note e preferenze); 4 eventi del calendario.
+  /// 3 sincronizzazione (note e preferenze); 4 eventi del calendario;
+  /// 5 ricorrenze delle attività.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -82,6 +83,9 @@ class AppDatabase extends _$AppDatabase {
         },
         from3To4: (Migrator m, Schema4 schema) async {
           await m.createTable(schema.eventiCalendario);
+        },
+        from4To5: (Migrator m, Schema5 schema) async {
+          await m.addColumn(schema.attivita, schema.attivita.ricorrenza);
         },
       ),
       beforeOpen: (OpeningDetails details) async {

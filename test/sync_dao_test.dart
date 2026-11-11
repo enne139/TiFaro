@@ -141,6 +141,40 @@ void main() {
     expect((await db.attivitaDao.trova('figlia'))!.genitoreId, 'madre');
   });
 
+  test(
+    'una riga senza una colonna nuova vale come quella colonna vuota',
+    () async {
+      // Così una versione vecchia dell'app, che non conosce la colonna, e una
+      // nuova non si rimandano le righe a ogni giro (voce 032).
+      final RigaSync conChiave = remota(
+        'a1',
+        titolo: 'Riga',
+        aggiornata: DateTime(2026, 11, 2),
+      );
+      final Map<String, dynamic> senza = Map<String, dynamic>.of(conChiave.dati)
+        ..remove('ricorrenza');
+      expect(conChiave.dati.containsKey('ricorrenza'), isTrue);
+      final RigaSync vecchia = RigaSync(
+        tabella: 'attivita',
+        id: 'a1',
+        aggiornata: conChiave.aggiornata,
+        dati: senza,
+      );
+      expect(vecchia.impronta, conChiave.impronta);
+
+      // Arrivata senza la chiave, si scrive con la colonna vuota e non
+      // risulta da rimandare.
+      await dao.applica(
+        accettate: const <RigaSync>[],
+        ricevute: <RigaSync>[vecchia],
+        revisione: 5,
+      );
+      expect((await db.attivitaDao.trova('a1'))!.ricorrenza, isNull);
+      final List<RigaSync> daMandare = await dao.righeDaInviare();
+      expect(daMandare.where((RigaSync r) => r.id == 'a1'), isEmpty);
+    },
+  );
+
   test('le tabelle sconosciute si ignorano', () async {
     await dao.applica(
       accettate: const <RigaSync>[],

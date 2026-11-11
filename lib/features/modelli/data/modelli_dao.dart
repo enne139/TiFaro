@@ -5,6 +5,7 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/database/data_modifica.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/modelli/data/modelli_tables.dart';
 import 'package:tifaro/features/modelli/logica/scadenze_relative.dart';
 import 'package:tifaro/features/modelli/logica/variabili.dart';
@@ -343,6 +344,7 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
   ///
   /// [variabili] riempie i segnaposto come `{luogo}` in titoli e
   /// descrizioni; `{data}` e `{oggi}` si riempiono da soli (voce 029).
+  /// [ricorrenza] fa ripetere l'attività principale (voce 032).
   Future<String> creaDaModello(
     String modelloId, {
     String? titolo,
@@ -354,6 +356,7 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
     bool scadenzaConOra = false,
     bool? nelCalendario,
     Map<String, String> variabili = const <String, String>{},
+    Ricorrenza? ricorrenza,
     DateTime? adesso,
   }) {
     return transaction(() async {
@@ -397,6 +400,7 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
         scadenzaConOra: principale.conOra,
         nelCalendario: nelCalendario ?? modello.nelCalendario,
         modelloId: modello.id,
+        ricorrenza: ricorrenza,
         adesso: ora,
       );
 

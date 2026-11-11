@@ -37,7 +37,15 @@ class RigaSync {
   final Map<String, dynamic> dati;
 
   /// L'impronta del contenuto, calcolata una volta.
-  late final String impronta = logica.impronta(dati);
+  ///
+  /// I campi vuoti (`null`) non contano: una riga scritta da una versione
+  /// dell'app che non ha ancora una colonna nuova (la chiave manca) è uguale
+  /// alla stessa riga con la colonna vuota. Senza, due versioni diverse si
+  /// rimanderebbero le righe a ogni sincronizzazione (voce 032).
+  late final String impronta = logica.impronta(<String, dynamic>{
+    for (final MapEntry<String, dynamic> campo in dati.entries)
+      if (campo.value != null) campo.key: campo.value,
+  });
 
   /// "tabella/id", come il server indica le righe rifiutate.
   String get chiave => '$tabella/$id';

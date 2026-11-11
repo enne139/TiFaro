@@ -10,11 +10,13 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/core/testo.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
 import 'package:tifaro/core/widgets/testo_markdown.dart';
 import 'package:tifaro/core/widgets/vuoto_view.dart';
 import 'package:tifaro/features/attivita/azioni.dart';
 import 'package:tifaro/features/attivita/data/attivita_dao.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/attivita/logica/viste.dart';
 import 'package:tifaro/features/attivita/widgets/riga_attivita.dart';
 import 'package:tifaro/features/attivita/widgets/selettori.dart';
@@ -291,6 +293,16 @@ class _DettaglioPageState extends State<DettaglioPage> {
                 style: tema.textTheme.bodySmall,
               ),
             ),
+          if (Ricorrenza.daCodice(attivita.ricorrenza) case final Ricorrenza r
+              when !fatta)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'Quando la segni fatta arriva la prossima volta, che scade '
+                '${_prossima(attivita, r)}.',
+                style: tema.textTheme.bodySmall,
+              ),
+            ),
           const SizedBox(height: 8),
           Text(
             fatta
@@ -421,6 +433,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
     final Tipologia? tipologia = dati.tipologiePerId[attivita.tipologiaId];
     final DateTime? scadenza = attivita.scadenza;
     final bool principale = attivita.genitoreId == null;
+    final Ricorrenza? ricorrenza = Ricorrenza.daCodice(attivita.ricorrenza);
     final Color? coloreScadenza = scaduta(attivita, DateTime.now())
         ? tema.colorScheme.error
         : null;
@@ -490,6 +503,19 @@ class _DettaglioPageState extends State<DettaglioPage> {
                 )
               : null,
         ),
+      InputChip(
+        avatar: const Icon(Icons.repeat),
+        label: Text(
+          ricorrenza == null ? 'Ripeti' : conMaiuscola(ricorrenza.descrizione),
+        ),
+        onPressed: () => _scegliRicorrenza(ricorrenza),
+        deleteButtonTooltipMessage: 'Non ripetere',
+        onDeleted: ricorrenza == null
+            ? null
+            : () => _aggiorna(
+                const ElencoAttivitaCompanion(ricorrenza: Value<String?>(null)),
+              ),
+      ),
       FilterChip(
         avatar: const Icon(Icons.calendar_month_outlined),
         label: const Text('Nel calendario'),
@@ -499,6 +525,35 @@ class _DettaglioPageState extends State<DettaglioPage> {
             _aggiorna(ElencoAttivitaCompanion(nelCalendario: Value<bool>(v))),
       ),
     ];
+  }
+
+  /// La scadenza della prossima volta se la si segnasse fatta adesso.
+  String _prossima(Attivita attivita, Ricorrenza ricorrenza) {
+    final DateTime adesso = DateTime.now();
+    return formatoScadenza(
+      prossimaScadenza(
+        ricorrenza,
+        scadenza: attivita.scadenza,
+        fattaIl: adesso,
+      ),
+      attivita.scadenza != null && attivita.scadenzaConOra,
+      adesso,
+    );
+  }
+
+  Future<void> _scegliRicorrenza(Ricorrenza? attuale) async {
+    final Scelta<Ricorrenza>? scelta = await scegliRicorrenza(
+      context,
+      attuale: attuale,
+    );
+    if (scelta == null || !mounted) {
+      return;
+    }
+    await _aggiorna(
+      ElencoAttivitaCompanion(
+        ricorrenza: Value<String?>(scelta.valore?.codice),
+      ),
+    );
   }
 
   Future<void> _scegliArgomento(Attivita attivita) async {

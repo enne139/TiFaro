@@ -10,6 +10,8 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/foto_archivio.dart';
+import 'package:tifaro/core/testo.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/attivita/widgets/selettori.dart';
 import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/cattura/scelta_foto.dart';
@@ -96,6 +98,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
   Scelta<String>? _tipologiaScelta;
   ({DateTime? data, bool conOra})? _scadenzaScelta;
   bool? _calendarioScelto;
+  Scelta<Ricorrenza>? _ricorrenzaScelta;
   late Scelta<String>? _modelloScelto = widget.modelloId == null
       ? null
       : (valore: widget.modelloId);
@@ -144,6 +147,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
     scadenza: _scadenzaScelta,
     calendario: _calendarioScelto,
     modello: _modelloScelto,
+    ricorrenza: _ricorrenzaScelta,
   );
 
   /// Mette insieme riga, menu e modello con i dati di adesso.
@@ -236,6 +240,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
                 scadenzaConOra: composta.conOra,
                 nelCalendario: composta.calendario,
                 variabili: _valoriVariabili,
+                ricorrenza: composta.ricorrenza,
               )
             : await db.attivitaDao.crea(
                 titolo: titolo,
@@ -246,6 +251,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
                 scadenza: composta.scadenza,
                 scadenzaConOra: composta.conOra,
                 nelCalendario: composta.calendario,
+                ricorrenza: composta.ricorrenza,
               );
         for (final String nome in nomiFoto) {
           await db.attivitaDao.aggiungiFoto(id, nome);
@@ -333,6 +339,16 @@ class _CatturaSheetState extends State<CatturaSheet> {
         conOra: conOra,
       ),
     );
+  }
+
+  Future<void> _scegliRicorrenza(CatturaComposta composta) async {
+    final Scelta<Ricorrenza>? scelta = await scegliRicorrenza(
+      context,
+      attuale: composta.ricorrenza,
+    );
+    if (scelta != null && mounted) {
+      setState(() => _ricorrenzaScelta = scelta);
+    }
   }
 
   Future<void> _scegliOra(CatturaComposta composta) async {
@@ -647,6 +663,17 @@ class _CatturaSheetState extends State<CatturaSheet> {
                 : (composta.conOra ? formatoOra(scadenza) : 'Nessuna'),
             onTap: scadenza == null ? null : () => _scegliOra(composta),
           ),
+          _RigaMenu(
+            icona: const Icon(Icons.repeat),
+            titolo: 'Si ripete',
+            valore: composta.ricorrenza == null
+                ? 'No'
+                : conMaiuscola(composta.ricorrenza!.descrizione),
+            onTap: () => _scegliRicorrenza(composta),
+            onAzzera: _ricorrenzaScelta == null
+                ? null
+                : () => setState(() => _ricorrenzaScelta = null),
+          ),
           SwitchListTile(
             secondary: const Icon(Icons.calendar_month_outlined),
             title: const Text('Nel calendario'),
@@ -749,6 +776,15 @@ class _CatturaSheetState extends State<CatturaSheet> {
           label: Text(
             formatoScadenza(scadenza, composta.conOra, DateTime.now()),
           ),
+        ),
+      );
+    }
+    final Ricorrenza? ricorrenza = composta.ricorrenza;
+    if (ricorrenza != null) {
+      etichette.add(
+        Chip(
+          avatar: const Icon(Icons.repeat),
+          label: Text(conMaiuscola(ricorrenza.descrizione)),
         ),
       );
     }
@@ -858,6 +894,11 @@ Future<void> mostraAiutoSintassi(BuildContext context) {
     ('15/11, 15/11/2027', 'una data'),
     ('tra 3 giorni, fra una settimana, tra 2 mesi', 'scadenza da oggi'),
     ('18:00, alle 18', 'ora della scadenza'),
+    (
+      'ogni giorno, ogni 2 settimane, ogni mese',
+      'si ripete: quando la segni fatta arriva la prossima',
+    ),
+    ('ogni lunedì', 'ogni settimana, dal prossimo lunedì'),
     ('!cal', 'da mettere nel calendario'),
   ];
   return showDialog<void>(

@@ -102,6 +102,9 @@ class RigaAttivita extends StatelessWidget {
     if (foto > 0) {
       info.add(_Info(icona: Icons.photo_outlined, testo: '$foto'));
     }
+    if (attivita.ricorrenza != null) {
+      info.add(const _Info(icona: Icons.repeat));
+    }
     if (attivita.nelCalendario) {
       info.add(const _Info(icona: Icons.calendar_month_outlined));
     }

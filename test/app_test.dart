@@ -224,4 +224,41 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('un\'attività che si ripete torna quando la si fa', (
+    WidgetTester tester,
+  ) async {
+    schermoAlto(tester);
+    final AppDatabase db = databaseInMemoria();
+    await avviaApp(tester, db);
+
+    await tester.tap(find.text('Nuova'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byType(TextField).first,
+      'pagare la bolletta ogni mese domani',
+    );
+    await tester.pump();
+    expect(find.text('Ogni mese'), findsOneWidget);
+    await tester.tap(find.text('Aggiungi'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pagare la bolletta'), findsOneWidget);
+    expect(find.byIcon(Icons.repeat), findsOneWidget);
+
+    // Fatta: la prossima volta compare al suo posto, da fare.
+    await tester.tap(find.byType(Checkbox).first);
+    await tester.pumpAndSettle();
+    final List<Attivita> tutte = (await tester.runAsync(
+      () => db.select(db.elencoAttivita).get(),
+    ))!;
+    expect(tutte, hasLength(2));
+    expect(tutte.where((Attivita a) => a.fattaIl == null), hasLength(1));
+    // Scade fra un mese: non è in Oggi (i prossimi 7 giorni) ma fra tutte.
+    expect(find.text('Pagare la bolletta'), findsNothing);
+    await tester.tap(find.text('Argomenti').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Pagare la bolletta'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
 }

@@ -3,7 +3,9 @@ import 'package:uuid/uuid.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/database/data_modifica.dart';
+import 'package:tifaro/core/date.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
 
 part 'attivita_dao.g.dart';
@@ -73,7 +75,8 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
   /// Una sotto-attività ([genitoreId]) prende sempre l'argomento del
   /// genitore e ignora [argomentoId]; un'attività principale senza argomento
   /// prende il predefinito. La nuova attività va in fondo alle sorelle.
-  /// [modelloId] dice da quale modello nasce, se nasce da uno.
+  /// [modelloId] dice da quale modello nasce, se nasce da uno; [ricorrenza]
+  /// ogni quanto si ripete (voce 032).
   Future<String> crea({
     required String titolo,
     String descrizione = '',
@@ -84,6 +87,7 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
     bool scadenzaConOra = false,
     bool nelCalendario = false,
     String? modelloId,
+    Ricorrenza? ricorrenza,
     DateTime? adesso,
   }) {
     return transaction(() async {
@@ -114,6 +118,7 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
           ordine: Value<int>(await _prossimoOrdine(genitoreId)),
           nelCalendario: Value<bool>(nelCalendario),
           modelloId: Value<String?>(modelloId),
+          ricorrenza: Value<String?>(ricorrenza?.codice),
           aggiornataIl: ora,
         ),
       );
@@ -200,7 +205,10 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
   ///
   /// Con [ancheSotto] chiude anche tutte le sotto-attività ancora aperte;
   /// quelle già fatte tengono la loro data. Riaprire riapre solo questa.
-  Future<void> segnaFatta(
+  ///
+  /// Se l'attività si ripete, chiuderla crea la prossima volta e ne
+  /// restituisce l'id (voce 032); altrimenti restituisce `null`.
+  Future<String?> segnaFatta(
     String id,
     bool fatta, {
     bool ancheSotto = false,
@@ -214,8 +222,11 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
           const ElencoAttivitaCompanion(fattaIl: Value<DateTime?>(null)),
           adesso: ora,
         );
-        return;
+        return null;
       }
+      // Letta prima di chiuderla: la prossima volta nasce solo se era
+      // ancora da fare.
+      final Attivita? prima = await trova(id);
       final List<String> ids = ancheSotto
           ? await _sottoalbero(id)
           : <String>[id];
@@ -236,7 +247,115 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
               ),
             ),
           );
+
+      final Ricorrenza? ricorrenza = Ricorrenza.daCodice(prima?.ricorrenza);
+      if (prima == null ||
+          ricorrenza == null ||
+          prima.fattaIl != null ||
+          prima.cancellataIl != null) {
+        return null;
+      }
+      return _prossimaVolta(prima, ricorrenza, ora);
     });
+  }
+
+  /// Crea la prossima volta di [fatta], un'attività che si ripete con
+  /// [ricorrenza] appena chiusa, e ne restituisce l'id.
+  ///
+  /// La copia ha le stesse sotto-attività, tutte da fare, con le scadenze
+  /// spostate degli stessi giorni della principale; le foto restano sulla
+  /// volta vecchia. La ricorrenza passa alla copia: così riaprire e
+  /// richiudere la vecchia non crea un doppione (voce 032).
+  Future<String> _prossimaVolta(
+    Attivita fatta,
+    Ricorrenza ricorrenza,
+    DateTime ora,
+  ) async {
+    final DateTime nuova = prossimaScadenza(
+      ricorrenza,
+      scadenza: fatta.scadenza,
+      fattaIl: ora,
+    );
+    // Di quanti giorni si sposta tutto. Senza scadenza le sotto-attività
+    // erano contate dalla creazione.
+    final int spostamento = giorniFra(fatta.scadenza ?? fatta.creataIl, nuova);
+    DateTime? sposta(DateTime? data) => data == null
+        ? null
+        : DateTime(
+            data.year,
+            data.month,
+            data.day + spostamento,
+            data.hour,
+            data.minute,
+          );
+
+    await (update(elencoAttivita)..where((t) => t.id.equals(fatta.id))).write(
+      const ElencoAttivitaCompanion(ricorrenza: Value<String?>(null)),
+    );
+
+    final String radiceId = _uuid.v4();
+    await into(elencoAttivita).insert(
+      ElencoAttivitaCompanion.insert(
+        id: radiceId,
+        titolo: fatta.titolo,
+        descrizione: Value<String>(fatta.descrizione),
+        creataIl: ora,
+        scadenza: Value<DateTime?>(nuova),
+        scadenzaConOra: Value<bool>(
+          fatta.scadenza != null && fatta.scadenzaConOra,
+        ),
+        argomentoId: fatta.argomentoId,
+        tipologiaId: Value<String?>(fatta.tipologiaId),
+        genitoreId: Value<String?>(fatta.genitoreId),
+        ordine: Value<int>(await _prossimoOrdine(fatta.genitoreId)),
+        modelloId: Value<String?>(fatta.modelloId),
+        nelCalendario: Value<bool>(fatta.nelCalendario),
+        ricorrenza: Value<String?>(ricorrenza.codice),
+        aggiornataIl: ora,
+      ),
+    );
+
+    final Map<String, List<Attivita>> figlie = <String, List<Attivita>>{};
+    for (final Attivita a in await (select(
+      elencoAttivita,
+    )..where((t) => t.cancellataIl.isNull())).get()) {
+      final String? genitore = a.genitoreId;
+      if (genitore != null) {
+        figlie.putIfAbsent(genitore, () => <Attivita>[]).add(a);
+      }
+    }
+    final Set<String> visti = <String>{fatta.id, radiceId};
+    Future<void> copia(String vecchioGenitore, String nuovoGenitore) async {
+      for (final Attivita a in figlie[vecchioGenitore] ?? <Attivita>[]) {
+        // `visti` protegge da un ciclo nei dati.
+        if (!visti.add(a.id)) {
+          continue;
+        }
+        final String id = _uuid.v4();
+        await into(elencoAttivita).insert(
+          ElencoAttivitaCompanion.insert(
+            id: id,
+            titolo: a.titolo,
+            descrizione: Value<String>(a.descrizione),
+            creataIl: ora,
+            scadenza: Value<DateTime?>(sposta(a.scadenza)),
+            scadenzaConOra: Value<bool>(a.scadenzaConOra),
+            argomentoId: a.argomentoId,
+            tipologiaId: Value<String?>(a.tipologiaId),
+            genitoreId: Value<String?>(nuovoGenitore),
+            ordine: Value<int>(a.ordine),
+            modelloId: Value<String?>(a.modelloId),
+            nelCalendario: Value<bool>(a.nelCalendario),
+            ricorrenza: Value<String?>(a.ricorrenza),
+            aggiornataIl: ora,
+          ),
+        );
+        await copia(a.id, id);
+      }
+    }
+
+    await copia(fatta.id, radiceId);
+    return radiceId;
   }
 
   /// Sposta un'attività di un posto fra le sorelle.

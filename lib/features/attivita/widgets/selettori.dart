@@ -10,7 +10,9 @@ import 'package:tifaro/core/dati_app.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/errori.dart';
+import 'package:tifaro/core/testo.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/cattura/composizione.dart';
 
 /// Una voce di una finestra di scelta, con la spunta se è quella attuale.
@@ -252,5 +254,162 @@ Future<Scelta<DateTime>?> scegliGiorno(
         lastDate: DateTime(2100),
       );
       return data == null ? null : (valore: data);
+  }
+}
+
+/// Le ricorrenze proposte subito; le altre si scrivono con «Altro…».
+const List<Ricorrenza> _ricorrenzePronte = <Ricorrenza>[
+  Ricorrenza(UnitaRicorrenza.giorno),
+  Ricorrenza(UnitaRicorrenza.settimana),
+  Ricorrenza(UnitaRicorrenza.settimana, 2),
+  Ricorrenza(UnitaRicorrenza.mese),
+  Ricorrenza(UnitaRicorrenza.mese, 3),
+  Ricorrenza(UnitaRicorrenza.anno),
+];
+
+/// Sceglie ogni quanto si ripete un'attività, oppure "non si ripete"
+/// (voce 032).
+///
+/// Restituisce `null` se si annulla, `(valore: null)` per "non si ripete".
+Future<Scelta<Ricorrenza>?> scegliRicorrenza(
+  BuildContext context, {
+  Ricorrenza? attuale,
+}) async {
+  // '' vuol dire "non si ripete", '+' "altro".
+  final String? scelta = await showDialog<String>(
+    context: context,
+    builder: (BuildContext context) => SimpleDialog(
+      title: const Text('Si ripete'),
+      children: <Widget>[
+        _opzione<String>(
+          context,
+          valore: '',
+          icona: const Icon(Icons.block),
+          titolo: 'Non si ripete',
+          scelta: attuale == null,
+        ),
+        for (final Ricorrenza r in _ricorrenzePronte)
+          _opzione<String>(
+            context,
+            valore: r.codice,
+            icona: const Icon(Icons.repeat),
+            titolo: conMaiuscola(r.descrizione),
+            scelta: r == attuale,
+          ),
+        _opzione<String>(
+          context,
+          valore: '+',
+          icona: const Icon(Icons.tune),
+          titolo: 'Altro…',
+          sottotitolo: attuale != null && !_ricorrenzePronte.contains(attuale)
+              ? conMaiuscola(attuale.descrizione)
+              : null,
+          scelta: attuale != null && !_ricorrenzePronte.contains(attuale),
+        ),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(24, 8, 24, 0),
+          child: Text(
+            'Quando la segni fatta arriva la prossima volta, con le sue '
+            'sotto-attività da fare.',
+          ),
+        ),
+      ],
+    ),
+  );
+  if (scelta == null) {
+    return null;
+  }
+  if (scelta.isEmpty) {
+    return (valore: null);
+  }
+  if (scelta != '+') {
+    return (valore: Ricorrenza.daCodice(scelta));
+  }
+  if (!context.mounted) {
+    return null;
+  }
+  final Ricorrenza? scritta = await showDialog<Ricorrenza>(
+    context: context,
+    builder: (BuildContext context) =>
+        _RicorrenzaLibera(iniziale: attuale ?? _ricorrenzePronte.first),
+  );
+  return scritta == null ? null : (valore: scritta);
+}
+
+/// La finestra per una ricorrenza qualunque: un numero e un'unità.
+class _RicorrenzaLibera extends StatefulWidget {
+  const _RicorrenzaLibera({required this.iniziale});
+
+  final Ricorrenza iniziale;
+
+  @override
+  State<_RicorrenzaLibera> createState() => _RicorrenzaLiberaState();
+}
+
+class _RicorrenzaLiberaState extends State<_RicorrenzaLibera> {
+  late final TextEditingController _ogni = TextEditingController(
+    text: '${widget.iniziale.ogni}',
+  );
+  late UnitaRicorrenza _unita = widget.iniziale.unita;
+
+  @override
+  void dispose() {
+    _ogni.dispose();
+    super.dispose();
+  }
+
+  /// Il numero scritto, se è valido (da 1 a 999).
+  int? get _numero {
+    final int? n = int.tryParse(_ogni.text.trim());
+    return n != null && n >= 1 && n <= 999 ? n : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final int? numero = _numero;
+    return AlertDialog(
+      title: const Text('Ogni quanto'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextField(
+            controller: _ogni,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: 'Ogni',
+              errorText: numero == null ? 'Un numero da 1 in su' : null,
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: <Widget>[
+              for (final UnitaRicorrenza u in UnitaRicorrenza.values)
+                ChoiceChip(
+                  label: Text(numero == 1 ? u.singolare : u.plurale),
+                  selected: u == _unita,
+                  onSelected: (_) => setState(() => _unita = u),
+                ),
+            ],
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Annulla'),
+        ),
+        FilledButton(
+          onPressed: numero == null
+              ? null
+              : () => Navigator.pop(context, Ricorrenza(_unita, numero)),
+          child: const Text('Scegli'),
+        ),
+      ],
+    );
   }
 }

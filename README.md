@@ -23,6 +23,11 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
 - **Descrizione in Markdown:** nel dettaglio si legge formattata
   (grassetti, elenchi, caselle `- [ ]`, titoli, link che si aprono nel
   browser); con la matita, o toccandola, si torna al testo da scrivere.
+- **Ricorrenze:** un'attività può ripetersi ogni N giorni, settimane, mesi o
+  anni. Quando la si segna fatta arriva la prossima volta, con le sue
+  sotto-attività da fare e le scadenze spostate; se la si fa in ritardo, la
+  prossima è la prima ancora da venire. Si sceglie dal dettaglio («Ripeti»),
+  dal menu della cattura o scrivendo `ogni …`.
 - **Schermate:** Oggi (scadute, oggi, prossimi 7 giorni e, in fondo, le
   attività senza scadenza in ordine di creazione), Argomenti (albero
   da aprire, per un argomento o per tutti insieme con «Tutte»), Tipologie,
@@ -42,11 +47,14 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   | `15/11`, `15/11/2027`, `tra 3 giorni`, `fra una settimana`, `tra 2 mesi` | scadenza |
   | `18:00`, `alle 18` | ora della scadenza |
   | `!cal` | da mettere nel calendario |
+  | `ogni giorno`, `ogni 2 settimane`, `ogni mese`, `ogni anno` | si ripete |
+  | `ogni lunedì` | si ripete ogni settimana, dal prossimo lunedì |
   | `/turno` | crea dal modello «Turno», con le sue sotto-attività |
 
   Il resto è il titolo. Prima di salvare si vede cosa è stato capito.
 - **Menu delle scelte:** la freccia accanto alla riga apre un menu per
-  scegliere modello, argomento, tipologia, scadenza, ora e calendario senza
+  scegliere modello, argomento, tipologia, scadenza, ora, ricorrenza e
+  calendario senza
   scrivere niente. Quello che si sceglie dal menu vale più di quello che si
   scrive.
 - **Modelli:** stampi per le cose che si ripetono. Un modello crea

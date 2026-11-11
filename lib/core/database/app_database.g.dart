@@ -2502,6 +2502,17 @@ class $ElencoAttivitaTable extends ElencoAttivita
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _ricorrenzaMeta = const VerificationMeta(
+    'ricorrenza',
+  );
+  @override
+  late final GeneratedColumn<String> ricorrenza = GeneratedColumn<String>(
+    'ricorrenza',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _aggiornataIlMeta = const VerificationMeta(
     'aggiornataIl',
   );
@@ -2539,6 +2550,7 @@ class $ElencoAttivitaTable extends ElencoAttivita
     ordine,
     modelloId,
     nelCalendario,
+    ricorrenza,
     aggiornataIl,
     cancellataIl,
   ];
@@ -2652,6 +2664,12 @@ class $ElencoAttivitaTable extends ElencoAttivita
         ),
       );
     }
+    if (data.containsKey('ricorrenza')) {
+      context.handle(
+        _ricorrenzaMeta,
+        ricorrenza.isAcceptableOrUnknown(data['ricorrenza']!, _ricorrenzaMeta),
+      );
+    }
     if (data.containsKey('aggiornata_il')) {
       context.handle(
         _aggiornataIlMeta,
@@ -2733,6 +2751,10 @@ class $ElencoAttivitaTable extends ElencoAttivita
         DriftSqlType.bool,
         data['${effectivePrefix}nel_calendario'],
       )!,
+      ricorrenza: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ricorrenza'],
+      ),
       aggiornataIl: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}aggiornata_il'],
@@ -2791,9 +2813,14 @@ class Attivita extends DataClass implements Insertable<Attivita> {
   /// principale creata dal modello, non sulle sue sotto-attività.
   final String? modelloId;
 
-  /// Se deve comparire su Google Calendar. Per ora si segna soltanto: gli
-  /// eventi li creerà il server, nella fase 4 (voce 009).
+  /// Se deve comparire nel calendario. L'evento lo scrive l'app sul
+  /// telefono (voce 027).
   final bool nelCalendario;
+
+  /// Ogni quanto si ripete, come codice di `Ricorrenza` (`mese:1`); nulla se
+  /// non si ripete. Quando la si segna fatta nasce la prossima volta, che si
+  /// porta via la ricorrenza (voce 032).
+  final String? ricorrenza;
 
   /// Ultima modifica: servirà alla sincronizzazione (voce 003).
   final DateTime aggiornataIl;
@@ -2816,6 +2843,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     required this.ordine,
     this.modelloId,
     required this.nelCalendario,
+    this.ricorrenza,
     required this.aggiornataIl,
     this.cancellataIl,
   });
@@ -2845,6 +2873,9 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       map['modello_id'] = Variable<String>(modelloId);
     }
     map['nel_calendario'] = Variable<bool>(nelCalendario);
+    if (!nullToAbsent || ricorrenza != null) {
+      map['ricorrenza'] = Variable<String>(ricorrenza);
+    }
     map['aggiornata_il'] = Variable<DateTime>(aggiornataIl);
     if (!nullToAbsent || cancellataIl != null) {
       map['cancellata_il'] = Variable<DateTime>(cancellataIl);
@@ -2877,6 +2908,9 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ? const Value.absent()
           : Value(modelloId),
       nelCalendario: Value(nelCalendario),
+      ricorrenza: ricorrenza == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ricorrenza),
       aggiornataIl: Value(aggiornataIl),
       cancellataIl: cancellataIl == null && nullToAbsent
           ? const Value.absent()
@@ -2903,6 +2937,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       ordine: serializer.fromJson<int>(json['ordine']),
       modelloId: serializer.fromJson<String?>(json['modelloId']),
       nelCalendario: serializer.fromJson<bool>(json['nelCalendario']),
+      ricorrenza: serializer.fromJson<String?>(json['ricorrenza']),
       aggiornataIl: serializer.fromJson<DateTime>(json['aggiornataIl']),
       cancellataIl: serializer.fromJson<DateTime?>(json['cancellataIl']),
     );
@@ -2924,6 +2959,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       'ordine': serializer.toJson<int>(ordine),
       'modelloId': serializer.toJson<String?>(modelloId),
       'nelCalendario': serializer.toJson<bool>(nelCalendario),
+      'ricorrenza': serializer.toJson<String?>(ricorrenza),
       'aggiornataIl': serializer.toJson<DateTime>(aggiornataIl),
       'cancellataIl': serializer.toJson<DateTime?>(cancellataIl),
     };
@@ -2943,6 +2979,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     int? ordine,
     Value<String?> modelloId = const Value.absent(),
     bool? nelCalendario,
+    Value<String?> ricorrenza = const Value.absent(),
     DateTime? aggiornataIl,
     Value<DateTime?> cancellataIl = const Value.absent(),
   }) => Attivita(
@@ -2959,6 +2996,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     ordine: ordine ?? this.ordine,
     modelloId: modelloId.present ? modelloId.value : this.modelloId,
     nelCalendario: nelCalendario ?? this.nelCalendario,
+    ricorrenza: ricorrenza.present ? ricorrenza.value : this.ricorrenza,
     aggiornataIl: aggiornataIl ?? this.aggiornataIl,
     cancellataIl: cancellataIl.present ? cancellataIl.value : this.cancellataIl,
   );
@@ -2989,6 +3027,9 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       nelCalendario: data.nelCalendario.present
           ? data.nelCalendario.value
           : this.nelCalendario,
+      ricorrenza: data.ricorrenza.present
+          ? data.ricorrenza.value
+          : this.ricorrenza,
       aggiornataIl: data.aggiornataIl.present
           ? data.aggiornataIl.value
           : this.aggiornataIl,
@@ -3014,6 +3055,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ..write('ordine: $ordine, ')
           ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
+          ..write('ricorrenza: $ricorrenza, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl')
           ..write(')'))
@@ -3035,6 +3077,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     ordine,
     modelloId,
     nelCalendario,
+    ricorrenza,
     aggiornataIl,
     cancellataIl,
   );
@@ -3055,6 +3098,7 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           other.ordine == this.ordine &&
           other.modelloId == this.modelloId &&
           other.nelCalendario == this.nelCalendario &&
+          other.ricorrenza == this.ricorrenza &&
           other.aggiornataIl == this.aggiornataIl &&
           other.cancellataIl == this.cancellataIl);
 }
@@ -3073,6 +3117,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
   final Value<int> ordine;
   final Value<String?> modelloId;
   final Value<bool> nelCalendario;
+  final Value<String?> ricorrenza;
   final Value<DateTime> aggiornataIl;
   final Value<DateTime?> cancellataIl;
   final Value<int> rowid;
@@ -3090,6 +3135,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.ordine = const Value.absent(),
     this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
+    this.ricorrenza = const Value.absent(),
     this.aggiornataIl = const Value.absent(),
     this.cancellataIl = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3108,6 +3154,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.ordine = const Value.absent(),
     this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
+    this.ricorrenza = const Value.absent(),
     required DateTime aggiornataIl,
     this.cancellataIl = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3130,6 +3177,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Expression<int>? ordine,
     Expression<String>? modelloId,
     Expression<bool>? nelCalendario,
+    Expression<String>? ricorrenza,
     Expression<DateTime>? aggiornataIl,
     Expression<DateTime>? cancellataIl,
     Expression<int>? rowid,
@@ -3148,6 +3196,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       if (ordine != null) 'ordine': ordine,
       if (modelloId != null) 'modello_id': modelloId,
       if (nelCalendario != null) 'nel_calendario': nelCalendario,
+      if (ricorrenza != null) 'ricorrenza': ricorrenza,
       if (aggiornataIl != null) 'aggiornata_il': aggiornataIl,
       if (cancellataIl != null) 'cancellata_il': cancellataIl,
       if (rowid != null) 'rowid': rowid,
@@ -3168,6 +3217,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Value<int>? ordine,
     Value<String?>? modelloId,
     Value<bool>? nelCalendario,
+    Value<String?>? ricorrenza,
     Value<DateTime>? aggiornataIl,
     Value<DateTime?>? cancellataIl,
     Value<int>? rowid,
@@ -3186,6 +3236,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       ordine: ordine ?? this.ordine,
       modelloId: modelloId ?? this.modelloId,
       nelCalendario: nelCalendario ?? this.nelCalendario,
+      ricorrenza: ricorrenza ?? this.ricorrenza,
       aggiornataIl: aggiornataIl ?? this.aggiornataIl,
       cancellataIl: cancellataIl ?? this.cancellataIl,
       rowid: rowid ?? this.rowid,
@@ -3234,6 +3285,9 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     if (nelCalendario.present) {
       map['nel_calendario'] = Variable<bool>(nelCalendario.value);
     }
+    if (ricorrenza.present) {
+      map['ricorrenza'] = Variable<String>(ricorrenza.value);
+    }
     if (aggiornataIl.present) {
       map['aggiornata_il'] = Variable<DateTime>(aggiornataIl.value);
     }
@@ -3262,6 +3316,7 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
           ..write('ordine: $ordine, ')
           ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
+          ..write('ricorrenza: $ricorrenza, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl, ')
           ..write('rowid: $rowid')
@@ -6856,6 +6911,7 @@ typedef $$ElencoAttivitaTableCreateCompanionBuilder =
       Value<int> ordine,
       Value<String?> modelloId,
       Value<bool> nelCalendario,
+      Value<String?> ricorrenza,
       required DateTime aggiornataIl,
       Value<DateTime?> cancellataIl,
       Value<int> rowid,
@@ -6875,6 +6931,7 @@ typedef $$ElencoAttivitaTableUpdateCompanionBuilder =
       Value<int> ordine,
       Value<String?> modelloId,
       Value<bool> nelCalendario,
+      Value<String?> ricorrenza,
       Value<DateTime> aggiornataIl,
       Value<DateTime?> cancellataIl,
       Value<int> rowid,
@@ -7027,6 +7084,11 @@ class $$ElencoAttivitaTableFilterComposer
 
   ColumnFilters<bool> get nelCalendario => $composableBuilder(
     column: $table.nelCalendario,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ricorrenza => $composableBuilder(
+    column: $table.ricorrenza,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7212,6 +7274,11 @@ class $$ElencoAttivitaTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get ricorrenza => $composableBuilder(
+    column: $table.ricorrenza,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get aggiornataIl => $composableBuilder(
     column: $table.aggiornataIl,
     builder: (column) => ColumnOrderings(column),
@@ -7354,6 +7421,11 @@ class $$ElencoAttivitaTableAnnotationComposer
 
   GeneratedColumn<bool> get nelCalendario => $composableBuilder(
     column: $table.nelCalendario,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ricorrenza => $composableBuilder(
+    column: $table.ricorrenza,
     builder: (column) => column,
   );
 
@@ -7534,6 +7606,7 @@ class $$ElencoAttivitaTableTableManager
                 Value<int> ordine = const Value.absent(),
                 Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
+                Value<String?> ricorrenza = const Value.absent(),
                 Value<DateTime> aggiornataIl = const Value.absent(),
                 Value<DateTime?> cancellataIl = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -7551,6 +7624,7 @@ class $$ElencoAttivitaTableTableManager
                 ordine: ordine,
                 modelloId: modelloId,
                 nelCalendario: nelCalendario,
+                ricorrenza: ricorrenza,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
                 rowid: rowid,
@@ -7570,6 +7644,7 @@ class $$ElencoAttivitaTableTableManager
                 Value<int> ordine = const Value.absent(),
                 Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
+                Value<String?> ricorrenza = const Value.absent(),
                 required DateTime aggiornataIl,
                 Value<DateTime?> cancellataIl = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -7587,6 +7662,7 @@ class $$ElencoAttivitaTableTableManager
                 ordine: ordine,
                 modelloId: modelloId,
                 nelCalendario: nelCalendario,
+                ricorrenza: ricorrenza,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
                 rowid: rowid,

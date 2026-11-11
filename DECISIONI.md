@@ -786,3 +786,55 @@ un'altra app diventi un paragrafo solo.
 telefono, e il testo salvato sarebbe un formato suo); caselle spuntabili
 nella descrizione (doppione delle sotto-attività, e bisognerebbe riscrivere
 il testo a ogni tocco).
+
+---
+
+## 032 — Attività che si ripetono
+
+**Data:** 2026-11-11
+
+**Contesto:** alcune cose tornano a intervalli regolari (una bolletta, un
+controllo, la palestra il lunedì) e vanno ricreate a mano ogni volta.
+
+**Decisione:** un'attività può avere una ricorrenza: ogni N giorni,
+settimane, mesi o anni, salvata come testo nella colonna `ricorrenza` di
+`attivita` (`mese:1`, `settimana:2`; schema 5). Quando la si segna fatta,
+`segnaFatta` crea nella stessa transazione la prossima volta: una copia con
+lo stesso titolo, descrizione, argomento, tipologia, calendario e modello,
+e con tutte le sotto-attività (da fare, con le scadenze spostate degli
+stessi giorni della principale); le foto restano sulla volta vecchia. La
+prossima scadenza si conta dalla scadenza vecchia, per tenere il ritmo (il
+lunedì resta il lunedì), e salta avanti finché arriva dopo il giorno in cui
+la si è fatta: fatta in ritardo, non lascia volte già scadute. Senza
+scadenza si conta dal giorno in cui è fatta. Un mese che non ha quel giorno
+prende l'ultimo (31 gennaio → 28 febbraio). La ricorrenza passa alla copia:
+riaprire e richiudere la volta vecchia non crea doppioni. Si ripete solo
+l'attività che si chiude: una sotto-attività che si ripete, chiusa insieme
+alla sua principale, non crea niente. Si sceglie dal dettaglio («Ripeti»),
+dal menu della cattura o con la sintassi `ogni mese`, `ogni 3 mesi`, `ogni
+due settimane`, `ogni lunedì` (che, senza un'altra data, comincia dal
+prossimo lunedì). I modelli non hanno una ricorrenza loro.
+
+**Sincronizzazione:** l'impronta di una riga (voce 021) ora non conta i
+campi vuoti. Una versione vecchia dell'app non conosce la colonna e manda le
+righe senza la chiave: senza questa regola le due versioni si sarebbero
+rimandate le righe a ogni giro. Il prezzo è che, dopo l'aggiornamento,
+tutte le righe con un campo vuoto si rimandano una volta. Un limite resta:
+finché un dispositivo ha la versione vecchia, una ricorrenza che riceve e
+rimanda può andare persa; vanno aggiornati tutti e due.
+
+**Motivazione:** una copia vera, creata quando serve, è un'attività come le
+altre: si vede negli elenchi, va nel calendario, ha le sue sotto-attività e
+si modifica senza toccare le volte passate, che restano fra le Fatte. Un
+codice di testo in una colonna sola si legge a occhio e si allunga con
+regole nuove senza cambiare lo schema.
+
+**Limiti noti:** spostando avanti un mese alla volta, il 31 che diventa 28
+a febbraio resta 28 anche dopo; se due dispositivi chiudono la stessa volta
+prima di sincronizzarsi, nascono due copie.
+
+**Alternative scartate:** regole complete come quelle dei calendari (RRULE:
+troppo per l'uso che serve); una sola attività che si riapre con la data
+spostata (si perde lo storico delle volte fatte e delle sotto-attività
+chiuse); creare in anticipo le volte future (si moltiplicano gli eventi e
+le attività da guardare).

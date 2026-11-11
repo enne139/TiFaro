@@ -5,6 +5,7 @@ library;
 
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/testo.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
 import 'package:tifaro/features/modelli/logica/scadenze_relative.dart';
 
@@ -22,6 +23,7 @@ class SceltaMenu {
     this.scadenza,
     this.calendario,
     this.modello,
+    this.ricorrenza,
   });
 
   final String? argomentoId;
@@ -29,6 +31,9 @@ class SceltaMenu {
   final ({DateTime? data, bool conOra})? scadenza;
   final bool? calendario;
   final Scelta<String>? modello;
+
+  /// Ogni quanto si ripete; `(valore: null)` è "non si ripete".
+  final Scelta<Ricorrenza>? ricorrenza;
 }
 
 /// Il risultato: l'attività che verrà creata.
@@ -44,6 +49,7 @@ class CatturaComposta {
     this.nuovoArgomento,
     this.tipologia,
     this.nuovaTipologia,
+    this.ricorrenza,
   });
 
   /// Il titolo; vuoto se non c'è né scritto né dal modello.
@@ -70,6 +76,9 @@ class CatturaComposta {
   final DateTime? scadenza;
   final bool conOra;
   final bool calendario;
+
+  /// Ogni quanto si ripete; nulla se non si ripete (voce 032).
+  final Ricorrenza? ricorrenza;
 }
 
 /// Mette insieme riga scritta, menu e modello.
@@ -199,5 +208,9 @@ CatturaComposta componiCattura({
     calendario:
         menu.calendario ??
         (riga.calendario || (modello?.nelCalendario ?? false)),
+    // I modelli non si ripetono da soli: vale il menu, poi il testo.
+    ricorrenza: menu.ricorrenza != null
+        ? menu.ricorrenza!.valore
+        : riga.ricorrenza,
   );
 }

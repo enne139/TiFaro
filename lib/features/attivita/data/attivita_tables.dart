@@ -55,10 +55,15 @@ class ElencoAttivita extends Table {
   /// principale creata dal modello, non sulle sue sotto-attività.
   TextColumn get modelloId => text().nullable().references(Modelli, #id)();
 
-  /// Se deve comparire su Google Calendar. Per ora si segna soltanto: gli
-  /// eventi li creerà il server, nella fase 4 (voce 009).
+  /// Se deve comparire nel calendario. L'evento lo scrive l'app sul
+  /// telefono (voce 027).
   BoolColumn get nelCalendario =>
       boolean().withDefault(const Constant(false))();
+
+  /// Ogni quanto si ripete, come codice di `Ricorrenza` (`mese:1`); nulla se
+  /// non si ripete. Quando la si segna fatta nasce la prossima volta, che si
+  /// porta via la ricorrenza (voce 032).
+  TextColumn get ricorrenza => text().nullable()();
 
   /// Ultima modifica: servirà alla sincronizzazione (voce 003).
   DateTimeColumn get aggiornataIl => dateTime()();

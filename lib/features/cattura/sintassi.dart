@@ -5,11 +5,13 @@
 /// ```text
 /// comprare guanti nitrile #ambulanza @acquisti venerdì 18:00 !cal
 /// /turno sabato
+/// pagare l'affitto ogni mese 5/12
 /// ```
 library;
 
 import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/testo.dart';
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 
 /// Quello che si è capito da una riga della cattura veloce.
 class RigaAnalizzata {
@@ -21,6 +23,7 @@ class RigaAnalizzata {
     this.conOra = false,
     this.calendario = false,
     this.modello,
+    this.ricorrenza,
   });
 
   /// Le parole rimaste, cioè cosa fare.
@@ -44,6 +47,9 @@ class RigaAnalizzata {
   /// L'etichetta dopo `/`, cioè il modello da usare, così come è stata
   /// scritta.
   final String? modello;
+
+  /// Ogni quanto si ripete, se nella riga c'era "ogni …" (voce 032).
+  final Ricorrenza? ricorrenza;
 }
 
 /// I giorni della settimana come si scrivono, con e senza accento.
@@ -76,6 +82,26 @@ const Set<String> _paroleDiCollegamento = <String>{
   'ore',
 };
 
+/// I numeri piccoli scritti in lettere, per "ogni due settimane".
+const Map<String, int> _numeriInLettere = <String, int>{
+  'due': 2,
+  'tre': 3,
+  'quattro': 4,
+  'cinque': 5,
+  'sei': 6,
+};
+
+/// L'unità di una ricorrenza scritta come [parola], al singolare o al
+/// plurale; `null` se non è un'unità.
+UnitaRicorrenza? _unitaRicorrenza(String parola) {
+  for (final UnitaRicorrenza u in UnitaRicorrenza.values) {
+    if (parola == u.singolare || parola == u.plurale) {
+      return u;
+    }
+  }
+  return null;
+}
+
 final RegExp _data = RegExp(r'^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?$');
 final RegExp _ora = RegExp(r'^(\d{1,2}):(\d{2})$');
 final RegExp _numero = RegExp(r'^\d{1,3}$');
@@ -90,7 +116,9 @@ final RegExp _modello = RegExp(r'^/([\p{L}\p{N}_-]+)$', unicode: true);
 /// Regole sulle date:
 /// - un giorno della settimana è il prossimo, mai oggi: per oggi c'è "oggi";
 /// - una data senza anno già passata è dell'anno prossimo;
-/// - un'ora senza data è oggi, o domani se quell'ora è già passata.
+/// - un'ora senza data è oggi, o domani se quell'ora è già passata;
+/// - "ogni lunedì" si ripete ogni settimana e, se non c'è un'altra data,
+///   comincia dal prossimo lunedì.
 RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
   final List<String> parole = riga.trim().split(RegExp(r'\s+'));
   final List<String> titolo = <String>[];
@@ -100,6 +128,8 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
   ({int ore, int minuti})? ora;
   bool calendario = false;
   String? modello;
+  Ricorrenza? ricorrenza;
+  int? giornoRicorrente;
   final DateTime oggi = giorno(adesso);
 
   /// Toglie dal fondo del titolo le parole di collegamento rimaste prima di
@@ -146,6 +176,35 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
     if (minuscola == '!cal') {
       calendario = true;
       continue;
+    }
+
+    // Ricorrenze: "ogni mese", "ogni 2 settimane", "ogni lunedì". Quello
+    // che non è riconosciuto ("ogni tanto") resta nel titolo.
+    if (minuscola == 'ogni' && seguente != null) {
+      final int? giornoSettimana = _giorniSettimana[seguente];
+      if (giornoSettimana != null) {
+        ricorrenza = const Ricorrenza(UnitaRicorrenza.settimana);
+        giornoRicorrente = giornoSettimana;
+        i += 1;
+        continue;
+      }
+      final UnitaRicorrenza? unita = _unitaRicorrenza(seguente);
+      if (unita != null) {
+        ricorrenza = Ricorrenza(unita);
+        i += 1;
+        continue;
+      }
+      final int? quante = _numero.hasMatch(seguente)
+          ? int.parse(seguente)
+          : _numeriInLettere[seguente];
+      final UnitaRicorrenza? unitaDopo = i + 2 < parole.length
+          ? _unitaRicorrenza(parole[i + 2].toLowerCase())
+          : null;
+      if (quante != null && quante >= 1 && unitaDopo != null) {
+        ricorrenza = Ricorrenza(unitaDopo, quante);
+        i += 2;
+        continue;
+      }
     }
 
     // Giorni con un nome.
@@ -226,6 +285,17 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
     titolo.add(parola);
   }
 
+  // "ogni lunedì" senza un'altra data: il prossimo lunedì, mai oggi, come
+  // per i giorni della settimana scritti da soli.
+  final int? ricorrente = giornoRicorrente;
+  if (data == null && ricorrente != null) {
+    int distanza = (ricorrente - oggi.weekday) % 7;
+    if (distanza == 0) {
+      distanza = 7;
+    }
+    data = _piuGiorni(oggi, distanza);
+  }
+
   DateTime? scadenza = data;
   if (ora != null) {
     DateTime base = data ?? oggi;
@@ -252,6 +322,7 @@ RigaAnalizzata analizzaRiga(String riga, DateTime adesso) {
     conOra: ora != null,
     calendario: calendario,
     modello: modello,
+    ricorrenza: ricorrenza,
   );
 }
 

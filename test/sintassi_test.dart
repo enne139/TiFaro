@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:tifaro/features/attivita/logica/ricorrenza.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
 
 void main() {
@@ -102,5 +103,44 @@ void main() {
   test('una riga vuota o di sole etichette dà un titolo vuoto', () {
     expect(analizza('').titolo, '');
     expect(analizza('#lavoro domani').titolo, '');
+  });
+
+  test('"ogni …" fa ripetere l\'attività', () {
+    final RigaAnalizzata mese = analizza('pagare l\'affitto ogni mese 5/12');
+    expect(mese.titolo, 'Pagare l\'affitto');
+    expect(mese.ricorrenza, const Ricorrenza(UnitaRicorrenza.mese));
+    expect(mese.scadenza, DateTime(2026, 12, 5));
+
+    expect(
+      analizza('cambiare il filtro ogni 3 mesi').ricorrenza,
+      const Ricorrenza(UnitaRicorrenza.mese, 3),
+    );
+    expect(
+      analizza('innaffiare ogni due settimane').ricorrenza,
+      const Ricorrenza(UnitaRicorrenza.settimana, 2),
+    );
+    expect(
+      analizza('medicina ogni giorno alle 8').ricorrenza,
+      const Ricorrenza(UnitaRicorrenza.giorno),
+    );
+  });
+
+  test('"ogni lunedì" si ripete ogni settimana dal prossimo lunedì', () {
+    // Adesso è martedì 10: il prossimo lunedì è il 16.
+    final RigaAnalizzata r = analizza('palestra ogni lunedì alle 18');
+    expect(r.titolo, 'Palestra');
+    expect(r.ricorrenza, const Ricorrenza(UnitaRicorrenza.settimana));
+    expect(r.scadenza, DateTime(2026, 11, 16, 18));
+    // Con un'altra data vale quella.
+    expect(
+      analizza('palestra ogni lunedì oggi').scadenza,
+      DateTime(2026, 11, 10),
+    );
+  });
+
+  test('"ogni" che non è una ricorrenza resta nel titolo', () {
+    final RigaAnalizzata r = analizza('controllare ogni tanto la posta');
+    expect(r.titolo, 'Controllare ogni tanto la posta');
+    expect(r.ricorrenza, isNull);
   });
 }
