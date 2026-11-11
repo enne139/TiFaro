@@ -708,3 +708,50 @@ più vecchia, perché quelle in attesa da più tempo non scivolino in fondo.
 **Alternative scartate:** anche le sotto-attività (troppe righe); dalla più
 recente (le vecchie sparirebbero sotto).
 
+---
+
+## 029 — Variabili nei modelli
+
+**Data:** 2026-11-11
+
+**Contesto:** molti modelli cambiano solo per un dettaglio (il luogo, una
+persona): si vogliono variabili da riempire quando si usano.
+
+**Decisione:** una variabile è un nome tra graffe, come `{luogo}`, scritto
+nel nome, nella descrizione o nelle sotto-attività del modello. Quando si
+sceglie il modello nella cattura veloce (con `/nome` o dal menu), sotto la
+riga compare un campo per ogni variabile, sempre in vista anche a menu
+chiuso; il suggerimento del titolo si aggiorna mentre si scrive. Le
+variabili si confrontano senza badare a maiuscole e spazi. `{data}` (la
+scadenza dell'attività creata, o oggi se non ne ha) e `{oggi}` si riempiono
+da sole. Una variabile lasciata vuota resta scritta tra graffe
+nell'attività creata. La sostituzione la fa `creaDaModello`; la logica sta
+in `modelli/logica/variabili.dart`. L'editor dei modelli spiega la regola e
+dice quali variabili il modello chiede.
+
+**Motivazione:** le graffe sono semplici da scrivere sul telefono e si
+leggono anche dentro il modello. Lasciare scritta una variabile vuota
+segnala cosa manca invece di creare una frase a metà ("Turno a ").
+
+**Alternative scartate:** variabili dichiarate a parte nel modello, con nome
+e tipo (più pesante da gestire, e il testo del modello non le mostrerebbe);
+bloccare il salvataggio finché non sono tutte riempite (rallenta la cattura
+veloce).
+
+---
+
+## 030 — Niente avviso dopo aver aggiunto un'attività
+
+**Data:** 2026-11-11
+
+**Contesto:** dopo ogni aggiunta compariva in basso l'avviso «Aggiunta …»
+con il pulsante «Apri», che dava fastidio.
+
+**Decisione:** l'avviso non c'è più. Restano gli avvisi di errore e quelli
+che offrono di annullare (cestino).
+
+**Motivazione:** l'attività compare subito nell'elenco, e la si apre da lì.
+
+**Alternative scartate:** un avviso più breve o più discreto (resta un
+avviso a ogni aggiunta).
+

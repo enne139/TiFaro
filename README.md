@@ -53,7 +53,10 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   (menu a sinistra → Modelli) o da un'attività esistente con «Salva come
   modello»; si usano con `/nome`, dal menu della cattura o dal pulsante
   accanto al modello. Nell'editor, `+2` e `-1` danno i giorni rispetto alla
-  principale.
+  principale. **Variabili:** un nome tra graffe, come `Turno a {luogo}`, nel
+  nome, nella descrizione o nelle sotto-attività del modello; la cattura
+  veloce lo chiede quando si usa il modello. `{data}` (la scadenza) e
+  `{oggi}` si riempiono da sole.
 - **Dal tasto Condividi di Android:** una foto o un testo da un'altra app
   aprono la cattura veloce già compilata.
 - **Sincronizzazione e backup:** con il server sul NAS ([server/](server/)),

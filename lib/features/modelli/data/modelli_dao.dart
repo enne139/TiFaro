@@ -7,6 +7,7 @@ import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/modelli/data/modelli_tables.dart';
 import 'package:tifaro/features/modelli/logica/scadenze_relative.dart';
+import 'package:tifaro/features/modelli/logica/variabili.dart';
 
 part 'modelli_dao.g.dart';
 
@@ -339,6 +340,9 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
   /// dal modello. Un titolo o una descrizione vuoti valgono come non
   /// passati. Le scadenze delle sotto-attività si contano dalla scadenza
   /// finale della principale, o da [adesso] se non ne ha (voce 017).
+  ///
+  /// [variabili] riempie i segnaposto come `{luogo}` in titoli e
+  /// descrizioni; `{data}` e `{oggi}` si riempiono da soli (voce 029).
   Future<String> creaDaModello(
     String modelloId, {
     String? titolo,
@@ -349,6 +353,7 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
     Value<DateTime?> scadenza = const Value<DateTime?>.absent(),
     bool scadenzaConOra = false,
     bool? nelCalendario,
+    Map<String, String> variabili = const <String, String>{},
     DateTime? adesso,
   }) {
     return transaction(() async {
@@ -363,14 +368,26 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
           : scadenzaRelativa(ora, modello.giorni, modello.minuti);
       final String? titoloScritto = titolo?.trim();
       final String? descrizioneScritta = descrizione?.trim();
+      // Le variabili scelte valgono più di quelle automatiche, se hanno lo
+      // stesso nome (voce 029).
+      final Map<String, String> valori = <String, String>{
+        ...valoriAutomatici(scadenza: principale.scadenza, adesso: ora),
+        for (final MapEntry<String, String> v in variabili.entries)
+          chiaveVariabile(v.key): v.value,
+      };
+      String riempi(String testo) => sostituisciVariabili(testo, valori);
 
       final String radiceId = await _attivita.crea(
-        titolo: titoloScritto == null || titoloScritto.isEmpty
-            ? modello.nome
-            : titoloScritto,
-        descrizione: descrizioneScritta == null || descrizioneScritta.isEmpty
-            ? modello.descrizione
-            : descrizioneScritta,
+        titolo: riempi(
+          titoloScritto == null || titoloScritto.isEmpty
+              ? modello.nome
+              : titoloScritto,
+        ),
+        descrizione: riempi(
+          descrizioneScritta == null || descrizioneScritta.isEmpty
+              ? modello.descrizione
+              : descrizioneScritta,
+        ),
         argomentoId: argomentoId ?? modello.argomentoId,
         genitoreId: genitoreId,
         tipologiaId: tipologiaId.present
@@ -401,8 +418,8 @@ class ModelliDao extends DatabaseAccessor<AppDatabase> with _$ModelliDaoMixin {
             v.minuti,
           );
           final String id = await _attivita.crea(
-            titolo: v.titolo,
-            descrizione: v.descrizione,
+            titolo: riempi(v.titolo),
+            descrizione: riempi(v.descrizione),
             genitoreId: attivitaGenitore,
             tipologiaId: v.tipologiaId,
             scadenza: sua.scadenza,

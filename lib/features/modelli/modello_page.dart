@@ -17,6 +17,7 @@ import 'package:tifaro/features/cattura/cattura_sheet.dart';
 import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/modelli/logica/riga_voce.dart';
 import 'package:tifaro/features/modelli/logica/scadenze_relative.dart';
+import 'package:tifaro/features/modelli/logica/variabili.dart';
 import 'package:tifaro/features/modelli/widgets/dialoghi_modello.dart';
 
 /// L'editor di un modello: i campi dell'attività principale e l'albero delle
@@ -179,6 +180,13 @@ class _ModelloPageState extends State<ModelloPage> {
               color: tema.colorScheme.onSurfaceVariant,
             ),
           ),
+          const SizedBox(height: 4),
+          Text(
+            _testoVariabili(modello, dati),
+            style: tema.textTheme.bodySmall?.copyWith(
+              color: tema.colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 12),
           Wrap(spacing: 8, runSpacing: 8, children: _etichette(modello, dati)),
           const SizedBox(height: 16),
@@ -192,7 +200,11 @@ class _ModelloPageState extends State<ModelloPage> {
               border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
-            onChanged: (_) => _testoCambiato(),
+            onChanged: (_) {
+              _testoCambiato();
+              // Per aggiornare l'elenco delle variabili qui sopra.
+              setState(() {});
+            },
           ),
           const SizedBox(height: 24),
           Text('Sotto-attività', style: tema.textTheme.titleMedium),
@@ -229,6 +241,27 @@ class _ModelloPageState extends State<ModelloPage> {
         ],
       ),
     );
+  }
+
+  /// La spiegazione delle variabili, con quelle che il modello usa.
+  String _testoVariabili(Modello modello, DatiApp dati) {
+    final List<String> usate = variabiliIn(<String>[
+      _nome?.text ?? modello.nome,
+      _descrizione?.text ?? modello.descrizione,
+      for (final ({VoceModello voce, int livello}) r in dati.voci.inOrdine(
+        modello.id,
+      )) ...<String>[r.voce.titolo, r.voce.descrizione],
+    ]);
+    const String regola =
+        'Variabili: scrivi un nome tra graffe, per esempio {luogo}, nel nome, '
+        'nella descrizione o nelle sotto-attività, e la cattura veloce te lo '
+        'chiede quando usi il modello. {data} (la scadenza) e {oggi} si '
+        'riempiono da sole.';
+    if (usate.isEmpty) {
+      return regola;
+    }
+    return '$regola Questo modello chiede: '
+        '${usate.map((String v) => '{$v}').join(', ')}.';
   }
 
   List<Widget> _etichette(Modello modello, DatiApp dati) {

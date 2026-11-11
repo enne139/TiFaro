@@ -10,11 +10,11 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/date.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/foto_archivio.dart';
-import 'package:tifaro/features/attivita/azioni.dart';
 import 'package:tifaro/features/attivita/widgets/selettori.dart';
 import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/cattura/scelta_foto.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
+import 'package:tifaro/features/modelli/logica/variabili.dart';
 
 /// Apre la cattura veloce dal basso.
 ///
@@ -29,37 +29,19 @@ Future<void> apriCattura(
   String descrizione = '',
   List<String> foto = const <String>[],
 }) async {
-  final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-  final ({String id, String titolo})? creata =
-      await showModalBottomSheet<({String id, String titolo})>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: true,
-        showDragHandle: true,
-        builder: (BuildContext context) => CatturaSheet(
-          genitoreId: genitoreId,
-          modelloId: modelloId,
-          testo: testo,
-          descrizione: descrizione,
-          foto: foto,
-        ),
-      );
-  // Una sotto-attività si vede subito nel dettaglio: l'avviso serve solo
-  // per quelle principali, che possono finire in un'altra schermata.
-  if (creata == null || genitoreId != null) {
-    return;
-  }
-  messenger.showSnackBar(
-    SnackBar(
-      content: Text('Aggiunta «${creata.titolo}»'),
-      action: SnackBarAction(
-        label: 'Apri',
-        onPressed: () {
-          if (context.mounted) {
-            apriDettaglio(context, creata.id);
-          }
-        },
-      ),
+  // Nessun avviso dopo l'aggiunta: l'attività compare subito nell'elenco
+  // (DECISIONI.md, voce 030).
+  await showModalBottomSheet<({String id, String titolo})>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    showDragHandle: true,
+    builder: (BuildContext context) => CatturaSheet(
+      genitoreId: genitoreId,
+      modelloId: modelloId,
+      testo: testo,
+      descrizione: descrizione,
+      foto: foto,
     ),
   );
 }
@@ -118,12 +100,43 @@ class _CatturaSheetState extends State<CatturaSheet> {
       ? null
       : (valore: widget.modelloId);
 
+  /// I campi delle variabili del modello, per chiave (voce 029). Si creano
+  /// quando una variabile compare e restano, così cambiando modello e
+  /// tornando indietro quello che si è scritto non si perde.
+  final Map<String, TextEditingController> _variabili =
+      <String, TextEditingController>{};
+
   @override
   void dispose() {
     _riga.dispose();
     _descrizione.dispose();
+    for (final TextEditingController c in _variabili.values) {
+      c.dispose();
+    }
     super.dispose();
   }
+
+  /// Le variabili da chiedere per il [modello]: quelle scritte nel suo nome,
+  /// nella descrizione e nelle sotto-attività.
+  List<String> _variabiliDi(DatiApp dati, Modello modello) {
+    return variabiliIn(<String>[
+      modello.nome,
+      modello.descrizione,
+      for (final ({VoceModello voce, int livello}) r in dati.voci.inOrdine(
+        modello.id,
+      )) ...<String>[r.voce.titolo, r.voce.descrizione],
+    ]);
+  }
+
+  /// Il campo della variabile [nome], creato la prima volta.
+  TextEditingController _campoVariabile(String nome) =>
+      _variabili.putIfAbsent(chiaveVariabile(nome), TextEditingController.new);
+
+  /// I valori scritti nei campi delle variabili, per chiave.
+  Map<String, String> get _valoriVariabili => <String, String>{
+    for (final MapEntry<String, TextEditingController> e in _variabili.entries)
+      e.key: e.value.text,
+  };
 
   SceltaMenu get _menu => SceltaMenu(
     argomentoId: _argomentoScelto,
@@ -222,6 +235,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
                 scadenza: Value<DateTime?>(composta.scadenza),
                 scadenzaConOra: composta.conOra,
                 nelCalendario: composta.calendario,
+                variabili: _valoriVariabili,
               )
             : await db.attivitaDao.crea(
                 titolo: titolo,
@@ -391,7 +405,16 @@ class _CatturaSheetState extends State<CatturaSheet> {
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       hintText: composta.modello != null
-                          ? composta.modello!.nome
+                          ? sostituisciVariabili(
+                              composta.modello!.nome,
+                              <String, String>{
+                                ...valoriAutomatici(
+                                  scadenza: composta.scadenza,
+                                  adesso: DateTime.now(),
+                                ),
+                                ..._valoriVariabili,
+                              },
+                            )
                           : 'es. comprare guanti #ambulanza @acquisti venerdì',
                       errorText: _avviso,
                       suffixIcon: IconButton(
@@ -425,6 +448,7 @@ class _CatturaSheetState extends State<CatturaSheet> {
               runSpacing: 4,
               children: _anteprima(composta, genitore),
             ),
+            ..._campiVariabili(dati, composta, tema),
             AnimatedSize(
               duration: const Duration(milliseconds: 200),
               alignment: Alignment.topCenter,
@@ -497,6 +521,41 @@ class _CatturaSheetState extends State<CatturaSheet> {
         ),
       ),
     );
+  }
+
+  /// I campi per le variabili del modello scelto, se ne ha (voce 029).
+  ///
+  /// Stanno fuori dal menu delle scelte, sempre in vista: senza valori le
+  /// variabili restano scritte tra graffe nell'attività creata.
+  List<Widget> _campiVariabili(
+    DatiApp dati,
+    CatturaComposta composta,
+    ThemeData tema,
+  ) {
+    final Modello? modello = composta.modello;
+    if (modello == null) {
+      return const <Widget>[];
+    }
+    final List<String> nomi = _variabiliDi(dati, modello);
+    if (nomi.isEmpty) {
+      return const <Widget>[];
+    }
+    return <Widget>[
+      const SizedBox(height: 12),
+      Text(
+        'Da completare per «${modello.nome}»',
+        style: tema.textTheme.labelLarge,
+      ),
+      for (final String nome in nomi)
+        TextField(
+          key: ValueKey<String>('variabile-${chiaveVariabile(nome)}'),
+          controller: _campoVariabile(nome),
+          textCapitalization: TextCapitalization.sentences,
+          decoration: InputDecoration(labelText: nome),
+          // Il suggerimento del titolo cambia mentre si scrive.
+          onChanged: (_) => setState(() {}),
+        ),
+    ];
   }
 
   /// Il menu delle scelte: una riga per dato, che apre la finestra per

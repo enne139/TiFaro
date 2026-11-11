@@ -234,4 +234,35 @@ void main() {
     await db.categorieDao.cancellaArgomento('argomento-ambulanza');
     expect((await modelli.trovaModello(modelloId))!.argomentoId, isNull);
   });
+
+  test(
+    'creaDaModello riempie le variabili, anche nelle sotto-attività',
+    () async {
+      final String modelloId = await modelli.creaModello(
+        'Turno a {luogo}',
+        descrizione: 'Con {persona}, il {data}',
+        giorni: 3,
+      );
+      await modelli.creaVoce(
+        modelloId: modelloId,
+        titolo: 'Chiamare {persona}',
+        descrizione: 'Preparato il {oggi}',
+      );
+      await modelli.creaVoce(modelloId: modelloId, titolo: 'Portare {cosa}');
+      final String id = await modelli.creaDaModello(
+        modelloId,
+        variabili: <String, String>{'Luogo': 'Gallarate', 'persona': 'Marco'},
+        adesso: adesso,
+      );
+      final IndiceAttivita i = await indice();
+      expect(i[id]!.titolo, 'Turno a Gallarate');
+      // {data} è la scadenza della principale: tre giorni dopo.
+      expect(i[id]!.descrizione, 'Con Marco, il ven 13 nov');
+      final List<Attivita> figlie = i.figlie(id);
+      expect(figlie[0].titolo, 'Chiamare Marco');
+      expect(figlie[0].descrizione, 'Preparato il mar 10 nov');
+      // Una variabile senza valore resta scritta, per sistemarla dopo.
+      expect(figlie[1].titolo, 'Portare {cosa}');
+    },
+  );
 }

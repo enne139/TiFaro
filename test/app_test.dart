@@ -188,4 +188,40 @@ void main() {
       await chiudiApp(tester);
     },
   );
+
+  testWidgets('le variabili del modello si chiedono nella cattura veloce', (
+    WidgetTester tester,
+  ) async {
+    schermoAlto(tester);
+    final AppDatabase db = databaseInMemoria();
+    await tester.runAsync(() async {
+      final String id = await db.modelliDao.creaModello('Turno a {luogo}');
+      await db.modelliDao.creaVoce(modelloId: id, titolo: 'Avvisare {luogo}');
+    });
+    await avviaApp(tester, db);
+
+    await tester.tap(find.text('Nuova'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, '/turno');
+    await tester.pump();
+    expect(find.text('Da completare per «Turno a {luogo}»'), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('variabile-luogo')),
+      'Gallarate',
+    );
+    await tester.tap(find.text('Aggiungi'));
+    await tester.pumpAndSettle();
+
+    final List<Attivita> tutte = (await tester.runAsync(
+      () => db.attivitaDao.osservaTutte().first,
+    ))!;
+    expect(
+      tutte.map((Attivita a) => a.titolo),
+      unorderedEquals(<String>['Turno a Gallarate', 'Avvisare Gallarate']),
+    );
+    // Nessun avviso in basso dopo l'aggiunta.
+    expect(find.byType(SnackBar), findsNothing);
+
+    await chiudiApp(tester);
+  });
 }
