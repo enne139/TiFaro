@@ -914,3 +914,42 @@ aspetta per "nuovo" su un computer.
 ora, e più lavoro da tenere aggiornato); su Linux, un'azione nella voce del
 menu che apre la cattura (partirebbe una seconda copia dell'app, che non
 può usare lo stesso database).
+
+---
+
+## 035 — Esportazione e importazione
+
+**Data:** 2026-11-11
+
+**Contesto:** serve un modo per avere tutti i dati in un file: una copia
+fuori dal NAS, o per passarli a un altro dispositivo senza server (fase 5).
+
+**Decisione:** Impostazioni → Dati. «Esporta tutto» crea uno zip con
+`tifaro.json` (formato, versione del formato, schema del database, data e,
+per ogni tabella che si sincronizza, tutte le righe come le scrive drift,
+cestinate comprese) e la cartella `foto/` con i file delle foto non tolte;
+il file si salva dove si sceglie, con la finestra del sistema
+(`file_picker`: su Android il selettore dei documenti, su Linux il portale
+del desktop). «Importa da un file» legge lo zip, o anche un `tifaro.json`
+da solo, dice cosa contiene e chiede conferma. Importare unisce: una riga
+entra se qui non c'è o se quella del file è più recente, con la stessa
+regola della sincronizzazione (voce 021); niente si cancella, e le foto
+già presenti non si ricopiano. Le righe entrate risultano cambiate e alla
+prossima sincronizzazione vanno al server, che tiene comunque la versione
+più recente. Un file di un formato più nuovo si rifiuta. Lo zip si scrive e
+si legge un file alla volta, senza tenere le foto in memoria; i nomi delle
+foto dentro lo zip si accettano solo semplici, senza percorsi.
+
+**Motivazione:** lo zip tiene insieme dati e foto in un file solo, e il
+JSON dentro resta leggibile e utilizzabile anche senza TiFaro. Unire invece
+di sostituire rende l'importazione sicura: non si perde niente di quello
+che c'è già, e importare due volte lo stesso file non cambia niente.
+
+**Limite noto:** su Android la finestra per salvare vuole il file intero in
+memoria; con molte foto può pesare.
+
+**Alternative scartate:** un JSON solo, con le foto dentro in base64 (un
+terzo più grande, e tutto in memoria); importare sostituendo tutto
+(rischioso, e inutile con la sincronizzazione); condividere il file con il
+tasto Condividi (su Android non c'è sempre un'app che lo salva in una
+cartella).

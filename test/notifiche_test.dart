@@ -253,4 +253,32 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('le impostazioni mostrano avvisi e dati', (
+    WidgetTester tester,
+  ) async {
+    schermoAlto(tester);
+    final AppDatabase db = databaseInMemoria();
+    final PianificatoreNotifiche p = PianificatoreNotifiche(
+      db: db,
+      dispositivo: NotificheFinte(),
+    );
+    await tester.runAsync(p.avvia);
+    await avviaApp(tester, db, notifiche: p);
+
+    tester.firstState<ScaffoldState>(find.byType(Scaffold)).openDrawer();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Impostazioni'));
+    // Le preferenze si leggono dal database, fuori dall'orologio finto.
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Ora del riepilogo'), 200);
+    expect(find.text('Avvisa quando scade qualcosa'), findsOneWidget);
+    expect(find.text('09:00'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Esporta tutto'), 200);
+    expect(find.text('Importa da un file'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
 }

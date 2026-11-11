@@ -32,7 +32,7 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   attività senza scadenza in ordine di creazione), Argomenti (albero
   da aprire, per un argomento o per tutti insieme con «Tutte»), Tipologie,
   Modelli, Fatte, Cestino (con ripristino), Ricerca, Impostazioni
-  (argomenti, tipologie e server).
+  (argomenti, tipologie, avvisi, server, calendario, dati).
 - **Cattura veloce**, senza AI: una riga come
 
   ```text
@@ -91,6 +91,10 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   9 (si cambia in Impostazioni → Avvisi). Toccando l'avviso si apre
   l'attività. Su Android arrivano anche ad app chiusa; su Linux solo mentre
   TiFaro è aperta.
+- **Esportazione e importazione:** in Impostazioni → Dati, «Esporta tutto»
+  salva uno zip con i dati (`tifaro.json`, leggibile) e le foto;
+  «Importa da un file» lo unisce ai dati che ci sono, senza cancellare
+  niente: di ogni cosa resta la versione più recente.
 
 ## Fasi
 
@@ -98,7 +102,11 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
 2. Modelli, e il menu delle scelte nella cattura — **fatta**
 3. Server Go sul NAS, sincronizzazione, backup, versione Linux — **fatta**
 4. Calendario, dal telefono — **fatta**
-5. Notifiche, release dell'APK per Obtainium, esportazione
+5. Avvisi delle scadenze, release dell'APK per Obtainium, esportazione e
+   importazione — **fatta**
+
+In più: descrizione in Markdown, attività che si ripetono, scorciatoie
+dell'icona.
 
 Le scelte, con il perché, in [DECISIONI.md](DECISIONI.md).
 
