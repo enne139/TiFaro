@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
@@ -258,6 +259,20 @@ void main() {
     await tester.tap(find.text('Argomenti').last);
     await tester.pumpAndSettle();
     expect(find.text('Pagare la bolletta'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
+
+  testWidgets('Ctrl+N apre la cattura veloce', (WidgetTester tester) async {
+    final AppDatabase db = databaseInMemoria();
+    await avviaApp(tester, db);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyN);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(find.text('Nuova attività'), findsOneWidget);
+    expect(find.text('Aggiungi'), findsOneWidget);
 
     await chiudiApp(tester);
   });

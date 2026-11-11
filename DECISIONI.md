@@ -887,3 +887,30 @@ volte, da TiFaro e dal promemoria di Google Calendar.
 di notifiche push); un avviso per ogni attività anche senza ora (troppe
 notifiche alla stessa ora); il permesso `USE_EXACT_ALARM`, concesso da sé
 ma riservato alle app sveglia e calendario.
+
+---
+
+## 034 — Scorciatoie dell'icona e Ctrl+N
+
+**Data:** 2026-11-11
+
+**Contesto:** aggiungere un'attività deve costare meno passaggi possibile,
+anche senza aprire prima l'app.
+
+**Decisione:** su Android, tenendo premuta l'icona di TiFaro compaiono due
+scorciatoie (`quick_actions`): «Nuova attività» apre la cattura veloce,
+«Foto» la apre con la fotocamera già accesa. Le icone sono disegni
+vettoriali in `res/drawable`, un simbolo blu su un cerchio chiaro come
+quelle di sistema; `res/raw/keep.xml` le tiene nella build di release, che
+altrimenti le toglierebbe perché l'app le chiama per nome. Sul computer
+Ctrl+N apre la cattura veloce dalla schermata principale.
+
+**Motivazione:** la scorciatoia arriva alla cattura con un gesto solo, e
+«Foto» copre il caso più frequente fuori casa (fotografare un foglio, uno
+scontrino, un oggetto da ricomprare). Ctrl+N è la scorciatoia che ci si
+aspetta per "nuovo" su un computer.
+
+**Alternative scartate:** un widget nella schermata Home (non richiesto per
+ora, e più lavoro da tenere aggiornato); su Linux, un'azione nella voce del
+menu che apre la cattura (partirebbe una seconda copia dell'app, che non
+può usare lo stesso database).

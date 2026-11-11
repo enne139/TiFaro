@@ -22,7 +22,8 @@ import 'package:tifaro/features/modelli/logica/variabili.dart';
 ///
 /// [testo], [descrizione] e [foto] la precompilano, per esempio con quello
 /// che arriva dal tasto Condividi di un'altra app. Con [genitoreId] crea una
-/// sotto-attività; con [modelloId] parte con quel modello già scelto.
+/// sotto-attività; con [modelloId] parte con quel modello già scelto; con
+/// [conFotocamera] apre subito la fotocamera (la scorciatoia «Foto»).
 Future<void> apriCattura(
   BuildContext context, {
   String? genitoreId,
@@ -30,6 +31,7 @@ Future<void> apriCattura(
   String testo = '',
   String descrizione = '',
   List<String> foto = const <String>[],
+  bool conFotocamera = false,
 }) async {
   // Nessun avviso dopo l'aggiunta: l'attività compare subito nell'elenco
   // (DECISIONI.md, voce 030).
@@ -44,6 +46,7 @@ Future<void> apriCattura(
       testo: testo,
       descrizione: descrizione,
       foto: foto,
+      conFotocamera: conFotocamera,
     ),
   );
 }
@@ -60,6 +63,7 @@ class CatturaSheet extends StatefulWidget {
     this.testo = '',
     this.descrizione = '',
     this.foto = const <String>[],
+    this.conFotocamera = false,
     super.key,
   });
 
@@ -68,6 +72,9 @@ class CatturaSheet extends StatefulWidget {
   final String testo;
   final String descrizione;
   final List<String> foto;
+
+  /// Se aprire subito la fotocamera, dove c'è.
+  final bool conFotocamera;
 
   @override
   State<CatturaSheet> createState() => _CatturaSheetState();
@@ -108,6 +115,20 @@ class _CatturaSheetState extends State<CatturaSheet> {
   /// tornando indietro quello che si è scritto non si perde.
   final Map<String, TextEditingController> _variabili =
       <String, TextEditingController>{};
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.conFotocamera && fotocameraDisponibile) {
+      // Dopo il primo disegno: il foglio deve esserci già, sotto la
+      // fotocamera, per riceverne la foto.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _aggiungiFoto(scattaFoto);
+        }
+      });
+    }
+  }
 
   @override
   void dispose() {

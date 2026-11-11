@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:tifaro/core/app_scope.dart';
 import 'package:tifaro/core/dati_app.dart';
@@ -10,6 +11,7 @@ import 'package:tifaro/features/attivita/tipologie_page.dart';
 import 'package:tifaro/features/categorie/impostazioni_page.dart';
 import 'package:tifaro/features/cattura/cattura_sheet.dart';
 import 'package:tifaro/features/cattura/condivisione.dart';
+import 'package:tifaro/features/cattura/scorciatoie.dart';
 import 'package:tifaro/features/modelli/modelli_page.dart';
 import 'package:tifaro/features/notifiche/pianificatore_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
@@ -54,10 +56,24 @@ class _AppShellState extends State<AppShell> {
   /// Gli avvisi, per aprire quello che si tocca.
   PianificatoreNotifiche? _avvisi;
 
+  final ScorciatoieIcona _scorciatoie = ScorciatoieIcona();
+
   @override
   void initState() {
     super.initState();
     _condivisioni.avvia();
+    _scorciatoie.avvia(_scorciatoiaUsata);
+  }
+
+  /// Una scorciatoia dell'icona apre la cattura veloce, con la fotocamera
+  /// se è «Foto» (voce 034).
+  void _scorciatoiaUsata(String tipo) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        apriCattura(context, conFotocamera: tipo == ScorciatoieIcona.foto);
+      }
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   @override
@@ -138,6 +154,17 @@ class _AppShellState extends State<AppShell> {
       children: <Widget>[for (final _Sezione s in _sezioni) s.pagina],
     );
 
+    // Ctrl+N apre la cattura veloce, comodo sul computer (voce 034).
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.keyN, control: true): () =>
+            apriCattura(context),
+      },
+      child: Focus(autofocus: true, child: _impalcatura(computer, corpo)),
+    );
+  }
+
+  Widget _impalcatura(bool computer, Widget corpo) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_sezioni[_sezione].titolo),
@@ -238,7 +265,7 @@ class _AppShellState extends State<AppShell> {
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add),
         label: const Text('Nuova'),
-        tooltip: 'Nuova attività',
+        tooltip: computer ? 'Nuova attività (Ctrl+N)' : 'Nuova attività',
         onPressed: () => apriCattura(context),
       ),
     );

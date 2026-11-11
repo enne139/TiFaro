@@ -70,6 +70,8 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   `{oggi}` si riempiono da sole.
 - **Dal tasto Condividi di Android:** una foto o un testo da un'altra app
   aprono la cattura veloce già compilata.
+- **Scorciatoie:** su Android, tenendo premuta l'icona, «Nuova attività» e
+  «Foto» (la cattura con la fotocamera già accesa); sul computer, Ctrl+N.
 - **Sincronizzazione e backup:** con il server sul NAS ([server/](server/)),
   telefono e PC vedono le stesse attività, foto comprese. L'app lavora anche
   senza rete e si allinea quando raggiunge il server: all'apertura, ogni
