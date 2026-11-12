@@ -133,7 +133,10 @@ jobs:
 
   linux:
     name: Linux
-    runs-on: ubuntu-latest
+    # Una versione fissa e non ubuntu-latest: su Ubuntu 26 i pacchetti qui
+    # sotto (libstdc++-12-dev) non ci sono più e la release si fermava. E un
+    # programma compilato su una Ubuntu più vecchia gira su più distribuzioni.
+    runs-on: ubuntu-24.04
     steps:
       - name: Scarica il codice
         uses: actions/checkout@v4
