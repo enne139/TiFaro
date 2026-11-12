@@ -175,7 +175,13 @@ void main() {
   });
 
   test('aggiorna scrive i campi e la data di modifica', () async {
-    final String id = await dao.crea(titolo: 'Bollo');
+    // Date fisse tutte e due: con la creazione all'ora vera, passato
+    // `quando` la data di modifica sarebbe "un secondo dopo la creazione"
+    // (voce 021) e la prova fallirebbe a seconda del giorno.
+    final String id = await dao.crea(
+      titolo: 'Bollo',
+      adesso: DateTime(2026, 11, 1),
+    );
     final DateTime quando = DateTime(2026, 11, 12, 9);
     await dao.aggiorna(
       id,
