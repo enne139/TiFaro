@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=TiFaro
+GenericName=Cose da fare
+Comment=Attività, sotto-attività, modelli e scadenze
+Exec=/usr/bin/tifaro
+Icon=/opt/tifaro/tifaro.svg
+Terminal=false
+Categories=Office;ProjectManagement;
+Keywords=todo;attività;compiti;scadenze;
+StartupWMClass=com.enne139.tifaro

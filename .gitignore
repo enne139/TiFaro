@@ -54,3 +54,10 @@ app.*.map.json
 key.properties
 .env
 *-service-account*.json
+
+# Quello che makepkg lascia se si costruisce il pacchetto per Arch nella sua
+# cartella.
+/strumenti/arch/src/
+/strumenti/arch/pkg/
+/strumenti/arch/*.tar.gz
+/strumenti/arch/*.pkg.tar.*

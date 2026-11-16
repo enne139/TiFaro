@@ -953,3 +953,45 @@ terzo più grande, e tutto in memoria); importare sostituendo tutto
 (rischioso, e inutile con la sincronizzazione); condividere il file con il
 tasto Condividi (su Android non c'è sempre un'app che lo salva in una
 cartella).
+
+---
+
+## 036 — Pacchetto per Arch, aggiornato da paru
+
+**Data:** 2026-11-16
+
+**Contesto:** su Android Obtainium segue le release e aggiorna da solo; su
+Linux la versione installata con `installa.sh` si aggiorna solo
+riscaricando l'archivio e rilanciandolo a mano, e così il PC resta indietro.
+Telefono e PC vanno invece tenuti alla stessa versione, perché una versione
+vecchia può perdere dati nuovi sincronizzando (le ricorrenze della 0.6).
+
+**Decisione:** un pacchetto `tifaro-bin` in `strumenti/arch/`. Non compila
+niente: scarica l'archivio Linux della release di GitHub e lo installa in
+`/opt/tifaro`, con `/usr/bin/tifaro`, la voce nel menu e l'icona; lo script
+`installa.sh` dell'archivio non entra nel pacchetto. La cartella si usa come
+repository di PKGBUILD di paru (sezione `[tifaro]` in `paru.conf`, con `Url`
+il repository su GitHub e `Path` la cartella): a ogni `paru` si scarica il
+repository, si legge la versione in `.SRCINFO` e, se è più nuova, TiFaro si
+aggiorna con il resto del sistema. A ogni release, dopo che il flusso
+Rilascio ha pubblicato la versione Linux, `strumenti/arch/aggiorna_pkgbuild.sh`
+cambia `pkgver`, calcola le impronte e rigenera `.SRCINFO`. Il programma non
+si ripulisce dei simboli (`!strip`), perché quello compilato di Flutter
+(`libapp.so`) poi non parte.
+
+**Motivazione:** sul PC con CachyOS gli aggiornamenti passano già da paru;
+TiFaro arriva insieme agli altri senza un servizio in più che giri da solo.
+pacman sa quali file sono del pacchetto, quindi aggiorna e toglie senza
+lasciare niente. Aggiornare il PKGBUILD dopo la release, e non nel commit
+della versione, evita la decina di minuti in cui il pacchetto indicherebbe
+un archivio che GitHub non ha ancora.
+
+**Alternative scartate:** pubblicarlo sull'AUR (serve un account con chiave
+SSH, il pacchetto diventa pubblico lì e a ogni release va mandato anche
+all'AUR: ha senso solo se lo usano altri); un timer di systemd che controlla
+le release e rilancia `installa.sh` (un pezzo in più da mantenere, e un
+aggiornamento che arriva mentre l'app è aperta); un controllo dentro l'app
+(funziona solo ad app aperta e deve sostituire sé stessa); un repository
+pacman vero con il database (va ospitato e ricostruito a ogni release);
+aggiornare il PKGBUILD dal flusso Rilascio con un commit fatto da GitHub (il
+repository sul PC e Gitea resterebbero indietro).

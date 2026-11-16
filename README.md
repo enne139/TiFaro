@@ -132,6 +132,27 @@ Le versioni pronte stanno nelle
   estratto, `tifaro/installa.sh` lo mette nel menu delle applicazioni con il
   comando `tifaro`. Rilanciarlo aggiorna; `--togli` lo toglie (i dati
   restano). Dal codice: `strumenti/installa_linux.sh` compila e installa.
+- **Arch Linux e derivate (CachyOS, EndeavourOS…):** il pacchetto
+  `tifaro-bin`, da installare con [paru](https://github.com/Morganamilo/paru),
+  che poi lo aggiorna insieme al resto del sistema. Una volta sola, in fondo
+  a `/etc/paru.conf`:
+
+  ```ini
+  [tifaro]
+  Url = https://github.com/enne139/TiFaro
+  Path = strumenti/arch
+  ```
+
+  poi `paru -Sy --pkgbuilds && paru -S tifaro-bin`. Da lì ogni `paru` porta
+  anche TiFaro all'ultima release; come per l'AUR, prima mostra le modifiche
+  al PKGBUILD da accettare (`SkipReview` nella sezione le salta). Va in
+  `/opt/tifaro`, con il comando `tifaro` e la voce nel menu;
+  `paru -R tifaro-bin` lo toglie (i dati restano). Chi l'aveva installato
+  con `installa.sh` toglie prima quella copia con
+  `~/.local/opt/tifaro/installa.sh --togli` (i dati restano): pacman non la
+  conosce e non la sostituisce, e lasciata lì vince lei, perché la sua voce
+  del menu ha lo stesso nome e `~/.local/bin` di solito viene prima di
+  `/usr/bin`. Menu e comando aprirebbero ancora la versione vecchia.
 - **Server:** l'immagine `ghcr.io/enne139/tifaro-server`, vedi
   [server/README.md](server/README.md).
 
@@ -147,7 +168,10 @@ Tre flussi in [.github/workflows/](.github/workflows/):
 
 **Fare una versione:** aggiornare `version` in `pubspec.yaml` (e
 `versione` in `server/main.go`), fare il commit, poi
-`git tag vX.Y.Z && git push origin vX.Y.Z`.
+`git tag vX.Y.Z && git push origin vX.Y.Z`. Quando la release è pubblicata
+(non prima: il pacchetto punterebbe a un archivio che non c'è ancora),
+`strumenti/arch/aggiorna_pkgbuild.sh` porta il pacchetto per Arch alla
+nuova versione; poi commit e push.
 
 **Firma dell'APK:** il flusso di rilascio legge la chiave da quattro segreti
 del repository (Settings → Secrets and variables → Actions); senza, una

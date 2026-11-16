@@ -145,6 +145,13 @@ tag. Il flusso Rilascio pubblica APK e versione Linux, il flusso Container
 l'immagine del server. Remote: `origin` è GitHub, `gitea` il Gitea di casa;
 si manda su tutti e due.
 
+Finito il flusso Rilascio, con la versione Linux pubblicata, si aggiorna il
+pacchetto per Arch (voce 036): `strumenti/arch/aggiorna_pkgbuild.sh`, poi
+commit `Arch: pacchetto alla X.Y.Z` e push su tutti e due i remote. Non va
+fatto nel commit della versione: finché la release non c'è, chi aggiorna
+con paru avrebbe un errore. `PKGBUILD` e `.SRCINFO` non si cambiano a mano
+per la versione.
+
 ## Verifiche prima di consegnare
 
 - `flutter analyze` senza segnalazioni;

@@ -1,0 +1,50 @@
+# Pacchetto di TiFaro per Arch Linux e derivate, da installare con paru.
+#
+# Non compila niente: prende la versione Linux già pronta allegata alla
+# release di GitHub e la mette in /opt/tifaro, con il comando «tifaro» e la
+# voce nel menu delle applicazioni. Questa cartella si usa come repository
+# di PKGBUILD di paru, così TiFaro si aggiorna con il resto del sistema:
+# vedi il README e la voce 036 di DECISIONI.md.
+#
+# A ogni release, quando la versione Linux è pubblicata, si aggiorna con
+# strumenti/arch/aggiorna_pkgbuild.sh (versione, impronte e .SRCINFO).
+
+pkgname=tifaro-bin
+pkgver=0.6.1
+pkgrel=1
+pkgdesc="Cose da fare con sotto-attività, modelli, scadenze e sincronizzazione"
+arch=('x86_64')
+url="https://github.com/enne139/TiFaro"
+license=('unknown')
+# Le librerie di sistema che l'app e il motore di Flutter caricano.
+depends=('gtk3' 'libepoxy' 'fontconfig' 'zlib' 'gcc-libs' 'glibc')
+provides=('tifaro')
+conflicts=('tifaro')
+# Il programma compilato di Flutter (libapp.so) non va toccato: ripulito dei
+# simboli non parte più.
+options=('!strip' '!debug')
+source=("TiFaro-v$pkgver-linux-x64.tar.gz::$url/releases/download/v$pkgver/TiFaro-v$pkgver-linux-x64.tar.gz"
+        "com.enne139.tifaro.desktop")
+sha256sums=('4f16cbb1150774a3c022d91b3a77a0b1e30f682a70d9b21ae0c7b1a8cb5bb871'
+            '781dca7aae45e9cba0854e25432b70d22c346f6cec73c02329ef061a17663eee')
+
+package() {
+  # Il programma con le sue librerie e i suoi dati, tutto in una cartella:
+  # l'eseguibile cerca lib/ e data/ accanto a sé.
+  install -d "$pkgdir/opt/tifaro"
+  cp -r tifaro/. "$pkgdir/opt/tifaro/"
+  # Lo script per installare nella propria home qui non serve, e lanciato
+  # creerebbe una seconda copia.
+  rm -f "$pkgdir/opt/tifaro/installa.sh"
+
+  # Il comando «tifaro»: il collegamento funziona perché l'eseguibile trova
+  # la sua cartella seguendo il percorso vero, non quello del collegamento.
+  install -d "$pkgdir/usr/bin"
+  ln -s /opt/tifaro/tifaro "$pkgdir/usr/bin/tifaro"
+
+  # Voce nel menu e icona nel tema, per chi la cerca per nome.
+  install -Dm644 com.enne139.tifaro.desktop \
+    "$pkgdir/usr/share/applications/com.enne139.tifaro.desktop"
+  install -Dm644 tifaro/tifaro.svg \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/com.enne139.tifaro.svg"
+}

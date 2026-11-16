@@ -1,0 +1,23 @@
+pkgbase = tifaro-bin
+	pkgdesc = Cose da fare con sotto-attività, modelli, scadenze e sincronizzazione
+	pkgver = 0.6.1
+	pkgrel = 1
+	url = https://github.com/enne139/TiFaro
+	arch = x86_64
+	license = unknown
+	depends = gtk3
+	depends = libepoxy
+	depends = fontconfig
+	depends = zlib
+	depends = gcc-libs
+	depends = glibc
+	provides = tifaro
+	conflicts = tifaro
+	options = !strip
+	options = !debug
+	source = TiFaro-v0.6.1-linux-x64.tar.gz::https://github.com/enne139/TiFaro/releases/download/v0.6.1/TiFaro-v0.6.1-linux-x64.tar.gz
+	source = com.enne139.tifaro.desktop
+	sha256sums = 4f16cbb1150774a3c022d91b3a77a0b1e30f682a70d9b21ae0c7b1a8cb5bb871
+	sha256sums = 781dca7aae45e9cba0854e25432b70d22c346f6cec73c02329ef061a17663eee
+
+pkgname = tifaro-bin
