@@ -10,7 +10,7 @@
 # strumenti/arch/aggiorna_pkgbuild.sh (versione, impronte e .SRCINFO).
 
 pkgname=tifaro-bin
-pkgver=0.6.1
+pkgver=0.6.2
 pkgrel=1
 pkgdesc="Cose da fare con sotto-attività, modelli, scadenze e sincronizzazione"
 arch=('x86_64')
@@ -25,7 +25,7 @@ conflicts=('tifaro')
 options=('!strip' '!debug')
 source=("TiFaro-v$pkgver-linux-x64.tar.gz::$url/releases/download/v$pkgver/TiFaro-v$pkgver-linux-x64.tar.gz"
         "com.enne139.tifaro.desktop")
-sha256sums=('4f16cbb1150774a3c022d91b3a77a0b1e30f682a70d9b21ae0c7b1a8cb5bb871'
+sha256sums=('b4883bc1fd4d88caf4f07970d65704ac83cecaeb4f0507f3d48a4880af59f4c1'
             '781dca7aae45e9cba0854e25432b70d22c346f6cec73c02329ef061a17663eee')
 
 package() {
