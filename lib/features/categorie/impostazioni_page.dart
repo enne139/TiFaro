@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:tifaro/core/app_scope.dart';
 import 'package:tifaro/core/aspetto.dart';
@@ -13,7 +14,8 @@ import 'package:tifaro/features/notifiche/sezione_notifiche.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Le impostazioni: argomenti e tipologie da aggiungere, modificare e
-/// togliere, avvisi, server, calendario, esportazione.
+/// togliere, avvisi, server, calendario, esportazione e, in fondo, la
+/// versione dell'app.
 class ImpostazioniPage extends StatelessWidget {
   const ImpostazioniPage({super.key});
 
@@ -133,6 +135,11 @@ class ImpostazioniPage extends StatelessWidget {
           const SezioneSync(),
           const SezioneCalendario(),
           const SezioneDati(),
+          const IntestazioneGruppo(
+            titolo: 'Informazioni',
+            icona: Icons.info_outline,
+          ),
+          const _Versione(),
         ],
       ),
     );
@@ -277,5 +284,48 @@ class ImpostazioniPage extends StatelessWidget {
         () => db.categorieDao.cancellaTipologia(tipologia.id),
       );
     }
+  }
+}
+
+/// La riga con la versione installata (DECISIONI.md, voce 037).
+///
+/// La versione si legge da quello che è stato compilato (`version` di
+/// `pubspec.yaml`), così non c'è un numero in più da cambiare a ogni
+/// rilascio.
+class _Versione extends StatefulWidget {
+  const _Versione();
+
+  @override
+  State<_Versione> createState() => _VersioneState();
+}
+
+class _VersioneState extends State<_Versione> {
+  /// La lettura si fa una volta sola: la pagina si ricostruisce a ogni
+  /// cambiamento dei dati, e la versione non cambia mentre l'app è aperta.
+  late final Future<PackageInfo> _info = PackageInfo.fromPlatform();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: _info,
+      builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+        final String versione = snapshot.data?.version ?? '';
+        final String testo;
+        if (versione.isNotEmpty) {
+          testo = versione;
+        } else if (snapshot.connectionState == ConnectionState.done) {
+          // Lettura finita senza numero (o con un errore): meglio dirlo
+          // che lasciare la riga vuota.
+          testo = 'Non disponibile';
+        } else {
+          testo = '…';
+        }
+        return ListTile(
+          leading: const Icon(Icons.tag),
+          title: const Text('Versione'),
+          subtitle: Text(testo),
+        );
+      },
+    );
   }
 }

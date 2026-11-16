@@ -995,3 +995,26 @@ aggiornamento che arriva mentre l'app è aperta); un controllo dentro l'app
 pacman vero con il database (va ospitato e ricostruito a ogni release);
 aggiornare il PKGBUILD dal flusso Rilascio con un commit fatto da GitHub (il
 repository sul PC e Gitea resterebbero indietro).
+
+---
+
+## 037 — Versione nelle impostazioni
+
+**Data:** 2026-11-16
+
+**Contesto:** telefono e PC vanno tenuti alla stessa versione (voce 036),
+ma dall'app non si vedeva quale fosse installata.
+
+**Decisione:** in fondo alle impostazioni, nel gruppo «Informazioni», la
+riga «Versione» con il numero letto da `package_info_plus`: su Android è il
+`versionName` dell'APK, su Linux il `version.json` che Flutter mette nel
+pacchetto. Tutti e due vengono da `version` in `pubspec.yaml`. Se la
+lettura non dà niente, la riga dice «Non disponibile».
+
+**Motivazione:** il numero è quello compilato davvero, e a ogni rilascio
+non c'è un posto in più da aggiornare.
+
+**Alternative scartate:** una costante nel codice (un terzo numero da
+cambiare a ogni rilascio, oltre a `pubspec.yaml` e `server/main.go`, e
+facile da dimenticare); passarla con `--dart-define` dal flusso Rilascio
+(le build fatte a mano resterebbero senza).

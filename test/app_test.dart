@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:tifaro/core/database/app_database.dart';
 
@@ -189,6 +190,31 @@ void main() {
       await chiudiApp(tester);
     },
   );
+
+  testWidgets('in fondo alle impostazioni c\'è la versione', (
+    WidgetTester tester,
+  ) async {
+    // Nelle prove non c'è la piattaforma: la versione si finge.
+    PackageInfo.setMockInitialValues(
+      appName: 'TiFaro',
+      packageName: 'tifaro',
+      version: '9.8.7',
+      buildNumber: '42',
+      buildSignature: '',
+    );
+    schermoAlto(tester);
+    final AppDatabase db = databaseInMemoria();
+    await avviaApp(tester, db);
+
+    tester.firstState<ScaffoldState>(find.byType(Scaffold)).openDrawer();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Impostazioni'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('9.8.7'), 200);
+    expect(find.text('Versione'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
 
   testWidgets('le variabili del modello si chiedono nella cattura veloce', (
     WidgetTester tester,
