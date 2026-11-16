@@ -216,7 +216,7 @@ class _AppShellState extends State<AppShell> {
               ListTile(
                 leading: const Icon(Icons.settings_outlined),
                 title: const Text('Impostazioni'),
-                subtitle: const Text('Argomenti, tipologie e server'),
+                subtitle: const Text('Argomenti, tipologie, server e altro'),
                 onTap: () {
                   Navigator.pop(context);
                   _apri(const ImpostazioniPage());

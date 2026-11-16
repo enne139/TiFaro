@@ -134,7 +134,7 @@ List<AvvisoVoluto> avvisiVoluti(
     if (!quando.isAfter(adesso) || quando.isAfter(limite)) {
       continue;
     }
-    // Dalla più vecchia, come in Oggi.
+    // Dalla più vecchia: chi aspetta da più tempo viene prima.
     final List<Attivita> elenco = g.value..sort(IndiceAttivita.perCreazione);
     avvisi.add(
       elenco.length == 1
