@@ -6,6 +6,7 @@ import 'package:tifaro/core/app_scope.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/features/attivita/logica/indice_attivita.dart';
+import 'package:tifaro/features/quaderno/data/chiavi_quaderno.dart';
 import 'package:tifaro/features/modelli/logica/albero_voci.dart';
 
 /// Tutto quello che serve alle schermate, letto una volta per tutta l'app.
@@ -20,6 +21,7 @@ class DatiApp {
     required List<Foto> foto,
     required this.modelli,
     required List<VoceModello> voci,
+    this.quadernoAttivo = true,
   }) : indice = IndiceAttivita(attivita),
        voci = AlberoVoci(voci),
        modelliPerId = <String, Modello>{
@@ -59,6 +61,11 @@ class DatiApp {
 
   /// Le voci dei modelli, ad albero.
   final AlberoVoci voci;
+
+  /// Se su questo dispositivo si vede il Quaderno: è una preferenza, ma
+  /// cambia le sezioni dell'app, quindi va letta qui come il resto
+  /// (DECISIONI.md, voce 038).
+  final bool quadernoAttivo;
 
   static Map<String, List<Foto>> _perAttivita(List<Foto> foto) {
     final Map<String, List<Foto>> mappa = <String, List<Foto>>{};
@@ -120,6 +127,7 @@ class _FonteDatiState extends State<FonteDati> {
   List<Foto>? _foto;
   List<Modello>? _modelli;
   List<VoceModello>? _voci;
+  bool? _quaderno;
   Object? _errore;
   DatiApp? _dati;
 
@@ -157,6 +165,12 @@ class _FonteDatiState extends State<FonteDati> {
         (List<VoceModello> v) => _aggiorna(() => _voci = v),
         onError: _guasto,
       ),
+      db.syncDao
+          .osservaPreferenza(ChiaviQuaderno.attivo)
+          .listen(
+            (String? v) => _aggiorna(() => _quaderno = v != 'no'),
+            onError: _guasto,
+          ),
     ]);
   }
 
@@ -169,12 +183,14 @@ class _FonteDatiState extends State<FonteDati> {
       final List<Foto>? foto = _foto;
       final List<Modello>? modelli = _modelli;
       final List<VoceModello>? voci = _voci;
+      final bool? quaderno = _quaderno;
       if (attivita != null &&
           argomenti != null &&
           tipologie != null &&
           foto != null &&
           modelli != null &&
-          voci != null) {
+          voci != null &&
+          quaderno != null) {
         _dati = DatiApp(
           attivita: attivita,
           argomenti: argomenti,
@@ -182,6 +198,7 @@ class _FonteDatiState extends State<FonteDati> {
           foto: foto,
           modelli: modelli,
           voci: voci,
+          quadernoAttivo: quaderno,
         );
       }
     });

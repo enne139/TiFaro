@@ -2513,6 +2513,32 @@ class $ElencoAttivitaTable extends ElencoAttivita
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _giornoQuadernoMeta = const VerificationMeta(
+    'giornoQuaderno',
+  );
+  @override
+  late final GeneratedColumn<DateTime> giornoQuaderno =
+      GeneratedColumn<DateTime>(
+        'giorno_quaderno',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _quadernoVeloceMeta = const VerificationMeta(
+    'quadernoVeloce',
+  );
+  @override
+  late final GeneratedColumn<bool> quadernoVeloce = GeneratedColumn<bool>(
+    'quaderno_veloce',
+    aliasedName,
+    true,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("quaderno_veloce" IN (0, 1))',
+    ),
+  );
   static const VerificationMeta _aggiornataIlMeta = const VerificationMeta(
     'aggiornataIl',
   );
@@ -2551,6 +2577,8 @@ class $ElencoAttivitaTable extends ElencoAttivita
     modelloId,
     nelCalendario,
     ricorrenza,
+    giornoQuaderno,
+    quadernoVeloce,
     aggiornataIl,
     cancellataIl,
   ];
@@ -2670,6 +2698,24 @@ class $ElencoAttivitaTable extends ElencoAttivita
         ricorrenza.isAcceptableOrUnknown(data['ricorrenza']!, _ricorrenzaMeta),
       );
     }
+    if (data.containsKey('giorno_quaderno')) {
+      context.handle(
+        _giornoQuadernoMeta,
+        giornoQuaderno.isAcceptableOrUnknown(
+          data['giorno_quaderno']!,
+          _giornoQuadernoMeta,
+        ),
+      );
+    }
+    if (data.containsKey('quaderno_veloce')) {
+      context.handle(
+        _quadernoVeloceMeta,
+        quadernoVeloce.isAcceptableOrUnknown(
+          data['quaderno_veloce']!,
+          _quadernoVeloceMeta,
+        ),
+      );
+    }
     if (data.containsKey('aggiornata_il')) {
       context.handle(
         _aggiornataIlMeta,
@@ -2755,6 +2801,14 @@ class $ElencoAttivitaTable extends ElencoAttivita
         DriftSqlType.string,
         data['${effectivePrefix}ricorrenza'],
       ),
+      giornoQuaderno: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}giorno_quaderno'],
+      ),
+      quadernoVeloce: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}quaderno_veloce'],
+      ),
       aggiornataIl: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}aggiornata_il'],
@@ -2822,6 +2876,16 @@ class Attivita extends DataClass implements Insertable<Attivita> {
   /// porta via la ricorrenza (voce 032).
   final String? ricorrenza;
 
+  /// Il giorno del Quaderno in cui è stata messa, a mezzanotte; nullo se
+  /// non è nel Quaderno. Un'attività sta in una pagina sola alla volta:
+  /// rimetterla in un altro giorno la sposta (voce 038).
+  final DateTime? giornoQuaderno;
+
+  /// Se nella pagina del Quaderno sta fra le cose veloci invece che fra le
+  /// tre del giorno. Vale `true` o nullo, mai `false`: così chi non usa il
+  /// Quaderno non ha campi in più nella sincronizzazione (voce 038).
+  final bool? quadernoVeloce;
+
   /// Ultima modifica: servirà alla sincronizzazione (voce 003).
   final DateTime aggiornataIl;
 
@@ -2844,6 +2908,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     this.modelloId,
     required this.nelCalendario,
     this.ricorrenza,
+    this.giornoQuaderno,
+    this.quadernoVeloce,
     required this.aggiornataIl,
     this.cancellataIl,
   });
@@ -2875,6 +2941,12 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     map['nel_calendario'] = Variable<bool>(nelCalendario);
     if (!nullToAbsent || ricorrenza != null) {
       map['ricorrenza'] = Variable<String>(ricorrenza);
+    }
+    if (!nullToAbsent || giornoQuaderno != null) {
+      map['giorno_quaderno'] = Variable<DateTime>(giornoQuaderno);
+    }
+    if (!nullToAbsent || quadernoVeloce != null) {
+      map['quaderno_veloce'] = Variable<bool>(quadernoVeloce);
     }
     map['aggiornata_il'] = Variable<DateTime>(aggiornataIl);
     if (!nullToAbsent || cancellataIl != null) {
@@ -2911,6 +2983,12 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       ricorrenza: ricorrenza == null && nullToAbsent
           ? const Value.absent()
           : Value(ricorrenza),
+      giornoQuaderno: giornoQuaderno == null && nullToAbsent
+          ? const Value.absent()
+          : Value(giornoQuaderno),
+      quadernoVeloce: quadernoVeloce == null && nullToAbsent
+          ? const Value.absent()
+          : Value(quadernoVeloce),
       aggiornataIl: Value(aggiornataIl),
       cancellataIl: cancellataIl == null && nullToAbsent
           ? const Value.absent()
@@ -2938,6 +3016,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       modelloId: serializer.fromJson<String?>(json['modelloId']),
       nelCalendario: serializer.fromJson<bool>(json['nelCalendario']),
       ricorrenza: serializer.fromJson<String?>(json['ricorrenza']),
+      giornoQuaderno: serializer.fromJson<DateTime?>(json['giornoQuaderno']),
+      quadernoVeloce: serializer.fromJson<bool?>(json['quadernoVeloce']),
       aggiornataIl: serializer.fromJson<DateTime>(json['aggiornataIl']),
       cancellataIl: serializer.fromJson<DateTime?>(json['cancellataIl']),
     );
@@ -2960,6 +3040,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       'modelloId': serializer.toJson<String?>(modelloId),
       'nelCalendario': serializer.toJson<bool>(nelCalendario),
       'ricorrenza': serializer.toJson<String?>(ricorrenza),
+      'giornoQuaderno': serializer.toJson<DateTime?>(giornoQuaderno),
+      'quadernoVeloce': serializer.toJson<bool?>(quadernoVeloce),
       'aggiornataIl': serializer.toJson<DateTime>(aggiornataIl),
       'cancellataIl': serializer.toJson<DateTime?>(cancellataIl),
     };
@@ -2980,6 +3062,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     Value<String?> modelloId = const Value.absent(),
     bool? nelCalendario,
     Value<String?> ricorrenza = const Value.absent(),
+    Value<DateTime?> giornoQuaderno = const Value.absent(),
+    Value<bool?> quadernoVeloce = const Value.absent(),
     DateTime? aggiornataIl,
     Value<DateTime?> cancellataIl = const Value.absent(),
   }) => Attivita(
@@ -2997,6 +3081,12 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     modelloId: modelloId.present ? modelloId.value : this.modelloId,
     nelCalendario: nelCalendario ?? this.nelCalendario,
     ricorrenza: ricorrenza.present ? ricorrenza.value : this.ricorrenza,
+    giornoQuaderno: giornoQuaderno.present
+        ? giornoQuaderno.value
+        : this.giornoQuaderno,
+    quadernoVeloce: quadernoVeloce.present
+        ? quadernoVeloce.value
+        : this.quadernoVeloce,
     aggiornataIl: aggiornataIl ?? this.aggiornataIl,
     cancellataIl: cancellataIl.present ? cancellataIl.value : this.cancellataIl,
   );
@@ -3030,6 +3120,12 @@ class Attivita extends DataClass implements Insertable<Attivita> {
       ricorrenza: data.ricorrenza.present
           ? data.ricorrenza.value
           : this.ricorrenza,
+      giornoQuaderno: data.giornoQuaderno.present
+          ? data.giornoQuaderno.value
+          : this.giornoQuaderno,
+      quadernoVeloce: data.quadernoVeloce.present
+          ? data.quadernoVeloce.value
+          : this.quadernoVeloce,
       aggiornataIl: data.aggiornataIl.present
           ? data.aggiornataIl.value
           : this.aggiornataIl,
@@ -3056,6 +3152,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
           ..write('ricorrenza: $ricorrenza, ')
+          ..write('giornoQuaderno: $giornoQuaderno, ')
+          ..write('quadernoVeloce: $quadernoVeloce, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl')
           ..write(')'))
@@ -3078,6 +3176,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
     modelloId,
     nelCalendario,
     ricorrenza,
+    giornoQuaderno,
+    quadernoVeloce,
     aggiornataIl,
     cancellataIl,
   );
@@ -3099,6 +3199,8 @@ class Attivita extends DataClass implements Insertable<Attivita> {
           other.modelloId == this.modelloId &&
           other.nelCalendario == this.nelCalendario &&
           other.ricorrenza == this.ricorrenza &&
+          other.giornoQuaderno == this.giornoQuaderno &&
+          other.quadernoVeloce == this.quadernoVeloce &&
           other.aggiornataIl == this.aggiornataIl &&
           other.cancellataIl == this.cancellataIl);
 }
@@ -3118,6 +3220,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
   final Value<String?> modelloId;
   final Value<bool> nelCalendario;
   final Value<String?> ricorrenza;
+  final Value<DateTime?> giornoQuaderno;
+  final Value<bool?> quadernoVeloce;
   final Value<DateTime> aggiornataIl;
   final Value<DateTime?> cancellataIl;
   final Value<int> rowid;
@@ -3136,6 +3240,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
     this.ricorrenza = const Value.absent(),
+    this.giornoQuaderno = const Value.absent(),
+    this.quadernoVeloce = const Value.absent(),
     this.aggiornataIl = const Value.absent(),
     this.cancellataIl = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3155,6 +3261,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     this.modelloId = const Value.absent(),
     this.nelCalendario = const Value.absent(),
     this.ricorrenza = const Value.absent(),
+    this.giornoQuaderno = const Value.absent(),
+    this.quadernoVeloce = const Value.absent(),
     required DateTime aggiornataIl,
     this.cancellataIl = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -3178,6 +3286,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Expression<String>? modelloId,
     Expression<bool>? nelCalendario,
     Expression<String>? ricorrenza,
+    Expression<DateTime>? giornoQuaderno,
+    Expression<bool>? quadernoVeloce,
     Expression<DateTime>? aggiornataIl,
     Expression<DateTime>? cancellataIl,
     Expression<int>? rowid,
@@ -3197,6 +3307,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       if (modelloId != null) 'modello_id': modelloId,
       if (nelCalendario != null) 'nel_calendario': nelCalendario,
       if (ricorrenza != null) 'ricorrenza': ricorrenza,
+      if (giornoQuaderno != null) 'giorno_quaderno': giornoQuaderno,
+      if (quadernoVeloce != null) 'quaderno_veloce': quadernoVeloce,
       if (aggiornataIl != null) 'aggiornata_il': aggiornataIl,
       if (cancellataIl != null) 'cancellata_il': cancellataIl,
       if (rowid != null) 'rowid': rowid,
@@ -3218,6 +3330,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     Value<String?>? modelloId,
     Value<bool>? nelCalendario,
     Value<String?>? ricorrenza,
+    Value<DateTime?>? giornoQuaderno,
+    Value<bool?>? quadernoVeloce,
     Value<DateTime>? aggiornataIl,
     Value<DateTime?>? cancellataIl,
     Value<int>? rowid,
@@ -3237,6 +3351,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
       modelloId: modelloId ?? this.modelloId,
       nelCalendario: nelCalendario ?? this.nelCalendario,
       ricorrenza: ricorrenza ?? this.ricorrenza,
+      giornoQuaderno: giornoQuaderno ?? this.giornoQuaderno,
+      quadernoVeloce: quadernoVeloce ?? this.quadernoVeloce,
       aggiornataIl: aggiornataIl ?? this.aggiornataIl,
       cancellataIl: cancellataIl ?? this.cancellataIl,
       rowid: rowid ?? this.rowid,
@@ -3288,6 +3404,12 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
     if (ricorrenza.present) {
       map['ricorrenza'] = Variable<String>(ricorrenza.value);
     }
+    if (giornoQuaderno.present) {
+      map['giorno_quaderno'] = Variable<DateTime>(giornoQuaderno.value);
+    }
+    if (quadernoVeloce.present) {
+      map['quaderno_veloce'] = Variable<bool>(quadernoVeloce.value);
+    }
     if (aggiornataIl.present) {
       map['aggiornata_il'] = Variable<DateTime>(aggiornataIl.value);
     }
@@ -3317,6 +3439,8 @@ class ElencoAttivitaCompanion extends UpdateCompanion<Attivita> {
           ..write('modelloId: $modelloId, ')
           ..write('nelCalendario: $nelCalendario, ')
           ..write('ricorrenza: $ricorrenza, ')
+          ..write('giornoQuaderno: $giornoQuaderno, ')
+          ..write('quadernoVeloce: $quadernoVeloce, ')
           ..write('aggiornataIl: $aggiornataIl, ')
           ..write('cancellataIl: $cancellataIl, ')
           ..write('rowid: $rowid')
@@ -6912,6 +7036,8 @@ typedef $$ElencoAttivitaTableCreateCompanionBuilder =
       Value<String?> modelloId,
       Value<bool> nelCalendario,
       Value<String?> ricorrenza,
+      Value<DateTime?> giornoQuaderno,
+      Value<bool?> quadernoVeloce,
       required DateTime aggiornataIl,
       Value<DateTime?> cancellataIl,
       Value<int> rowid,
@@ -6932,6 +7058,8 @@ typedef $$ElencoAttivitaTableUpdateCompanionBuilder =
       Value<String?> modelloId,
       Value<bool> nelCalendario,
       Value<String?> ricorrenza,
+      Value<DateTime?> giornoQuaderno,
+      Value<bool?> quadernoVeloce,
       Value<DateTime> aggiornataIl,
       Value<DateTime?> cancellataIl,
       Value<int> rowid,
@@ -7089,6 +7217,16 @@ class $$ElencoAttivitaTableFilterComposer
 
   ColumnFilters<String> get ricorrenza => $composableBuilder(
     column: $table.ricorrenza,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get giornoQuaderno => $composableBuilder(
+    column: $table.giornoQuaderno,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get quadernoVeloce => $composableBuilder(
+    column: $table.quadernoVeloce,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7279,6 +7417,16 @@ class $$ElencoAttivitaTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get giornoQuaderno => $composableBuilder(
+    column: $table.giornoQuaderno,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get quadernoVeloce => $composableBuilder(
+    column: $table.quadernoVeloce,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get aggiornataIl => $composableBuilder(
     column: $table.aggiornataIl,
     builder: (column) => ColumnOrderings(column),
@@ -7426,6 +7574,16 @@ class $$ElencoAttivitaTableAnnotationComposer
 
   GeneratedColumn<String> get ricorrenza => $composableBuilder(
     column: $table.ricorrenza,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get giornoQuaderno => $composableBuilder(
+    column: $table.giornoQuaderno,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get quadernoVeloce => $composableBuilder(
+    column: $table.quadernoVeloce,
     builder: (column) => column,
   );
 
@@ -7607,6 +7765,8 @@ class $$ElencoAttivitaTableTableManager
                 Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
                 Value<String?> ricorrenza = const Value.absent(),
+                Value<DateTime?> giornoQuaderno = const Value.absent(),
+                Value<bool?> quadernoVeloce = const Value.absent(),
                 Value<DateTime> aggiornataIl = const Value.absent(),
                 Value<DateTime?> cancellataIl = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -7625,6 +7785,8 @@ class $$ElencoAttivitaTableTableManager
                 modelloId: modelloId,
                 nelCalendario: nelCalendario,
                 ricorrenza: ricorrenza,
+                giornoQuaderno: giornoQuaderno,
+                quadernoVeloce: quadernoVeloce,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
                 rowid: rowid,
@@ -7645,6 +7807,8 @@ class $$ElencoAttivitaTableTableManager
                 Value<String?> modelloId = const Value.absent(),
                 Value<bool> nelCalendario = const Value.absent(),
                 Value<String?> ricorrenza = const Value.absent(),
+                Value<DateTime?> giornoQuaderno = const Value.absent(),
+                Value<bool?> quadernoVeloce = const Value.absent(),
                 required DateTime aggiornataIl,
                 Value<DateTime?> cancellataIl = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -7663,6 +7827,8 @@ class $$ElencoAttivitaTableTableManager
                 modelloId: modelloId,
                 nelCalendario: nelCalendario,
                 ricorrenza: ricorrenza,
+                giornoQuaderno: giornoQuaderno,
+                quadernoVeloce: quadernoVeloce,
                 aggiornataIl: aggiornataIl,
                 cancellataIl: cancellataIl,
                 rowid: rowid,

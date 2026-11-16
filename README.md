@@ -29,11 +29,21 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   sotto-attività da fare e le scadenze spostate; se la si fa in ritardo, la
   prossima è la prima ancora da venire. Si sceglie dal dettaglio («Ripeti»),
   dal menu della cattura o scrivendo `ogni …`.
+- **Quaderno:** una pagina al giorno, come su un quaderno di carta: al
+  massimo 3 cose da fare scelte fra le attività (di una cosa lunga si vede
+  sotto il prossimo passo), le cose veloci scritte al volo e, in fondo,
+  «Ho fatto anche» con quello che si è fatto in più. Si prepara anche la
+  pagina di domani. Le cose non fatte non passano da sole al giorno dopo:
+  compaiono in «Da riscegliere», per rimetterle in oggi o toglierle. Anche
+  dal dettaglio di un'attività, con l'etichetta «Quaderno», si vede in quale
+  pagina è e la si mette o la si toglie. Pensato per chi si distrae
+  facilmente; si spegne dalle impostazioni.
 - **Schermate:** Oggi (scadute, oggi, prossimi 7 giorni e, in fondo, le
-  attività senza scadenza in ordine di creazione), Argomenti (albero
-  da aprire, per un argomento o per tutti insieme con «Tutte»), Tipologie,
-  Modelli, Fatte, Cestino (con ripristino), Ricerca, Impostazioni
-  (argomenti, tipologie, avvisi, server, calendario, dati).
+  attività senza scadenza in ordine di creazione), Quaderno, Argomenti
+  (albero da aprire, per un argomento o per tutti insieme con «Tutte»),
+  Tipologie, Modelli, Fatte, Cestino (con ripristino), Ricerca,
+  Impostazioni (argomenti, tipologie, Quaderno, avvisi, server, calendario,
+  dati).
 - **Cattura veloce**, senza AI: una riga come
 
   ```text
@@ -107,7 +117,7 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
    importazione — **fatta**
 
 In più: descrizione in Markdown, attività che si ripetono, scorciatoie
-dell'icona.
+dell'icona, Quaderno.
 
 Le scelte, con il perché, in [DECISIONI.md](DECISIONI.md).
 

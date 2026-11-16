@@ -65,6 +65,16 @@ class ElencoAttivita extends Table {
   /// porta via la ricorrenza (voce 032).
   TextColumn get ricorrenza => text().nullable()();
 
+  /// Il giorno del Quaderno in cui è stata messa, a mezzanotte; nullo se
+  /// non è nel Quaderno. Un'attività sta in una pagina sola alla volta:
+  /// rimetterla in un altro giorno la sposta (voce 038).
+  DateTimeColumn get giornoQuaderno => dateTime().nullable()();
+
+  /// Se nella pagina del Quaderno sta fra le cose veloci invece che fra le
+  /// tre del giorno. Vale `true` o nullo, mai `false`: così chi non usa il
+  /// Quaderno non ha campi in più nella sincronizzazione (voce 038).
+  BoolColumn get quadernoVeloce => boolean().nullable()();
+
   /// Ultima modifica: servirà alla sincronizzazione (voce 003).
   DateTimeColumn get aggiornataIl => dateTime()();
 

@@ -25,6 +25,7 @@ import 'package:tifaro/features/cattura/composizione.dart';
 import 'package:tifaro/features/cattura/scelta_foto.dart';
 import 'package:tifaro/features/cattura/sintassi.dart';
 import 'package:tifaro/features/modelli/modelli_page.dart';
+import 'package:tifaro/features/quaderno/azioni_quaderno.dart';
 
 /// Le voci del menu in alto nel dettaglio.
 enum _Azione { sottoCompleta, sottoDaModello, salvaModello, su, giu, cestino }
@@ -426,7 +427,7 @@ class _DettaglioPageState extends State<DettaglioPage> {
     }
   }
 
-  // --- Etichette: argomento, tipologia, scadenza, calendario ---------------
+  // --- Etichette: argomento, tipologia, scadenza, calendario, Quaderno -----
 
   List<Widget> _etichette(Attivita attivita, DatiApp dati, ThemeData tema) {
     final Argomento? argomento = dati.argomentiPerId[attivita.argomentoId];
@@ -524,7 +525,32 @@ class _DettaglioPageState extends State<DettaglioPage> {
         onSelected: (bool v) =>
             _aggiorna(ElencoAttivitaCompanion(nelCalendario: Value<bool>(v))),
       ),
+      // In quale pagina del Quaderno è, e da qui la si mette o la si toglie
+      // (voce 038). Con il Quaderno spento non c'è.
+      if (dati.quadernoAttivo)
+        InputChip(
+          avatar: const Icon(Icons.menu_book_outlined),
+          label: Text(_etichettaQuaderno(attivita)),
+          onPressed: () => scegliQuaderno(context, attivita),
+          deleteButtonTooltipMessage: 'Togli dal Quaderno',
+          onDeleted: attivita.giornoQuaderno == null
+              ? null
+              : () => togliDalQuaderno(context, attivita.id),
+        ),
     ];
+  }
+
+  /// Cosa dice l'etichetta del Quaderno: «Quaderno» se non c'è, altrimenti
+  /// il giorno della pagina, come «Quaderno: domani (veloce)».
+  String _etichettaQuaderno(Attivita attivita) {
+    final DateTime? pagina = attivita.giornoQuaderno;
+    if (pagina == null) {
+      return 'Quaderno';
+    }
+    final String quando = formatoScadenza(pagina, false, DateTime.now());
+    return attivita.quadernoVeloce == true
+        ? 'Quaderno: $quando (veloce)'
+        : 'Quaderno: $quando';
   }
 
   /// La scadenza della prossima volta se la si segnasse fatta adesso.

@@ -58,9 +58,9 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// Storia: 1 attività, argomenti, tipologie e foto; 2 modelli;
   /// 3 sincronizzazione (note e preferenze); 4 eventi del calendario;
-  /// 5 ricorrenze delle attività.
+  /// 5 ricorrenze delle attività; 6 Quaderno (giorno e cose veloci).
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -86,6 +86,10 @@ class AppDatabase extends _$AppDatabase {
         },
         from4To5: (Migrator m, Schema5 schema) async {
           await m.addColumn(schema.attivita, schema.attivita.ricorrenza);
+        },
+        from5To6: (Migrator m, Schema6 schema) async {
+          await m.addColumn(schema.attivita, schema.attivita.giornoQuaderno);
+          await m.addColumn(schema.attivita, schema.attivita.quadernoVeloce);
         },
       ),
       beforeOpen: (OpeningDetails details) async {

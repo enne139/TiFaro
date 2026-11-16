@@ -28,6 +28,33 @@ const List<String> mesiBrevi = <String>[
   'dic',
 ];
 
+/// I nomi interi dei giorni, da lunedì.
+const List<String> giorniInteri = <String>[
+  'lunedì',
+  'martedì',
+  'mercoledì',
+  'giovedì',
+  'venerdì',
+  'sabato',
+  'domenica',
+];
+
+/// I nomi interi dei mesi, da gennaio.
+const List<String> mesiInteri = <String>[
+  'gennaio',
+  'febbraio',
+  'marzo',
+  'aprile',
+  'maggio',
+  'giugno',
+  'luglio',
+  'agosto',
+  'settembre',
+  'ottobre',
+  'novembre',
+  'dicembre',
+];
+
 /// Il giorno di [data], a mezzanotte.
 DateTime giorno(DateTime data) => DateTime(data.year, data.month, data.day);
 
@@ -55,6 +82,13 @@ String formatoGiorno(DateTime data, DateTime adesso) {
   final String base =
       '${giorniBrevi[data.weekday - 1]} ${data.day} ${mesiBrevi[data.month - 1]}';
   return data.year == adesso.year ? base : '$base ${data.year}';
+}
+
+/// Un giorno per esteso, come in cima alla pagina di un quaderno:
+/// "lunedì 16 novembre".
+String formatoGiornoIntero(DateTime data) {
+  return '${giorniInteri[data.weekday - 1]} ${data.day} '
+      '${mesiInteri[data.month - 1]}';
 }
 
 /// Una scadenza come si legge in un elenco: "oggi", "domani 18:00",

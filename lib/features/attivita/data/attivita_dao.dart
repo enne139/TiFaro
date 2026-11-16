@@ -76,7 +76,9 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
   /// genitore e ignora [argomentoId]; un'attività principale senza argomento
   /// prende il predefinito. La nuova attività va in fondo alle sorelle.
   /// [modelloId] dice da quale modello nasce, se nasce da uno; [ricorrenza]
-  /// ogni quanto si ripete (voce 032).
+  /// ogni quanto si ripete (voce 032). Con [giornoQuaderno] nasce già nella
+  /// pagina di quel giorno del Quaderno, fra le veloci se [quadernoVeloce]
+  /// (voce 038).
   Future<String> crea({
     required String titolo,
     String descrizione = '',
@@ -88,6 +90,8 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
     bool nelCalendario = false,
     String? modelloId,
     Ricorrenza? ricorrenza,
+    DateTime? giornoQuaderno,
+    bool quadernoVeloce = false,
     DateTime? adesso,
   }) {
     return transaction(() async {
@@ -119,11 +123,53 @@ class AttivitaDao extends DatabaseAccessor<AppDatabase>
           nelCalendario: Value<bool>(nelCalendario),
           modelloId: Value<String?>(modelloId),
           ricorrenza: Value<String?>(ricorrenza?.codice),
+          giornoQuaderno: Value<DateTime?>(
+            giornoQuaderno == null ? null : giorno(giornoQuaderno),
+          ),
+          quadernoVeloce: Value<bool?>(
+            giornoQuaderno != null && quadernoVeloce ? true : null,
+          ),
           aggiornataIl: ora,
         ),
       );
       return id;
     });
+  }
+
+  /// Mette un'attività nella pagina del Quaderno di [pagina], fra le cose
+  /// veloci se [veloce]. Se era già in un'altra pagina, la sposta: un
+  /// giorno solo alla volta (voce 038).
+  ///
+  /// Il limite delle tre cose al giorno lo controlla chi chiama: con la
+  /// sincronizzazione una pagina può comunque trovarsene di più, e vanno
+  /// mostrate tutte.
+  Future<void> mettiNelQuaderno(
+    String id,
+    DateTime pagina, {
+    bool veloce = false,
+    DateTime? adesso,
+  }) {
+    return aggiorna(
+      id,
+      ElencoAttivitaCompanion(
+        giornoQuaderno: Value<DateTime?>(giorno(pagina)),
+        quadernoVeloce: Value<bool?>(veloce ? true : null),
+      ),
+      adesso: adesso,
+    );
+  }
+
+  /// Toglie un'attività dal Quaderno: resta fra le cose da fare, senza
+  /// giorno.
+  Future<void> togliDalQuaderno(String id, {DateTime? adesso}) {
+    return aggiorna(
+      id,
+      const ElencoAttivitaCompanion(
+        giornoQuaderno: Value<DateTime?>(null),
+        quadernoVeloce: Value<bool?>(null),
+      ),
+      adesso: adesso,
+    );
   }
 
   /// L'id dell'argomento predefinito.

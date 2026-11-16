@@ -1021,6 +1021,82 @@ facile da dimenticare); passarla con `--dart-define` dal flusso Rilascio
 
 ---
 
+## 038 — Quaderno: tre cose al giorno
+
+**Data:** 2026-11-16
+
+**Contesto:** per chi è disorganizzato, si distrae facilmente e ha momenti
+di sconforto, una lista lunga di cose da fare pesa invece di aiutare. Il
+metodo che funziona su carta è un quaderno: in cima il giorno, al massimo
+tre cose da fare, sotto lo spazio per le cose veloci, e la sera si prepara
+la pagina di domani scegliendo dal resto. Di una cosa lunga si scrive solo
+il prossimo passo. Le cose non fatte non si ricopiano in automatico: si
+riscelgono o si tolgono, senza sensi di colpa.
+
+**Decisione:** una sezione «Quaderno» nella barra, dopo Oggi, accesa
+all'inizio e da spegnere in Impostazioni → Quaderno.
+
+- **Dati:** due colonne facoltative in `attivita`: `giorno_quaderno` (il
+  giorno della pagina, a mezzanotte) e `quaderno_veloce` (`true` o nullo).
+  Un'attività sta in una pagina sola: rimetterla in un altro giorno la
+  sposta. Si sincronizzano con il resto dell'attività, così telefono e PC
+  vedono la stessa pagina. Database alla versione 6.
+- **Pagina:** «Le 3 cose», scelte fra le attività da fare (sotto-attività
+  comprese, per scegliere il passo di una cosa lunga) o create con la
+  cattura veloce; sotto ognuna, se ha sotto-attività aperte, il prossimo
+  passo (la prima aperta, scendendo nell'albero), se non è già a sua volta
+  nella pagina. Poi «Veloci», con un
+  campo per scriverle al volo con la sintassi veloce (non i modelli); la
+  freccia accanto apre la cattura veloce con il menu delle scelte già
+  aperto (argomento, tipologia, scadenza), e quello che si crea va fra le
+  veloci. In fondo «Ho fatto anche»: le attività fatte quel giorno che non erano nella
+  pagina, senza le sotto-attività di quelle della pagina. Le cose fatte
+  restano nella pagina, barrate.
+- **Oggi e domani:** due pulsanti in cima. Domani non ha «Ho fatto anche».
+- **Da riscegliere:** nella pagina di oggi, le attività lasciate nelle
+  pagine dei giorni prima e non fatte, con «Oggi» e un menu per toglierle
+  dal Quaderno o cestinarle (una veloce che non serve più, tolta e basta,
+  resterebbe fra le attività).
+- **Dal dettaglio:** un'etichetta «Quaderno» dice in quale pagina è
+  l'attività («Quaderno: domani (veloce)») e apre la scelta: oggi o
+  domani, fra le tre cose o fra le veloci, oppure toglierla. Una pagina
+  già piena non si può scegliere, e lo dice. Le azioni di mettere e
+  togliere stanno in `azioni_quaderno.dart`, uguali per il Quaderno e per
+  il dettaglio. Con il Quaderno spento l'etichetta non c'è.
+- **Limite:** tre cose principali per pagina, fatte comprese
+  (`cosePerGiorno`). Lo controlla la schermata quando si sceglie o si
+  sposta; il DAO no, perché con la sincronizzazione una pagina può
+  trovarsene di più, e vanno mostrate tutte. Le veloci non hanno limite.
+- **Ordine:** le tre cose per scadenza; le veloci come sono state scritte.
+- **Interruttore:** la preferenza `quaderno.attivo` (`no` se spento) resta
+  sul dispositivo. Si legge in `DatiApp` come il resto dei dati, perché
+  cambia le sezioni della barra; il DAO la manda solo quando cambia, così
+  le scritture della sincronizzazione sulle preferenze non ricostruiscono
+  l'app. Spento, le attività tengono il loro giorno.
+- `apriCattura` restituisce l'id dell'attività creata, che il Quaderno
+  mette nella pagina, e con `conMenu` parte con il menu aperto.
+
+**Motivazione:** riprende il metodo su carta senza un secondo elenco da
+tenere allineato: le cose del Quaderno sono attività normali, con
+scadenze, sotto-attività, foto e sincronizzazione, e compaiono anche in
+Oggi e negli Argomenti. Tre cose e non cinque: una pagina che a sera resta
+a metà scoraggia, e «Ho fatto anche» fa vedere tutto quello che si è
+fatto, non solo cosa manca. Non riportare da sole le cose rimaste evita
+che la pagina si riempia di arretrati; chiedere di riscegliere è il
+momento in cui si decide se servono ancora.
+
+**Alternative scartate:** una tabella a parte per le pagine (più
+complicata, e un'attività in due pagine non ha senso); il limite di cinque
+cose (proposto all'inizio, ma pesa di più nei giorni no); un limite
+scelto nelle impostazioni (si può aggiungere se servirà); spostare da sole
+le cose non fatte al giorno dopo (la pagina si riempie e scoraggia);
+l'ordine scelto a mano fra le tre cose (serve una colonna in più, e con
+tre cose conta poco); un interruttore sincronizzato (sul PC e sul telefono
+si può volere diversamente); il Quaderno come prima sezione al posto di
+Oggi (chi non lo usa partirebbe da una pagina vuota).
+
+---
+
 ## 039 — Gli argomenti si riordinano dalle impostazioni
 
 **Data:** 2026-11-16

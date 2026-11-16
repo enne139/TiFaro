@@ -12,11 +12,12 @@ import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/calendario/sezione_calendario.dart';
 import 'package:tifaro/features/esportazione/sezione_dati.dart';
 import 'package:tifaro/features/notifiche/sezione_notifiche.dart';
+import 'package:tifaro/features/quaderno/sezione_quaderno.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Le impostazioni: argomenti e tipologie da aggiungere, modificare e
-/// togliere, avvisi, server, calendario, esportazione e, in fondo, la
-/// versione dell'app.
+/// togliere, Quaderno, avvisi, server, calendario, esportazione e, in
+/// fondo, la versione dell'app.
 class ImpostazioniPage extends StatelessWidget {
   const ImpostazioniPage({super.key});
 
@@ -153,6 +154,7 @@ class ImpostazioniPage extends StatelessWidget {
             title: const Text('Nuova tipologia'),
             onTap: () => _nuovaTipologia(context, db),
           ),
+          const SezioneQuaderno(),
           const SezioneNotifiche(),
           const SezioneSync(),
           const SezioneCalendario(),

@@ -165,6 +165,18 @@ class SyncDao extends DatabaseAccessor<AppDatabase> with _$SyncDaoMixin {
     return riga?.valore;
   }
 
+  /// Il valore di una preferenza, o `null`, e poi ogni suo cambiamento.
+  ///
+  /// Manda un valore nuovo solo quando cambia davvero: la tabella cambia
+  /// anche per le altre preferenze (la sincronizzazione ci scrive a ogni
+  /// giro), e chi ascolta non deve ricostruirsi per niente.
+  Stream<String?> osservaPreferenza(String chiave) {
+    return (select(preferenze)..where((t) => t.chiave.equals(chiave)))
+        .watchSingleOrNull()
+        .map((Preferenza? riga) => riga?.valore)
+        .distinct();
+  }
+
   /// Imposta una preferenza; con `null` la toglie.
   Future<void> impostaPreferenza(String chiave, String? valore) async {
     if (valore == null) {

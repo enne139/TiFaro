@@ -41,6 +41,10 @@ cambia se ne aggiunge una nuova che dice quale supera.
   quali avvisi programmare è pura, in `logica/avvisi.dart` (voce 033).
 - `lib/features/esportazione/`: esportare e importare tutti i dati in uno
   zip (voce 035).
+- `lib/features/quaderno/`: il Quaderno, una pagina al giorno con al
+  massimo tre cose; cosa sta in una pagina è logica pura, in
+  `logica/pagina.dart`; mettere e togliere, con il controllo del limite,
+  in `azioni_quaderno.dart`, usato anche dal dettaglio (voce 038).
 - `lib/features/calendario/`: gli eventi nel calendario del telefono; il
   pezzo Android è in `android/app/src/main/kotlin/.../MainActivity.kt`
   (canale `tifaro/calendario`). La logica di cosa creare, aggiornare e
@@ -53,7 +57,8 @@ cambia se ne aggiunge una nuova che dice quale supera.
 ## Dati
 
 - **Una lettura sola per tutta l'app.** `FonteDati` (in `core/dati_app.dart`)
-  legge attività, argomenti, tipologie, foto, modelli e voci; le schermate prendono i dati
+  legge attività, argomenti, tipologie, foto, modelli e voci, più la
+  preferenza del Quaderno, che cambia le sezioni; le schermate prendono i dati
   con `DatiApp.of(context)` e li filtrano in Dart con le funzioni di
   `features/attivita/logica/`. Non aprire stream nelle schermate (l'unica
   eccezione è il cestino). Voce 012.

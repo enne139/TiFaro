@@ -23,8 +23,13 @@ import 'package:tifaro/features/modelli/logica/variabili.dart';
 /// [testo], [descrizione] e [foto] la precompilano, per esempio con quello
 /// che arriva dal tasto Condividi di un'altra app. Con [genitoreId] crea una
 /// sotto-attività; con [modelloId] parte con quel modello già scelto; con
-/// [conFotocamera] apre subito la fotocamera (la scorciatoia «Foto»).
-Future<void> apriCattura(
+/// [conFotocamera] apre subito la fotocamera (la scorciatoia «Foto»); con
+/// [conMenu] parte con il menu delle scelte già aperto.
+///
+/// Restituisce l'id dell'attività creata, o `null` se si è chiuso il
+/// foglio senza aggiungere: serve a chi deve fare altro con la nuova
+/// attività, come il Quaderno che la mette nella sua pagina (voce 038).
+Future<String?> apriCattura(
   BuildContext context, {
   String? genitoreId,
   String? modelloId,
@@ -32,23 +37,27 @@ Future<void> apriCattura(
   String descrizione = '',
   List<String> foto = const <String>[],
   bool conFotocamera = false,
+  bool conMenu = false,
 }) async {
   // Nessun avviso dopo l'aggiunta: l'attività compare subito nell'elenco
   // (DECISIONI.md, voce 030).
-  await showModalBottomSheet<({String id, String titolo})>(
-    context: context,
-    isScrollControlled: true,
-    useSafeArea: true,
-    showDragHandle: true,
-    builder: (BuildContext context) => CatturaSheet(
-      genitoreId: genitoreId,
-      modelloId: modelloId,
-      testo: testo,
-      descrizione: descrizione,
-      foto: foto,
-      conFotocamera: conFotocamera,
-    ),
-  );
+  final ({String id, String titolo})? creata =
+      await showModalBottomSheet<({String id, String titolo})>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        showDragHandle: true,
+        builder: (BuildContext context) => CatturaSheet(
+          genitoreId: genitoreId,
+          modelloId: modelloId,
+          testo: testo,
+          descrizione: descrizione,
+          foto: foto,
+          conFotocamera: conFotocamera,
+          conMenu: conMenu,
+        ),
+      );
+  return creata?.id;
 }
 
 /// La cattura veloce: una riga con la sintassi veloce e, aprendo la
@@ -64,6 +73,7 @@ class CatturaSheet extends StatefulWidget {
     this.descrizione = '',
     this.foto = const <String>[],
     this.conFotocamera = false,
+    this.conMenu = false,
     super.key,
   });
 
@@ -75,6 +85,10 @@ class CatturaSheet extends StatefulWidget {
 
   /// Se aprire subito la fotocamera, dove c'è.
   final bool conFotocamera;
+
+  /// Se partire con il menu delle scelte aperto: chi arriva dalla freccia
+  /// delle Veloci nel Quaderno vuole scegliere, non scrivere (voce 038).
+  final bool conMenu;
 
   @override
   State<CatturaSheet> createState() => _CatturaSheetState();
@@ -96,8 +110,8 @@ class _CatturaSheetState extends State<CatturaSheet> {
   String? _avviso;
 
   /// Se il menu delle scelte è aperto. Parte aperto se si arriva con un
-  /// modello già scelto, così si vede cosa porta.
-  late bool _menuAperto = widget.modelloId != null;
+  /// modello già scelto, così si vede cosa porta, o se lo si è chiesto.
+  late bool _menuAperto = widget.modelloId != null || widget.conMenu;
 
   // Le scelte fatte dal menu; `null` vuol dire "non scelto" e allora vale
   // quello scritto (voce 018).

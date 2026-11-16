@@ -14,6 +14,7 @@ import 'package:tifaro/features/cattura/condivisione.dart';
 import 'package:tifaro/features/cattura/scorciatoie.dart';
 import 'package:tifaro/features/modelli/modelli_page.dart';
 import 'package:tifaro/features/notifiche/pianificatore_notifiche.dart';
+import 'package:tifaro/features/quaderno/quaderno_page.dart';
 import 'package:tifaro/features/sincronizzazione/sezione_sync.dart';
 
 /// Una sezione principale dell'app.
@@ -26,17 +27,43 @@ class _Sezione {
   final Widget pagina;
 }
 
-/// Le sezioni principali, nell'ordine della barra.
-const List<_Sezione> _sezioni = <_Sezione>[
-  _Sezione('Oggi', Icons.today_outlined, Icons.today, OggiPage()),
-  _Sezione('Argomenti', Icons.folder_outlined, Icons.folder, ArgomentiPage()),
-  _Sezione('Tipologie', Icons.label_outline, Icons.label, TipologiePage()),
+/// La sezione con cui parte l'app, e dove porta un avviso toccato.
+const _Sezione _oggi = _Sezione(
+  'Oggi',
+  Icons.today_outlined,
+  Icons.today,
+  OggiPage(),
+);
+
+/// Le sezioni principali nell'ordine della barra. Il Quaderno c'è solo se
+/// è acceso nelle impostazioni (DECISIONI.md, voce 038).
+List<_Sezione> _sezioni({required bool quaderno}) => <_Sezione>[
+  _oggi,
+  if (quaderno)
+    const _Sezione(
+      'Quaderno',
+      Icons.menu_book_outlined,
+      Icons.menu_book,
+      QuadernoPage(),
+    ),
+  const _Sezione(
+    'Argomenti',
+    Icons.folder_outlined,
+    Icons.folder,
+    ArgomentiPage(),
+  ),
+  const _Sezione(
+    'Tipologie',
+    Icons.label_outline,
+    Icons.label,
+    TipologiePage(),
+  ),
 ];
 
 /// Larghezza oltre la quale la barra va di lato invece che in basso.
 const double _larghezzaComputer = 720;
 
-/// L'impalcatura dell'app: le tre sezioni principali, il menu laterale con
+/// L'impalcatura dell'app: le sezioni principali, il menu laterale con
 /// quelle secondarie e il pulsante «Nuova» per la cattura veloce.
 ///
 /// Sul telefono la barra sta in basso, sul computer di lato.
@@ -48,7 +75,9 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  int _sezione = 0;
+  /// Il titolo della sezione scelta. Si tiene il titolo e non la posizione
+  /// perché accendendo o spegnendo il Quaderno le posizioni cambiano.
+  String _sezione = _oggi.titolo;
   late final AscoltoCondivisioni _condivisioni = AscoltoCondivisioni(
     _condivisioneRicevuta,
   );
@@ -108,7 +137,7 @@ class _AppShellState extends State<AppShell> {
       if (!mounted) {
         return;
       }
-      setState(() => _sezione = 0);
+      setState(() => _sezione = _oggi.titolo);
       final String? id = apertura.attivitaId;
       if (id != null && DatiApp.leggi(context).indice[id] != null) {
         apriDettaglio(context, id);
@@ -147,11 +176,23 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     final bool computer =
         MediaQuery.sizeOf(context).width >= _larghezzaComputer;
+    final List<_Sezione> sezioni = _sezioni(
+      quaderno: DatiApp.of(context).quadernoAttivo,
+    );
+    // Una sezione spenta mentre era scelta riporta a Oggi.
+    final int scelta = sezioni
+        .indexWhere((_Sezione s) => s.titolo == _sezione)
+        .clamp(0, sezioni.length - 1);
     // IndexedStack tiene vive le sezioni: tornando su Argomenti si
-    // ritrovano l'argomento scelto e i rami aperti.
+    // ritrovano l'argomento scelto e i rami aperti. Le chiavi le tengono
+    // vive anche quando il Quaderno compare o sparisce e le posizioni
+    // cambiano.
     final Widget corpo = IndexedStack(
-      index: _sezione,
-      children: <Widget>[for (final _Sezione s in _sezioni) s.pagina],
+      index: scelta,
+      children: <Widget>[
+        for (final _Sezione s in sezioni)
+          KeyedSubtree(key: ValueKey<String>(s.titolo), child: s.pagina),
+      ],
     );
 
     // Ctrl+N apre la cattura veloce, comodo sul computer (voce 034).
@@ -160,14 +201,23 @@ class _AppShellState extends State<AppShell> {
         const SingleActivator(LogicalKeyboardKey.keyN, control: true): () =>
             apriCattura(context),
       },
-      child: Focus(autofocus: true, child: _impalcatura(computer, corpo)),
+      child: Focus(
+        autofocus: true,
+        child: _impalcatura(computer, corpo, sezioni, scelta),
+      ),
     );
   }
 
-  Widget _impalcatura(bool computer, Widget corpo) {
+  Widget _impalcatura(
+    bool computer,
+    Widget corpo,
+    List<_Sezione> sezioni,
+    int scelta,
+  ) {
+    void scegli(int i) => setState(() => _sezione = sezioni[i].titolo);
     return Scaffold(
       appBar: AppBar(
-        title: Text(_sezioni[_sezione].titolo),
+        title: Text(sezioni[scelta].titolo),
         actions: <Widget>[
           const IconaSync(),
           IconButton(
@@ -230,12 +280,11 @@ class _AppShellState extends State<AppShell> {
           ? Row(
               children: <Widget>[
                 NavigationRail(
-                  selectedIndex: _sezione,
+                  selectedIndex: scelta,
                   labelType: NavigationRailLabelType.all,
-                  onDestinationSelected: (int i) =>
-                      setState(() => _sezione = i),
+                  onDestinationSelected: scegli,
                   destinations: <NavigationRailDestination>[
-                    for (final _Sezione s in _sezioni)
+                    for (final _Sezione s in sezioni)
                       NavigationRailDestination(
                         icon: Icon(s.icona),
                         selectedIcon: Icon(s.iconaScelta),
@@ -251,10 +300,10 @@ class _AppShellState extends State<AppShell> {
       bottomNavigationBar: computer
           ? null
           : NavigationBar(
-              selectedIndex: _sezione,
-              onDestinationSelected: (int i) => setState(() => _sezione = i),
+              selectedIndex: scelta,
+              onDestinationSelected: scegli,
               destinations: <NavigationDestination>[
-                for (final _Sezione s in _sezioni)
+                for (final _Sezione s in sezioni)
                   NavigationDestination(
                     icon: Icon(s.icona),
                     selectedIcon: Icon(s.iconaScelta),
