@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/database/data_modifica.dart';
 import 'package:tifaro/core/testo.dart';
+import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/attivita/data/attivita_tables.dart';
 import 'package:tifaro/features/categorie/data/categorie_tables.dart';
 import 'package:tifaro/features/modelli/data/modelli_tables.dart';
@@ -22,7 +23,8 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
 
   // --- Argomenti -----------------------------------------------------------
 
-  /// Gli argomenti attivi, nell'ordine scelto.
+  /// Gli argomenti attivi, nell'ordine scelto nelle impostazioni (voce
+  /// 039); a parità di posizione, per nome.
   Stream<List<Argomento>> osservaArgomenti() => _selezioneArgomenti().watch();
 
   /// Gli argomenti attivi, una volta sola.
@@ -84,6 +86,41 @@ class CategorieDao extends DatabaseAccessor<AppDatabase>
     ids,
     colonna: 'aggiornato_il',
   );
+
+  /// Sposta un argomento di un posto nell'elenco (voce 039).
+  ///
+  /// Rinumera tutti gli argomenti invece di scambiare due numeri: così anche
+  /// posizioni doppie (per esempio dopo una sincronizzazione) si sistemano.
+  /// Si tocca solo chi cambia davvero, perché ogni riga toccata andrà poi
+  /// sincronizzata.
+  Future<void> spostaArgomento(String id, Direzione direzione) {
+    return transaction(() async {
+      final List<Argomento> elenco = await leggiArgomenti();
+      final int da = elenco.indexWhere((Argomento a) => a.id == id);
+      final int verso = direzione == Direzione.su ? da - 1 : da + 1;
+      if (da < 0 || verso < 0 || verso >= elenco.length) {
+        return;
+      }
+      elenco.insert(verso, elenco.removeAt(da));
+      final List<String> cambiati = <String>[
+        for (int i = 0; i < elenco.length; i++)
+          if (elenco[i].ordine != i) elenco[i].id,
+      ];
+      final DateTime quando = await _dataArgomenti(cambiati);
+      for (int i = 0; i < elenco.length; i++) {
+        if (elenco[i].ordine != i) {
+          await (update(
+            argomenti,
+          )..where((t) => t.id.equals(elenco[i].id))).write(
+            ArgomentiCompanion(
+              ordine: Value<int>(i),
+              aggiornatoIl: Value<DateTime>(quando),
+            ),
+          );
+        }
+      }
+    });
+  }
 
   /// Fa di [id] l'argomento predefinito della cattura veloce.
   Future<void> rendiPredefinito(String id) {

@@ -35,6 +35,29 @@ void main() {
     expect(await db.categorieDao.leggiTipologie(), hasLength(3));
   });
 
+  test('gli argomenti si spostano, e si tocca solo chi cambia', () async {
+    List<String> nomi(List<Argomento> elenco) =>
+        elenco.map((Argomento a) => a.nome).toList();
+    final List<Argomento> prima = await db.categorieDao.leggiArgomenti();
+    final Argomento ambulanza = prima.last;
+    final Argomento lavoro = prima.first;
+
+    await db.categorieDao.spostaArgomento(ambulanza.id, Direzione.su);
+    final List<Argomento> dopo = await db.categorieDao.leggiArgomenti();
+    expect(nomi(dopo), <String>['Lavoro', 'Ambulanza', 'Personale']);
+    // Lavoro non si è mosso: non va risincronizzato.
+    expect(dopo.first.aggiornatoIl, lavoro.aggiornatoIl);
+
+    // Il primo non sale e l'ultimo non scende.
+    await db.categorieDao.spostaArgomento(lavoro.id, Direzione.su);
+    await db.categorieDao.spostaArgomento(dopo.last.id, Direzione.giu);
+    expect(nomi(await db.categorieDao.leggiArgomenti()), <String>[
+      'Lavoro',
+      'Ambulanza',
+      'Personale',
+    ]);
+  });
+
   test('senza argomento si usa il predefinito', () async {
     final String id = await dao.crea(titolo: '  Comprare il pane  ');
     final Attivita a = await leggi(id);

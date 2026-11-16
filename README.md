@@ -14,7 +14,8 @@ calendario» diventano eventi del calendario scelto (anche Google Calendar).
   volta ne hanno altre. Chi ha sotto-attività mostra l'avanzamento (2/5);
   chiudendola, l'app chiede se chiudere anche quelle aperte.
 - **Argomenti** (Lavoro, Personale, Ambulanza…): dove sta un'attività. Le
-  sotto-attività prendono quello della principale.
+  sotto-attività prendono quello della principale. L'ordine si sceglie in
+  Impostazioni, con «Sposta su» e «Sposta giù».
 - **Tipologie** (Telefonata, Acquisto, Burocrazia…): che genere di cosa è. La
   schermata Tipologie raggruppa quelle simili da tutti gli argomenti e da
   qualunque livello, per farle tutte insieme.

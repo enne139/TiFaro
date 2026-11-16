@@ -1018,3 +1018,32 @@ non c'è un posto in più da aggiornare.
 cambiare a ogni rilascio, oltre a `pubspec.yaml` e `server/main.go`, e
 facile da dimenticare); passarla con `--dart-define` dal flusso Rilascio
 (le build fatte a mano resterebbero senza).
+
+---
+
+## 039 — Gli argomenti si riordinano dalle impostazioni
+
+**Data:** 2026-11-16
+
+**Contesto:** gli argomenti hanno una posizione (`ordine`) e il codice li
+legge «nell'ordine scelto», ma non c'era modo di sceglierlo: restavano
+nell'ordine di creazione. Quell'ordine è quello delle schede in Argomenti
+e dei menu della cattura e del dettaglio.
+
+**Decisione:** nel menu di ogni argomento, in Impostazioni, «Sposta su» e
+«Sposta giù», spente sul primo e sull'ultimo, come per le sotto-attività.
+Spostando, `spostaArgomento` rinumera tutti gli argomenti da zero e
+scrive solo quelli la cui posizione cambia davvero, con la data di
+modifica di `dataDiModifica`. A parità di posizione vale il nome.
+
+**Motivazione:** è lo stesso modo in cui si spostano le sotto-attività e
+le voci dei modelli, e rispetta «ogni gesto ha un pulsante» (voce 014).
+Rinumerare tutto sistema anche posizioni doppie arrivate con la
+sincronizzazione; toccare solo chi cambia evita di rimandare al server
+righe uguali.
+
+**Alternative scartate:** trascinare le righe (sul computer non c'è un
+pulsante, voce 014); ordine alfabetico fisso (gli argomenti più usati non
+potrebbero stare davanti); scambiare solo le due posizioni (con posizioni
+doppie lo spostamento non si vedrebbe).
+

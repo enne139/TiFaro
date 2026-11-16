@@ -339,4 +339,37 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('gli argomenti si riordinano dalle impostazioni', (
+    WidgetTester tester,
+  ) async {
+    schermoAlto(tester);
+    final AppDatabase db = databaseInMemoria();
+    await avviaApp(tester, db);
+
+    tester.firstState<ScaffoldState>(find.byType(Scaffold)).openDrawer();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Impostazioni'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: find.widgetWithText(ListTile, 'Ambulanza'),
+        matching: find.byType(PopupMenuButton<String>),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Sposta su'));
+    await tester.pumpAndSettle();
+
+    final List<Argomento>? argomenti = await tester.runAsync<List<Argomento>>(
+      () => db.categorieDao.leggiArgomenti(),
+    );
+    expect(argomenti?.map((Argomento a) => a.nome), <String>[
+      'Lavoro',
+      'Ambulanza',
+      'Personale',
+    ]);
+
+    await chiudiApp(tester);
+  });
 }

@@ -8,6 +8,7 @@ import 'package:tifaro/core/database/app_database.dart';
 import 'package:tifaro/core/errori.dart';
 import 'package:tifaro/core/widgets/dialoghi.dart';
 import 'package:tifaro/core/widgets/vuoto_view.dart';
+import 'package:tifaro/features/attivita/data/attivita_dao.dart';
 import 'package:tifaro/features/calendario/sezione_calendario.dart';
 import 'package:tifaro/features/esportazione/sezione_dati.dart';
 import 'package:tifaro/features/notifiche/sezione_notifiche.dart';
@@ -44,7 +45,7 @@ class ImpostazioniPage extends StatelessWidget {
             titolo: 'Argomenti',
             icona: Icons.folder_outlined,
           ),
-          for (final Argomento a in dati.argomenti)
+          for (final (int i, Argomento a) in dati.argomenti.indexed)
             ListTile(
               leading: CircleAvatar(
                 backgroundColor: coloreArgomento(a.colore).colore,
@@ -67,12 +68,32 @@ class ImpostazioniPage extends StatelessWidget {
                     context,
                     () => db.categorieDao.rendiPredefinito(a.id),
                   ),
+                  'su' => eseguiSegnalandoErrori(
+                    context,
+                    () => db.categorieDao.spostaArgomento(a.id, Direzione.su),
+                  ),
+                  'giu' => eseguiSegnalandoErrori(
+                    context,
+                    () => db.categorieDao.spostaArgomento(a.id, Direzione.giu),
+                  ),
                   _ => _togliArgomento(context, db, a),
                 },
+                // Spostare si fa con le voci del menu e non trascinando:
+                // ogni gesto ha un pulsante (voce 014).
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: 'modifica',
                     child: Text('Modifica'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'su',
+                    enabled: i > 0,
+                    child: const Text('Sposta su'),
+                  ),
+                  PopupMenuItem<String>(
+                    value: 'giu',
+                    enabled: i < dati.argomenti.length - 1,
+                    child: const Text('Sposta giù'),
                   ),
                   if (!a.predefinito)
                     const PopupMenuItem<String>(
@@ -95,7 +116,8 @@ class ImpostazioniPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Il predefinito è quello che prende la cattura veloce quando '
-              'non scrivi #argomento.',
+              'non scrivi #argomento. L\'ordine è quello di Argomenti e dei '
+              'menu: si cambia con «Sposta su» e «Sposta giù».',
             ),
           ),
           const IntestazioneGruppo(
