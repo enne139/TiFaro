@@ -42,10 +42,16 @@ class _ModelloPageState extends State<ModelloPage> {
   final TextEditingController _nuovaVoce = TextEditingController();
   final FocusNode _focusNuovaVoce = FocusNode();
 
+  /// Dove mostrare gli errori del salvataggio. Si tiene da parte perché il
+  /// salvataggio può partire da `dispose`, quando gli antenati non si possono
+  /// più cercare: cercandolo lì, Flutter si ferma e il testo non si salva.
+  ScaffoldMessengerState? _messenger;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _db = AppScope.db(context);
+    _messenger = ScaffoldMessenger.maybeOf(context);
   }
 
   @override
@@ -72,9 +78,7 @@ class _ModelloPageState extends State<ModelloPage> {
     // Letti subito: da `dispose` i controller spariscono appena si torna.
     final String nome = _nome?.text.trim() ?? '';
     final String? descrizione = _descrizione?.text.trim();
-    final ScaffoldMessengerState? messenger = mounted
-        ? ScaffoldMessenger.of(context)
-        : null;
+    final ScaffoldMessengerState? messenger = _messenger;
     try {
       await _db.modelliDao.modificaModello(
         widget.id,

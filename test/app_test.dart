@@ -302,4 +302,41 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('il nome del modello scritto all\'ultimo si salva uscendo', (
+    WidgetTester tester,
+  ) async {
+    final AppDatabase db = databaseInMemoria();
+    final String? id = await tester.runAsync<String>(
+      () => db.modelliDao.creaModello('Turno'),
+    );
+    await avviaApp(tester, db);
+
+    tester.firstState<ScaffoldState>(find.byType(Scaffold)).openDrawer();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Modelli'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Turno'));
+    await tester.pumpAndSettle();
+
+    // Si esce subito, prima che parta il salvataggio ritardato: il nome
+    // si salva uscendo, come nel dettaglio di un'attività.
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Turno'),
+      'Turno di notte',
+    );
+    await tester.tap(find.byTooltip('Indietro'));
+    // La pagina si chiude in 500 ms, prima dei 600 del salvataggio
+    // ritardato: è la chiusura a dover salvare.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 550));
+    expect(find.text('Nome del modello'), findsNothing);
+
+    final Modello? modello = await tester.runAsync<Modello>(
+      () => (db.select(db.modelli)..where((t) => t.id.equals(id!))).getSingle(),
+    );
+    expect(modello?.nome, 'Turno di notte');
+
+    await chiudiApp(tester);
+  });
 }
